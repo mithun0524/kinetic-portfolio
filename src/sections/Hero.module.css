@@ -12,13 +12,14 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 40vw;
-  height: 40vw;
+  width: 26vw;
+  height: 26vw;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(236, 233, 226, 0.09), transparent 65%);
+  background: radial-gradient(circle, rgba(236, 233, 226, 0.18), transparent 62%);
   transform: translate(-50%, -50%);
   pointer-events: none;
   z-index: 0;
+  will-change: transform;
 }
 
 .eyebrow {

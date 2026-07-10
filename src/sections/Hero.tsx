@@ -22,8 +22,8 @@ export function Hero({ ready }: { ready: boolean }) {
 
       // cursor-follow highlight (runs regardless of ready)
       if (blob.current && !prefersReducedMotion()) {
-        const xTo = gsap.quickTo(blob.current, 'x', { duration: 0.8, ease: 'power3' })
-        const yTo = gsap.quickTo(blob.current, 'y', { duration: 0.8, ease: 'power3' })
+        const xTo = gsap.quickTo(blob.current, 'x', { duration: 0.4, ease: 'power3' })
+        const yTo = gsap.quickTo(blob.current, 'y', { duration: 0.4, ease: 'power3' })
         const move = (e: PointerEvent) => {
           xTo(e.clientX)
           yTo(e.clientY)
