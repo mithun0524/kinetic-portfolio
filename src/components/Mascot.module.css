@@ -1,0 +1,25 @@
+.mascot {
+  position: absolute;
+  right: clamp(4rem, 12vw, 14rem);
+  top: 50%;
+  transform: translateY(-50%);
+  width: clamp(150px, 18vw, 260px);
+  z-index: 1;
+  pointer-events: auto;
+  cursor: pointer;
+  filter: drop-shadow(0 20px 50px rgba(0, 0, 0, 0.6));
+}
+
+.svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+/* keep the creature out of the way on narrow screens */
+@media (max-width: 1024px) {
+  .mascot {
+    display: none;
+  }
+}

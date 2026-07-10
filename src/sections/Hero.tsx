@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { gsap, useGSAP, prefersReducedMotion } from '../lib/gsap'
 import { useMagnetic } from '../hooks/useMagnetic'
+import { Mascot } from '../components/Mascot'
 import styles from './Hero.module.css'
 
 /**
@@ -68,6 +69,8 @@ export function Hero({ ready }: { ready: boolean }) {
   return (
     <header className={styles.hero}>
       <div ref={blob} className={styles.blob} aria-hidden />
+
+      <Mascot />
 
       <span ref={eyebrow} className={`eyebrow ${styles.eyebrow}`} style={{ opacity: 0 }}>
         Full-Stack AI Engineer
