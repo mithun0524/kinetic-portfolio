@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { ScrollTrigger } from './lib/gsap'
 import { useLenis } from './hooks/useLenis'
 import { Cursor } from './components/Cursor'
 import { Grain } from './components/Grain'
@@ -15,6 +16,14 @@ import { Contact } from './sections/Contact'
 export default function App() {
   const [ready, setReady] = useState(false)
   useLenis()
+
+  // Pins (Capabilities) insert spacers that shift every trigger below them.
+  // Recompute all trigger positions once fonts + layout have settled.
+  useEffect(() => {
+    document.fonts.ready.then(() => ScrollTrigger.refresh())
+    const t = setTimeout(() => ScrollTrigger.refresh(), 600)
+    return () => clearTimeout(t)
+  }, [ready])
 
   return (
     <>
