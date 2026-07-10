@@ -11,8 +11,8 @@
 }
 
 .line {
-  font-size: var(--step-hero);
-  line-height: 0.95;
+  font-size: clamp(2.4rem, 6vw, 5.5rem);
+  line-height: 1;
 }
 
 .lineMask {
