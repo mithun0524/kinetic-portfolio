@@ -45,7 +45,7 @@ export function Hero({ ready }: { ready: boolean }) {
       <div ref={blob} className={styles.blob} aria-hidden />
 
       <span className={`eyebrow ${styles.eyebrow}`}>
-        AI &amp; Full-Stack Developer
+        Full-Stack AI Engineer
       </span>
 
       <h1 className={`display ${styles.title}`}>
