@@ -47,13 +47,11 @@ export function Contact() {
 
       <a
         ref={btn}
-        href="https://github.com/mithun0524"
-        target="_blank"
-        rel="noreferrer"
+        href="mailto:mithun.chavan.a24@gmail.com"
         className={styles.cta}
         data-cursor="grow"
       >
-        <span>github.com/mithun0524</span>
+        <span>mithun.chavan.a24@gmail.com</span>
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
           <path d="M4 16L16 4M16 4H6M16 4v10" stroke="currentColor" strokeWidth="1.5" />
         </svg>
