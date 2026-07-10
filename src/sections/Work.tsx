@@ -27,9 +27,9 @@ function Card({ project }: { project: Project }) {
       // parallax on the inner visual
       gsap.fromTo(
         vis,
-        { yPercent: -12 },
+        { yPercent: -6 },
         {
-          yPercent: 12,
+          yPercent: 6,
           ease: 'none',
           scrollTrigger: {
             trigger: el,
