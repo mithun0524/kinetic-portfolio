@@ -11,7 +11,7 @@
 }
 
 .line {
-  font-size: clamp(2.4rem, 6vw, 5.5rem);
+  font-size: clamp(3.4rem, 8.5vw, 8.5rem);
   line-height: 1;
 }
 
