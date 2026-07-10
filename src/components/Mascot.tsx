@@ -219,26 +219,29 @@ export function Mascot() {
                 </g>
 
                 <g ref={body}>
-                  <rect x="24" y="82" width="20" height="36" rx="7" fill="var(--m)" />
-                  <rect x="156" y="82" width="20" height="36" rx="7" fill="var(--m)" />
-                  <rect ref={legL} x="64" y="146" width="20" height="32" rx="6" fill="var(--m)" />
-                  <rect ref={legR} x="116" y="146" width="20" height="32" rx="6" fill="var(--m)" />
-                  <rect x="42" y="44" width="116" height="112" rx="18" fill="var(--m)" />
+                  {/* side nubs */}
+                  <rect x="8" y="82" width="22" height="34" rx="6" fill="var(--m)" />
+                  <rect x="170" y="82" width="22" height="34" rx="6" fill="var(--m)" />
+                  {/* legs */}
+                  <rect ref={legL} x="62" y="138" width="22" height="30" rx="5" fill="var(--m)" />
+                  <rect ref={legR} x="116" y="138" width="22" height="30" rx="5" fill="var(--m)" />
+                  {/* wide body, small radius */}
+                  <rect x="28" y="52" width="144" height="90" rx="12" fill="var(--m)" />
 
                   <g ref={eyesOpen}>
-                    <ellipse cx="80" cy="96" rx="11" ry="13" fill="#20140f" />
-                    <ellipse cx="120" cy="96" rx="11" ry="13" fill="#20140f" />
+                    <ellipse cx="82" cy="97" rx="11" ry="13" fill="#20140f" />
+                    <ellipse cx="118" cy="97" rx="11" ry="13" fill="#20140f" />
                     <g ref={pupilL}>
-                      <circle cx="83" cy="93" r="3.2" fill="#fff" />
+                      <circle cx="85" cy="94" r="3.2" fill="#fff" />
                     </g>
                     <g ref={pupilR}>
-                      <circle cx="123" cy="93" r="3.2" fill="#fff" />
+                      <circle cx="121" cy="94" r="3.2" fill="#fff" />
                     </g>
                   </g>
 
                   <g ref={eyesHappy} stroke="#20140f" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" fill="none">
-                    <path d="M70 84 L90 98 L70 112" />
-                    <path d="M130 84 L110 98 L130 112" />
+                    <path d="M72 86 L92 99 L72 112" />
+                    <path d="M128 86 L108 99 L128 112" />
                   </g>
                 </g>
               </svg>
