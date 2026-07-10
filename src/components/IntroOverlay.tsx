@@ -7,12 +7,12 @@ function Column({
   refEl,
   count,
 }: {
-  refEl: React.RefObject<HTMLDivElement>
+  refEl: React.RefObject<HTMLSpanElement>
   count: number
 }) {
   return (
     <span className={styles.col}>
-      <span ref={refEl} className={styles.strip}>
+      <span ref={refEl} className={`chrome-text ${styles.strip}`}>
         {Array.from({ length: count + 1 }, (_, i) => (
           <span key={i} className={styles.digit}>
             {i % 10}
@@ -30,9 +30,9 @@ function Column({
  */
 export function IntroOverlay({ onDone }: { onDone: () => void }) {
   const root = useRef<HTMLDivElement>(null)
-  const hund = useRef<HTMLDivElement>(null)
-  const tens = useRef<HTMLDivElement>(null)
-  const units = useRef<HTMLDivElement>(null)
+  const hund = useRef<HTMLSpanElement>(null)
+  const tens = useRef<HTMLSpanElement>(null)
+  const units = useRef<HTMLSpanElement>(null)
   const [gone, setGone] = useState(false)
 
   useGSAP(() => {
@@ -82,11 +82,11 @@ export function IntroOverlay({ onDone }: { onDone: () => void }) {
     <div ref={root} className={styles.overlay}>
       <div className={styles.inner}>
         <span className={styles.label}>Loading portfolio</span>
-        <div className={`chrome-text ${styles.num}`}>
+        <div className={styles.num}>
           <Column refEl={hund} count={1} />
           <Column refEl={tens} count={10} />
           <Column refEl={units} count={100} />
-          <span className={styles.pct}>%</span>
+          <span className={`chrome-text ${styles.pct}`}>%</span>
         </div>
         <div className={styles.track}>
           <div className={styles.bar} />
