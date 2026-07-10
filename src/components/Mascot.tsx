@@ -28,6 +28,7 @@ export function Mascot() {
   const legTweens = useRef<gsap.core.Tween[]>([])
 
   const busy = useRef(false)
+  const hovering = useRef(false)
   const drag_ = useRef({ active: false, moved: false, sx: 0, sy: 0, ox: 0, oy: 0 })
 
   const face = (dir: number) => gsap.to(facer.current, { scaleX: dir, duration: 0.25, overwrite: 'auto' })
@@ -85,20 +86,17 @@ export function Mascot() {
     gsap.to(eyesHappy.current, { autoAlpha: on ? 1 : 0, duration: 0.1 })
   }
 
-  const hover = (on: boolean) => {
-    if (prefersReducedMotion() || drag_.current.active) return
-    if (on) {
-      walkTl.current?.pause()
-      // stand still: stop the legs + waddle and plant them
-      legTweens.current.forEach((t) => t.pause())
-      gsap.to([legL.current, legR.current], { y: 0, duration: 0.2, ease: 'power2.out' })
-      gsap.to(facer.current, { rotation: 0, duration: 0.2 })
-    } else if (!busy.current) {
-      walkTl.current?.resume()
-      legTweens.current.forEach((t) => t.resume())
-    }
-    if (busy.current) return
-    showHappy(on)
+  const startWalking = () => {
+    walkTl.current?.resume()
+    legTweens.current.forEach((t) => t.resume())
+  }
+  const stopWalking = () => {
+    walkTl.current?.pause()
+    legTweens.current.forEach((t) => t.pause())
+    gsap.to([legL.current, legR.current], { y: 0, duration: 0.2, ease: 'power2.out' })
+    gsap.to(facer.current, { rotation: 0, duration: 0.2 })
+  }
+  const lean = (on: boolean) =>
     gsap.to(body.current, {
       scaleX: on ? 1.06 : 1,
       scaleY: on ? 0.94 : 1,
@@ -107,20 +105,39 @@ export function Mascot() {
       duration: 0.5,
       ease: 'elastic.out(1, 0.4)',
     })
+
+  const hover = (on: boolean) => {
+    if (prefersReducedMotion() || drag_.current.active) return
+    hovering.current = on
+    if (busy.current) return
+    if (on) {
+      stopWalking()
+      showHappy(true)
+      lean(true)
+    } else {
+      startWalking()
+      showHappy(false)
+      lean(false)
+    }
   }
 
   const hop = () => {
     if (prefersReducedMotion() || busy.current) return
     busy.current = true
-    walkTl.current?.pause()
+    stopWalking()
     showHappy(true)
     gsap
       .timeline({
         onComplete: () => {
           busy.current = false
-          showHappy(false)
           gsap.set(body.current, { rotation: 0 })
-          walkTl.current?.resume()
+          // if the pointer is still on it, stay stopped & happy; else walk again
+          if (hovering.current) {
+            showHappy(true)
+          } else {
+            showHappy(false)
+            startWalking()
+          }
         },
       })
       .to(body.current, { scaleY: 0.78, scaleX: 1.18, transformOrigin: '50% 100%', duration: 0.1 })
@@ -187,14 +204,17 @@ export function Mascot() {
     face(x > 0 ? -1 : 1)
     const dur = gsap.utils.clamp(0.5, 1.8, Math.hypot(x, y) / 180)
     gsap.to(body.current, { scale: 1, duration: 0.25 })
-    // legs start walking again for the trip home
+    // legs start stepping again for the trip home
     legTweens.current.forEach((t) => t.resume())
     gsap.to(drag.current, {
       x: 0,
       y: 0,
       duration: dur,
       ease: 'power1.inOut',
-      onComplete: () => walkTl.current?.resume(),
+      onComplete: () => {
+        if (hovering.current) stopWalking()
+        else startWalking()
+      },
     })
   }
 
