@@ -35,6 +35,8 @@
   display: flex;
   align-items: baseline;
   line-height: 1;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
 }
 
 .suffix {
