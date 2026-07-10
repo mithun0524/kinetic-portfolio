@@ -5,11 +5,25 @@
   justify-content: center;
   gap: clamp(2rem, 6vh, 4rem);
   border-top: 1px solid var(--line);
+  /* min-height already fills the viewport; trim the section's bottom padding
+     so there isn't a large empty band under the footer */
+  padding-bottom: clamp(1.5rem, 4vh, 2.5rem);
 }
 
 .line {
   font-size: var(--step-hero);
   line-height: 0.95;
+}
+
+.lineMask {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+}
+
+.lineInner {
+  display: block;
+  will-change: transform;
 }
 
 .cta {
@@ -33,7 +47,7 @@
 
 .meta {
   margin-top: auto;
-  padding-top: clamp(3rem, 10vh, 6rem);
+  padding-top: clamp(2rem, 6vh, 4rem);
   display: flex;
   justify-content: space-between;
   align-items: center;
