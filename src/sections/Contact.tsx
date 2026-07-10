@@ -63,11 +63,27 @@ export function Contact() {
           <a href="https://github.com/mithun0524" target="_blank" rel="noreferrer" data-cursor="grow">
             GitHub
           </a>
-          <a href="https://mithundotdev.vercel.app" target="_blank" rel="noreferrer" data-cursor="grow">
-            mithun.dev
+          <a
+            href="https://www.linkedin.com/in/mithun-chavan-8b9198254"
+            target="_blank"
+            rel="noreferrer"
+            data-cursor="grow"
+          >
+            LinkedIn
           </a>
-          <a href="https://crayon-umber.vercel.app" target="_blank" rel="noreferrer" data-cursor="grow">
-            Crayon
+          <a href="https://x.com/Mithun_Chavan_" target="_blank" rel="noreferrer" data-cursor="grow">
+            X
+          </a>
+          <a href="https://leetcode.com/mithun0524/" target="_blank" rel="noreferrer" data-cursor="grow">
+            LeetCode
+          </a>
+          <a
+            href="https://www.codewars.com/users/mithun0524"
+            target="_blank"
+            rel="noreferrer"
+            data-cursor="grow"
+          >
+            Codewars
           </a>
         </div>
       </div>
