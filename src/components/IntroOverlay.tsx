@@ -48,10 +48,7 @@ export function IntroOverlay({ onDone }: { onDone: () => void }) {
 
     const counter = { v: 0 }
     const tl = gsap.timeline({
-      onComplete: () => {
-        setGone(true)
-        onDone()
-      },
+      onComplete: () => setGone(true),
     })
 
     tl.to(counter, {
@@ -73,6 +70,8 @@ export function IntroOverlay({ onDone }: { onDone: () => void }) {
         duration: 1,
         ease: 'power4.inOut',
         delay: 0.15,
+        // hero starts revealing as the loader slides up, not after
+        onStart: onDone,
       })
   })
 
