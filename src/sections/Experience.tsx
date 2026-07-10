@@ -36,7 +36,11 @@ export function Experience() {
       duration: 0.9,
       ease: 'power4.out',
       stagger: 0.15,
-      scrollTrigger: { trigger: `.${styles.list}`, start: 'top 80%' },
+      scrollTrigger: {
+        trigger: `.${styles.list}`,
+        start: 'top 80%',
+        toggleActions: 'play none none reverse',
+      },
     })
   }, { scope: section })
 

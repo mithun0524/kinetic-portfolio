@@ -61,7 +61,9 @@ export function useSplitReveal<T extends HTMLElement>(options: Options = {}) {
           scrollTrigger: {
             trigger: el,
             start,
-            ...(scrub ? { end: 'top 40%', scrub: 1 as const } : {}),
+            ...(scrub
+              ? { end: 'top 40%', scrub: 1 as const }
+              : { toggleActions: 'play none none reverse' }),
           },
         })
 

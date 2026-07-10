@@ -18,7 +18,11 @@ function Card({ project }: { project: Project }) {
         clipPath: 'inset(100% 0% 0% 0%)',
         duration: 1.1,
         ease: 'power4.out',
-        scrollTrigger: { trigger: el, start: 'top 85%' },
+        scrollTrigger: {
+          trigger: el,
+          start: 'top 85%',
+          toggleActions: 'play none none reverse',
+        },
       })
       // parallax on the inner visual
       gsap.fromTo(
