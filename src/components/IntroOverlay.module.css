@@ -26,17 +26,33 @@
   font-family: var(--font-display);
   font-weight: 700;
   font-size: var(--step-hero);
-  line-height: 0.9;
+  line-height: 1;
   display: flex;
-  align-items: baseline;
+  align-items: flex-end;
   font-variant-numeric: tabular-nums;
   font-feature-settings: 'tnum' 1;
 }
 
-.num > span:first-child {
+/* one visible digit slot; the strip inside slides vertically */
+.col {
+  position: relative;
   display: inline-block;
-  text-align: right;
-  min-width: 2.4ch;
+  height: 1em;
+  width: 0.62em;
+  overflow: hidden;
+}
+
+.strip {
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+}
+
+.digit {
+  height: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .pct {

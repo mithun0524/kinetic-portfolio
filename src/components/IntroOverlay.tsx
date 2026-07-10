@@ -2,13 +2,37 @@ import { useRef, useState } from 'react'
 import { gsap, useGSAP, prefersReducedMotion } from '../lib/gsap'
 import styles from './IntroOverlay.module.css'
 
+/** A vertical strip of digits for one odometer column. */
+function Column({
+  refEl,
+  count,
+}: {
+  refEl: React.RefObject<HTMLDivElement>
+  count: number
+}) {
+  return (
+    <span className={styles.col}>
+      <span ref={refEl} className={styles.strip}>
+        {Array.from({ length: count + 1 }, (_, i) => (
+          <span key={i} className={styles.digit}>
+            {i % 10}
+          </span>
+        ))}
+      </span>
+    </span>
+  )
+}
+
 /**
- * Page-load intro: counter 0 -> 100, then the panel wipes up to reveal
- * the site. Calls onDone when finished (hero waits for this to animate).
+ * Page-load intro: an odometer rolls 0 -> 100 (each digit column slides
+ * vertically), then the panel wipes up to reveal the site. onDone fires
+ * when finished so the hero can animate in.
  */
 export function IntroOverlay({ onDone }: { onDone: () => void }) {
   const root = useRef<HTMLDivElement>(null)
-  const count = useRef<HTMLSpanElement>(null)
+  const hund = useRef<HTMLDivElement>(null)
+  const tens = useRef<HTMLDivElement>(null)
+  const units = useRef<HTMLDivElement>(null)
   const [gone, setGone] = useState(false)
 
   useGSAP(() => {
@@ -16,6 +40,10 @@ export function IntroOverlay({ onDone }: { onDone: () => void }) {
       setGone(true)
       onDone()
       return
+    }
+
+    const setY = (el: HTMLElement | null, em: number) => {
+      if (el) el.style.transform = `translateY(${em}em)`
     }
 
     const counter = { v: 0 }
@@ -28,10 +56,15 @@ export function IntroOverlay({ onDone }: { onDone: () => void }) {
 
     tl.to(counter, {
       v: 100,
-      duration: 2.2,
-      ease: 'none',
+      duration: 2.4,
+      ease: 'power2.out',
       onUpdate: () => {
-        if (count.current) count.current.textContent = String(Math.round(counter.v))
+        const v = counter.v
+        // each column slides up by its running position; units spins fast,
+        // tens rolls slowly, hundreds flips once at the end.
+        setY(units.current, -v)
+        setY(tens.current, -v / 10)
+        setY(hund.current, -v / 100)
       },
     })
       .to(`.${styles.bar}`, { scaleX: 1, duration: 1.4, ease: 'power3.inOut' }, 0)
@@ -39,7 +72,7 @@ export function IntroOverlay({ onDone }: { onDone: () => void }) {
         yPercent: -100,
         duration: 1,
         ease: 'power4.inOut',
-        delay: 0.1,
+        delay: 0.15,
       })
   })
 
@@ -50,7 +83,9 @@ export function IntroOverlay({ onDone }: { onDone: () => void }) {
       <div className={styles.inner}>
         <span className={styles.label}>Loading portfolio</span>
         <div className={`chrome-text ${styles.num}`}>
-          <span ref={count}>0</span>
+          <Column refEl={hund} count={1} />
+          <Column refEl={tens} count={10} />
+          <Column refEl={units} count={100} />
           <span className={styles.pct}>%</span>
         </div>
         <div className={styles.track}>
