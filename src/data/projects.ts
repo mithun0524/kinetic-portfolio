@@ -17,7 +17,7 @@ export const projects: Project[] = [
     year: '2026',
     tags: ['TypeScript', 'Ink', 'LLM Agents'],
     blurb:
-      'Autonomous AI coding agent for the terminal & VS Code. A ReAct loop that plans, runs commands and self-heals failing builds — with a local Tree-sitter + SQLite indexer and hot-swappable models (Anthropic, OpenAI, Ollama).',
+      'An AI coding agent that lives in your terminal and VS Code. It plans the work, runs the commands, and fixes its own broken builds. It indexes your codebase locally and lets you swap between Claude, GPT and local Ollama models.',
     href: 'https://crayon-umber.vercel.app',
   },
   {
@@ -27,7 +27,7 @@ export const projects: Project[] = [
     year: '2026',
     tags: ['Next.js', 'React 19', 'WebContainers'],
     blurb:
-      'A browser-based AI code editor that ships production apps with live preview. Full Node runtime via WebContainers, Monaco editor, integrated terminal and 5+ free LLMs — zero backend.',
+      'An AI code editor that runs entirely in your browser. It spins up a real Node environment, generates whole apps with live preview, and needs no backend at all.',
     href: 'https://devforge-chi.vercel.app',
   },
   {
@@ -37,7 +37,7 @@ export const projects: Project[] = [
     year: '2026',
     tags: ['TypeScript', 'IRT', 'AI Tutoring'],
     blurb:
-      'Adaptive learning platform for maths. IRT-driven difficulty that meets each learner at their level, AI hints at the moment of confusion, and NCERT-aligned practice with streaks and progress tracking.',
+      'A maths practice app that adapts to each student. It reads how you’re doing and adjusts the difficulty, drops in hints when you get stuck, and tracks your progress across NCERT topics.',
     href: 'https://github.com/mithun0524/AdaptIQ',
   },
   {
@@ -47,7 +47,7 @@ export const projects: Project[] = [
     year: '2025',
     tags: ['Next.js', 'Voice AI', 'Firebase'],
     blurb:
-      'AI-powered interview prep with real-time voice. Simulates technical, behavioral and mixed interviews, then returns instant scored feedback and a reviewable history.',
+      'Practice interviews out loud with an AI. It runs technical and behavioral rounds by voice, scores you right after, and keeps every session so you can look back on how you did.',
     href: 'https://interprep-kappa.vercel.app',
   },
 ]
