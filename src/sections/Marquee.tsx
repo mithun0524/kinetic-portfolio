@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import { gsap, useGSAP, ScrollTrigger, prefersReducedMotion } from '../lib/gsap'
 import styles from './Marquee.module.css'
 
-const WORDS = ['GSAP', 'PARALLAX', 'KINETIC TYPE', 'SMOOTH SCROLL', 'WEBGL', 'MOTION']
+const WORDS = ['AI AGENTS', 'LLMs', 'FULL-STACK', 'DEV TOOLS', 'REACT', 'PYTHON', 'MACHINE LEARNING']
 
 /**
  * Infinite ticker whose base speed is constant but gets a velocity boost
