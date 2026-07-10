@@ -87,8 +87,16 @@ export function Mascot() {
 
   const hover = (on: boolean) => {
     if (prefersReducedMotion() || drag_.current.active) return
-    if (on) walkTl.current?.pause()
-    else if (!busy.current) walkTl.current?.resume()
+    if (on) {
+      walkTl.current?.pause()
+      // stand still: stop the legs + waddle and plant them
+      legTweens.current.forEach((t) => t.pause())
+      gsap.to([legL.current, legR.current], { y: 0, duration: 0.2, ease: 'power2.out' })
+      gsap.to(facer.current, { rotation: 0, duration: 0.2 })
+    } else if (!busy.current) {
+      walkTl.current?.resume()
+      legTweens.current.forEach((t) => t.resume())
+    }
     if (busy.current) return
     showHappy(on)
     gsap.to(body.current, {
