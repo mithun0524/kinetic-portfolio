@@ -9,18 +9,18 @@ export const stats: Stat[] = [
   { value: 30, suffix: '+', label: 'Public repositories shipped' },
   { value: 15, suffix: '+', label: 'Full-stack & AI apps built' },
   { value: 5, suffix: '+', label: 'Products live on the web' },
-  { value: 2, suffix: 'yrs', label: 'Building & shipping fast' },
+  { value: 8, suffix: '+', label: 'Languages & frameworks in play' },
 ]
 
 export const capabilities: string[] = [
+  'Agentic AI',
+  'LLM Integration',
   'React & Next.js',
   'TypeScript',
-  'GSAP Motion',
-  'AI Agents',
-  'LLM Integration',
-  'WebContainers',
+  'AWS Cloud',
+  'Master Data Management',
   'FastAPI & Python',
-  'Framer Motion',
+  'Full-Stack Systems',
+  'GSAP Motion',
   'Supabase',
-  'Computer Vision',
 ]
