@@ -18,8 +18,8 @@
   /* cool silver/chrome tint */
   background: radial-gradient(
     circle,
-    rgba(210, 216, 228, 0.28),
-    rgba(150, 158, 172, 0.1) 40%,
+    rgba(210, 216, 228, 0.14),
+    rgba(150, 158, 172, 0.05) 40%,
     transparent 62%
   );
   transform: translate(-50%, -50%);
