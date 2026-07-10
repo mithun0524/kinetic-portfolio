@@ -25,6 +25,7 @@ export function Mascot() {
   const legR = useRef<SVGRectElement>(null)
   const spark = useRef<SVGGElement>(null)
   const walkTl = useRef<gsap.core.Timeline | null>(null)
+  const legTweens = useRef<gsap.core.Tween[]>([])
 
   const busy = useRef(false)
   const drag_ = useRef({ active: false, moved: false, sx: 0, sy: 0, ox: 0, oy: 0 })
@@ -44,10 +45,12 @@ export function Mascot() {
         .add(() => face(-1))
         .to(walker.current, { x: -80, duration: 4.5, ease: 'none' })
 
-      // stepping legs + waddle
-      gsap.to(legL.current, { y: -7, duration: 0.28, repeat: -1, yoyo: true, ease: 'sine.inOut' })
-      gsap.to(legR.current, { y: -7, duration: 0.28, repeat: -1, yoyo: true, ease: 'sine.inOut' }).progress(0.5)
-      gsap.to(facer.current, { rotation: 2.5, duration: 0.28, repeat: -1, yoyo: true, ease: 'sine.inOut' })
+      // stepping legs + waddle (tracked so drag can freeze them)
+      const stepL = gsap.to(legL.current, { y: -7, duration: 0.28, repeat: -1, yoyo: true, ease: 'sine.inOut' })
+      const stepR = gsap.to(legR.current, { y: -7, duration: 0.28, repeat: -1, yoyo: true, ease: 'sine.inOut' })
+      stepR.progress(0.5)
+      const waddle = gsap.to(facer.current, { rotation: 2.5, duration: 0.28, repeat: -1, yoyo: true, ease: 'sine.inOut' })
+      legTweens.current = [stepL, stepR, waddle]
 
       // blink
       const blink = () => {
@@ -146,7 +149,10 @@ export function Mascot() {
     const dy = e.clientY - s.sy
     if (!s.moved && Math.hypot(dx, dy) > 4) {
       s.moved = true
-      // "picked up" pose
+      // "picked up" pose: freeze the legs/waddle and tuck legs in
+      legTweens.current.forEach((t) => t.pause())
+      gsap.to([legL.current, legR.current], { y: 0, duration: 0.2, ease: 'power2.out' })
+      gsap.to(facer.current, { rotation: 0, duration: 0.2 })
       showHappy(false)
       gsap.to(body.current, { scale: 1.12, duration: 0.2, ease: 'back.out(2)', transformOrigin: '50% 50%' })
     }
@@ -173,6 +179,8 @@ export function Mascot() {
     face(x > 0 ? -1 : 1)
     const dur = gsap.utils.clamp(0.5, 1.8, Math.hypot(x, y) / 180)
     gsap.to(body.current, { scale: 1, duration: 0.25 })
+    // legs start walking again for the trip home
+    legTweens.current.forEach((t) => t.resume())
     gsap.to(drag.current, {
       x: 0,
       y: 0,
