@@ -10,7 +10,6 @@ import styles from './Mascot.module.css'
  */
 export function Mascot() {
   const root = useRef<HTMLDivElement>(null)
-  const float = useRef<HTMLDivElement>(null)
   const body = useRef<SVGGElement>(null)
   const eyesOpen = useRef<SVGGElement>(null)
   const eyesHappy = useRef<SVGGElement>(null)
@@ -21,15 +20,6 @@ export function Mascot() {
     () => {
       gsap.set(eyesHappy.current, { autoAlpha: 0 })
       if (prefersReducedMotion()) return
-
-      // idle bob
-      gsap.to(float.current, {
-        y: -14,
-        duration: 2.4,
-        ease: 'sine.inOut',
-        repeat: -1,
-        yoyo: true,
-      })
 
       // blink loop
       const blink = () => {
@@ -86,7 +76,7 @@ export function Mascot() {
       onPointerEnter={() => react(true)}
       onPointerLeave={() => react(false)}
     >
-      <div ref={float}>
+      <div>
         <svg viewBox="0 0 200 200" className={styles.svg}>
           <g ref={body}>
             {/* side nubs */}
