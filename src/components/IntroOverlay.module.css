@@ -1,0 +1,52 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: var(--bg);
+  display: grid;
+  place-items: center;
+}
+
+.inner {
+  width: min(90vw, 900px);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.label {
+  font-family: var(--font-display);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  font-size: var(--step--1);
+  color: var(--text-dim);
+}
+
+.num {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--step-hero);
+  line-height: 0.9;
+  display: flex;
+  align-items: baseline;
+}
+
+.pct {
+  font-size: 0.25em;
+  margin-left: 0.3em;
+}
+
+.track {
+  width: 100%;
+  height: 2px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.bar {
+  width: 100%;
+  height: 100%;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  background: var(--chrome);
+}

@@ -1,0 +1,33 @@
+:root {
+  /* palette */
+  --bg: #0a0a0a;
+  --bg-soft: #111111;
+  --text: #ece9e2;
+  --text-dim: #8a8781;
+  --line: rgba(236, 233, 226, 0.12);
+
+  /* chrome/silver accent — applied as a clipped text gradient */
+  --chrome: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #d9d9d9 22%,
+    #8a8a8a 46%,
+    #f2f2f2 58%,
+    #6a6a6a 78%,
+    #cfcfcf 100%
+  );
+
+  /* type */
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+
+  /* fluid sizes */
+  --step--1: clamp(0.83rem, 0.78rem + 0.25vw, 0.95rem);
+  --step-0: clamp(1rem, 0.95rem + 0.3vw, 1.15rem);
+  --step-2: clamp(1.6rem, 1.3rem + 1.5vw, 2.4rem);
+  --step-4: clamp(2.6rem, 1.8rem + 4vw, 5rem);
+  --step-hero: clamp(3.4rem, 1rem + 14vw, 15rem);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --pad: clamp(1.2rem, 5vw, 6rem);
+}

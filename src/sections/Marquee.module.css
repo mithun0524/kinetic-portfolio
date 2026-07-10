@@ -1,0 +1,27 @@
+.wrap {
+  overflow: hidden;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: clamp(1rem, 3vw, 2rem) 0;
+  white-space: nowrap;
+}
+
+.track {
+  display: inline-flex;
+  will-change: transform;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  font-size: var(--step-4);
+  padding-right: clamp(1.5rem, 4vw, 3.5rem);
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.star {
+  color: var(--text-dim);
+  font-size: 0.5em;
+}

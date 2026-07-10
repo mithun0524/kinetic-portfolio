@@ -1,0 +1,18 @@
+.about {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  min-height: 80svh;
+  justify-content: center;
+}
+
+.statement {
+  max-width: 20ch;
+  font-size: var(--step-4);
+  line-height: 1.05;
+  font-weight: 500;
+}
+
+.statement .chrome-text {
+  font-style: italic;
+}

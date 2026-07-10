@@ -1,0 +1,57 @@
+.contact {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(2rem, 6vh, 4rem);
+  border-top: 1px solid var(--line);
+}
+
+.line {
+  font-size: var(--step-hero);
+  line-height: 0.95;
+}
+
+.cta {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  padding: 0.8rem 1.6rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  will-change: transform;
+  transition: background 0.3s var(--ease-out), color 0.3s var(--ease-out);
+}
+
+.cta:hover {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.meta {
+  margin-top: auto;
+  padding-top: clamp(3rem, 10vh, 6rem);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  color: var(--text-dim);
+  font-size: var(--step--1);
+}
+
+.socials {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.socials a {
+  transition: color 0.3s var(--ease-out);
+}
+
+.socials a:hover {
+  color: var(--text);
+}
