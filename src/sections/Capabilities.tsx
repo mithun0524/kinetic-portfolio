@@ -7,9 +7,24 @@ import styles from './Capabilities.module.css'
  * Capabilities: animated stat counters + a horizontally-scrolling,
  * pinned panel of capability keywords driven by vertical scroll.
  */
+// Second row keywords — the supporting toolkit under the headline skills.
+const toolkit = [
+  'OpenRouter',
+  'Ollama',
+  'Tree-sitter',
+  'SQLite',
+  'Tailwind',
+  'Firebase',
+  'WebSockets',
+  'Vite',
+  'Node.js',
+  'REST APIs',
+]
+
 export function Capabilities() {
   const section = useRef<HTMLElement>(null)
-  const panel = useRef<HTMLDivElement>(null)
+  const rowA = useRef<HTMLDivElement>(null)
+  const rowB = useRef<HTMLDivElement>(null)
 
   useGSAP(() => {
     // count-up stats
@@ -30,25 +45,30 @@ export function Capabilities() {
       })
     })
 
-    // horizontal pinned scroll (desktop, motion allowed)
-    if (prefersReducedMotion() || isMobile() || !panel.current) return
-    const el = panel.current
-    const amount = el.scrollWidth - window.innerWidth
+    // horizontal pinned scroll (desktop, motion allowed): two rows, opposite ways
+    if (prefersReducedMotion() || isMobile() || !rowA.current || !rowB.current) return
+    const a = rowA.current
+    const b = rowB.current
+    const amount = a.scrollWidth - window.innerWidth
     if (amount <= 0) return
 
-    gsap.to(el, {
-      x: -amount,
-      ease: 'none',
+    // row B is wider than the viewport and pre-shifted left so it can travel right
+    const amountB = Math.max(b.scrollWidth - window.innerWidth, amount)
+    gsap.set(b, { x: -amountB })
+
+    const tl = gsap.timeline({
       scrollTrigger: {
         trigger: section.current,
         start: 'top top',
-        end: () => `+=${amount}`,
+        end: () => `+=${amount * 1.2}`,
         scrub: 1,
         pin: true,
         anticipatePin: 1,
         invalidateOnRefresh: true,
       },
     })
+    tl.to(a, { x: -amount, ease: 'none' }, 0)
+    tl.to(b, { x: 0, ease: 'none' }, 0)
   }, { scope: section })
 
   return (
@@ -68,10 +88,20 @@ export function Capabilities() {
       </div>
 
       <div className={styles.strip}>
-        <div ref={panel} className={styles.panel}>
-          <span className="eyebrow">( Capabilities )</span>
-          {capabilities.map((c) => (
+        <span className={`eyebrow ${styles.stripLabel}`}>( Capabilities )</span>
+
+        <div ref={rowA} className={styles.panel}>
+          {capabilities.map((c, i) => (
             <span key={c} className={`display ${styles.cap}`}>
+              <sup className={styles.capNum}>{String(i + 1).padStart(2, '0')}</sup>
+              {c}
+            </span>
+          ))}
+        </div>
+
+        <div ref={rowB} className={`${styles.panel} ${styles.panelB}`}>
+          {toolkit.map((c) => (
+            <span key={c} className={styles.tool}>
               {c}
             </span>
           ))}
