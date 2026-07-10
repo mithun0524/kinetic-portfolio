@@ -29,7 +29,7 @@ export function IntroOverlay({ onDone }: { onDone: () => void }) {
     tl.to(counter, {
       v: 100,
       duration: 2,
-      ease: 'power2.inOut',
+      ease: 'steps(7)',
       onUpdate: () => {
         if (count.current) count.current.textContent = String(Math.round(counter.v))
       },
