@@ -9,6 +9,8 @@ export interface Project {
   href: string
   /** Live-site screenshot in /public/previews; falls back to a generated visual. */
   image?: string
+  /** No image + not yet deployed: card shows a "Coming Soon" label. */
+  comingSoon?: boolean
 }
 
 export const projects: Project[] = [
@@ -43,6 +45,7 @@ export const projects: Project[] = [
     blurb:
       'A maths practice app that adapts to each student. It reads how you’re doing and adjusts the difficulty, drops in hints when you get stuck, and tracks your progress across NCERT topics.',
     href: 'https://github.com/mithun0524/AdaptIQ',
+    comingSoon: true,
   },
   {
     index: '04',

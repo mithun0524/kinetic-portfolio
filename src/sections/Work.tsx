@@ -82,6 +82,8 @@ function Card({ project }: { project: Project }) {
                 className={styles.img}
                 loading="lazy"
               />
+            ) : project.comingSoon ? (
+              <span className={styles.comingSoon}>Coming Soon</span>
             ) : (
               <span className={styles.bigIndex}>{project.index}</span>
             )}

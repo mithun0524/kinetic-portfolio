@@ -77,6 +77,18 @@
   display: block;
 }
 
+.comingSoon {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1.4rem, 3vw, 2.4rem);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  background: var(--chrome);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
 .bigIndex {
   font-family: var(--font-display);
   font-weight: 700;
