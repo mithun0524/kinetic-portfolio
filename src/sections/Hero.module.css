@@ -15,10 +15,18 @@
   width: 26vw;
   height: 26vw;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(236, 233, 226, 0.18), transparent 62%);
+  /* cool silver/chrome tint */
+  background: radial-gradient(
+    circle,
+    rgba(210, 216, 228, 0.28),
+    rgba(150, 158, 172, 0.1) 40%,
+    transparent 62%
+  );
   transform: translate(-50%, -50%);
   pointer-events: none;
-  z-index: 0;
+  z-index: 2;
+  /* inverts against the light name text for a chrome-y interaction */
+  mix-blend-mode: difference;
   will-change: transform;
 }
 
