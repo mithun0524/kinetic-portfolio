@@ -7,6 +7,8 @@ export interface Project {
   tags: string[]
   blurb: string
   href: string
+  /** Live-site screenshot in /public/previews; falls back to a generated visual. */
+  image?: string
 }
 
 export const projects: Project[] = [
@@ -19,6 +21,7 @@ export const projects: Project[] = [
     blurb:
       'An AI coding agent that lives in your terminal and VS Code. It plans the work, runs the commands, and fixes its own broken builds. It indexes your codebase locally and lets you swap between Claude, GPT and local Ollama models.',
     href: 'https://crayon-umber.vercel.app',
+    image: '/previews/crayon.png',
   },
   {
     index: '02',
@@ -29,6 +32,7 @@ export const projects: Project[] = [
     blurb:
       'An AI code editor that runs entirely in your browser. It spins up a real Node environment, generates whole apps with live preview, and needs no backend at all.',
     href: 'https://devforge-chi.vercel.app',
+    image: '/previews/devforge.png',
   },
   {
     index: '03',
@@ -49,5 +53,6 @@ export const projects: Project[] = [
     blurb:
       'Practice interviews out loud with an AI. It runs technical and behavioral rounds by voice, scores you right after, and keeps every session so you can look back on how you did.',
     href: 'https://interprep-kappa.vercel.app',
+    image: '/previews/interprep.png',
   },
 ]

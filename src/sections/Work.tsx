@@ -73,7 +73,16 @@ function Card({ project }: { project: Project }) {
             className={styles.visual}
             style={{ ['--seed' as string]: project.index }}
           >
-            <span className={styles.bigIndex}>{project.index}</span>
+            {project.image ? (
+              <img
+                src={project.image}
+                alt={`${project.title} preview`}
+                className={styles.img}
+                loading="lazy"
+              />
+            ) : (
+              <span className={styles.bigIndex}>{project.index}</span>
+            )}
           </div>
         </div>
         <div className={styles.info}>
