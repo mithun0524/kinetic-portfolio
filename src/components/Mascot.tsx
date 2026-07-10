@@ -88,55 +88,45 @@ export function Mascot() {
     >
       <svg viewBox="0 0 200 210" className={styles.svg}>
         <defs>
-          <radialGradient id="blob-body" cx="0.4" cy="0.3" r="0.85">
+          <linearGradient id="chrome-blob" x1="0.3" y1="0" x2="0.6" y2="1">
             <stop offset="0" stopColor="#ffffff" />
-            <stop offset="0.6" stopColor="#ecebe6" />
-            <stop offset="1" stopColor="#cfcdc4" />
-          </radialGradient>
+            <stop offset="0.35" stopColor="#e2e4e8" />
+            <stop offset="0.52" stopColor="#a9adb5" />
+            <stop offset="0.7" stopColor="#7c8088" />
+            <stop offset="1" stopColor="#c6c9cf" />
+          </linearGradient>
         </defs>
 
+        {/* contact shadow */}
+        <ellipse cx="100" cy="192" rx="52" ry="10" fill="#000" opacity="0.35" />
+
         <g ref={body}>
-          {/* little sprout on top */}
-          <path
-            d="M100 34 C100 18 108 10 120 8 C116 20 110 28 100 34 Z"
-            fill="#cfcdc4"
-          />
+          {/* clean rounded chrome droplet */}
+          <ellipse cx="100" cy="106" rx="72" ry="76" fill="url(#chrome-blob)" />
 
-          {/* soft round body */}
-          <path
-            d="M100 30
-               C148 30 168 68 168 112
-               C168 165 137 188 100 188
-               C63 188 32 165 32 112
-               C32 68 52 30 100 30 Z"
-            fill="url(#blob-body)"
-          />
-
-          {/* blush cheeks */}
-          <ellipse cx="62" cy="126" rx="13" ry="8" fill="#ff9e8a" opacity="0.55" />
-          <ellipse cx="138" cy="126" rx="13" ry="8" fill="#ff9e8a" opacity="0.55" />
+          {/* glossy specular highlights (liquid-metal shine) */}
+          <ellipse cx="74" cy="58" rx="30" ry="16" fill="#ffffff" opacity="0.75" />
+          <circle cx="140" cy="150" r="10" fill="#ffffff" opacity="0.25" />
 
           {/* eyes */}
           <g ref={eyes}>
-            <ellipse cx="74" cy="102" rx="16" ry="19" fill="#ffffff" />
-            <ellipse cx="126" cy="102" rx="16" ry="19" fill="#ffffff" />
+            <ellipse cx="78" cy="104" rx="15" ry="17" fill="#141414" />
+            <ellipse cx="122" cy="104" rx="15" ry="17" fill="#141414" />
             <g ref={pupilL}>
-              <circle cx="74" cy="104" r="10" fill="#171717" />
-              <circle cx="78" cy="100" r="3.4" fill="#ffffff" />
-              <circle cx="71" cy="107" r="1.6" fill="#ffffff" opacity="0.8" />
+              <circle cx="82" cy="100" r="4.5" fill="#ffffff" />
+              <circle cx="74" cy="108" r="2" fill="#ffffff" opacity="0.7" />
             </g>
             <g ref={pupilR}>
-              <circle cx="126" cy="104" r="10" fill="#171717" />
-              <circle cx="130" cy="100" r="3.4" fill="#ffffff" />
-              <circle cx="123" cy="107" r="1.6" fill="#ffffff" opacity="0.8" />
+              <circle cx="126" cy="100" r="4.5" fill="#ffffff" />
+              <circle cx="118" cy="108" r="2" fill="#ffffff" opacity="0.7" />
             </g>
           </g>
 
           {/* tiny happy mouth */}
           <path
-            d="M90 140 Q100 150 110 140"
+            d="M90 138 Q100 148 110 138"
             fill="none"
-            stroke="#171717"
+            stroke="#141414"
             strokeWidth="4.5"
             strokeLinecap="round"
           />
