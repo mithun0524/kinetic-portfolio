@@ -45,22 +45,23 @@ export function Hero({ ready }: { ready: boolean }) {
       <div ref={blob} className={styles.blob} aria-hidden />
 
       <span className={`eyebrow ${styles.eyebrow}`}>
-        Motion &amp; Interaction Engineer
+        Creative Developer — Frontend &amp; AI
       </span>
 
       <h1 className={`display ${styles.title}`}>
         <span ref={line1} className={styles.line} style={{ opacity: 0 }}>
-          Kaan
+          Mithun
         </span>
         <span ref={line2} className={`chrome-text ${styles.line}`} style={{ opacity: 0 }}>
-          Voss
+          Chavan
         </span>
       </h1>
 
       <div ref={meta} className={styles.meta}>
         <p>
-          I build web experiences that move — GSAP timelines, kinetic type,
-          parallax and buttery smooth scroll.
+          CS student in Bangalore who ships fast. I build AI agents, full-stack
+          products and motion-rich interfaces — from autonomous coding tools to
+          adaptive learning platforms.
         </p>
         <a ref={cue} href="#work" className={styles.cue} data-cursor="grow">
           <span>Scroll</span>

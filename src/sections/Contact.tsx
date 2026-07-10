@@ -19,27 +19,29 @@ export function Contact() {
 
       <a
         ref={btn}
-        href="mailto:hello@kaanvoss.dev"
+        href="https://github.com/mithun0524"
+        target="_blank"
+        rel="noreferrer"
         className={styles.cta}
         data-cursor="grow"
       >
-        <span>hello@kaanvoss.dev</span>
+        <span>github.com/mithun0524</span>
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
           <path d="M4 16L16 4M16 4H6M16 4v10" stroke="currentColor" strokeWidth="1.5" />
         </svg>
       </a>
 
       <div className={styles.meta}>
-        <span>© 2026 Kaan Voss — placeholder demo</span>
+        <span>© 2026 Mithun Chavan A — Bangalore, India</span>
         <div className={styles.socials}>
-          <a href="#" data-cursor="grow">
-            Instagram
+          <a href="https://github.com/mithun0524" target="_blank" rel="noreferrer" data-cursor="grow">
+            GitHub
           </a>
-          <a href="#" data-cursor="grow">
-            Dribbble
+          <a href="https://mithundotdev.vercel.app" target="_blank" rel="noreferrer" data-cursor="grow">
+            mithun.dev
           </a>
-          <a href="#" data-cursor="grow">
-            LinkedIn
+          <a href="https://crayon-umber.vercel.app" target="_blank" rel="noreferrer" data-cursor="grow">
+            Crayon
           </a>
         </div>
       </div>

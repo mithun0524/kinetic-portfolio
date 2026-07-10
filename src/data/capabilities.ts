@@ -1,4 +1,4 @@
-// PLACEHOLDER content — swap for real numbers/skills.
+// Real stats + skills for Mithun Chavan A (github.com/mithun0524)
 export interface Stat {
   value: number
   suffix: string
@@ -6,21 +6,21 @@ export interface Stat {
 }
 
 export const stats: Stat[] = [
-  { value: 60, suffix: 'fps', label: 'Buttery on mid-range mobile' },
-  { value: 40, suffix: '+', label: 'Shipped animated experiences' },
-  { value: 6, suffix: '', label: 'Awwwards / FWA honors' },
-  { value: 9, suffix: 'yrs', label: 'Crafting motion on the web' },
+  { value: 30, suffix: '+', label: 'Public repositories shipped' },
+  { value: 15, suffix: '+', label: 'Full-stack & AI apps built' },
+  { value: 5, suffix: '+', label: 'Products live on the web' },
+  { value: 2, suffix: 'yrs', label: 'Building & shipping fast' },
 ]
 
 export const capabilities: string[] = [
-  'GSAP Timelines',
-  'ScrollTrigger',
-  'Kinetic Typography',
-  'Parallax Systems',
-  'Smooth Scroll / Lenis',
-  'WebGL & Shaders',
-  'SVG Morphing',
-  'Magnetic UI',
-  'Page Transitions',
-  'Performance Budgets',
+  'React & Next.js',
+  'TypeScript',
+  'GSAP Motion',
+  'AI Agents',
+  'LLM Integration',
+  'WebContainers',
+  'FastAPI & Python',
+  'Framer Motion',
+  'Supabase',
+  'Computer Vision',
 ]

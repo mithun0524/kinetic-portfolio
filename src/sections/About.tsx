@@ -18,9 +18,9 @@ export function About() {
     <section className={`section ${styles.about}`} id="about">
       <span className="eyebrow">( About )</span>
       <p ref={statement} className={`display ${styles.statement}`} style={{ opacity: 0 }}>
-        I turn interfaces into motion. For nearly a decade I&apos;ve engineered
-        performant, expressive web experiences — where every scroll, hover and
-        transition feels <span className="chrome-text">intentional</span>.
+        I turn ideas into shipped products — fast. From AI agents to adaptive
+        learning, I build full-stack experiences where every interaction feels
+        <span className="chrome-text"> intentional</span>.
       </p>
     </section>
   )
