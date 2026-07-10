@@ -35,9 +35,16 @@
   flex-direction: column;
 }
 
+.lineMask {
+  display: block;
+  overflow: hidden;
+  /* a touch of vertical breathing room so descenders aren't clipped */
+  padding-bottom: 0.08em;
+}
+
 .line {
   display: block;
-  perspective: 600px;
+  will-change: transform;
 }
 
 .meta {

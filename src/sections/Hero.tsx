@@ -1,6 +1,5 @@
 import { useRef } from 'react'
 import { gsap, useGSAP, prefersReducedMotion } from '../lib/gsap'
-import { splitText } from '../lib/splitText'
 import { useMagnetic } from '../hooks/useMagnetic'
 import styles from './Hero.module.css'
 
@@ -47,21 +46,17 @@ export function Hero({ ready }: { ready: boolean }) {
       }
 
       document.fonts.ready.then(() => {
-        const nameChars = [
-          ...splitText(line1.current!, 'chars').chars,
-          ...splitText(line2.current!, 'chars').chars,
-        ]
-        const words = splitText(intro.current!, 'words').words
         gsap.set(targets, { opacity: 1 })
 
         const tl = gsap.timeline({ defaults: { ease: 'power4.out' } })
         tl.from(eyebrow.current, { y: 20, opacity: 0, duration: 0.6 })
+          // each name line slides up from behind its mask
           .from(
-            nameChars,
-            { yPercent: 120, opacity: 0, rotateX: -40, duration: 0.9, stagger: 0.03 },
+            [line1.current, line2.current],
+            { yPercent: 115, duration: 1, stagger: 0.12 },
             '-=0.2'
           )
-          .from(words, { y: 40, opacity: 0, duration: 0.7, stagger: 0.02 }, '-=0.4')
+          .from(intro.current, { y: 40, opacity: 0, duration: 0.8 }, '-=0.55')
           .from(cue.current, { opacity: 0, duration: 0.6 }, '-=0.3')
       })
 
@@ -79,11 +74,15 @@ export function Hero({ ready }: { ready: boolean }) {
       </span>
 
       <h1 className={`display ${styles.title}`}>
-        <span ref={line1} className={styles.line} style={{ opacity: 0 }}>
-          Mithun
+        <span className={styles.lineMask}>
+          <span ref={line1} className={styles.line} style={{ opacity: 0 }}>
+            Mithun
+          </span>
         </span>
-        <span ref={line2} className={`chrome-text ${styles.line}`} style={{ opacity: 0 }}>
-          Chavan
+        <span className={styles.lineMask}>
+          <span ref={line2} className={`chrome-text ${styles.line}`} style={{ opacity: 0 }}>
+            Chavan
+          </span>
         </span>
       </h1>
 
