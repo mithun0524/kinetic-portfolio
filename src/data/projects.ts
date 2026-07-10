@@ -50,24 +50,4 @@ export const projects: Project[] = [
       'AI-powered interview prep with real-time voice. Simulates technical, behavioral and mixed interviews, then returns instant scored feedback and a reviewable history.',
     href: 'https://interprep-kappa.vercel.app',
   },
-  {
-    index: '05',
-    title: 'Apex AI Trading',
-    role: 'Creator',
-    year: '2025',
-    tags: ['Python', 'WebSockets', 'AI Signals'],
-    blurb:
-      'A single-dashboard AI paper-trading platform. Signal generator with confidence scores and human-readable reasoning, real-time WebSocket updates, and an SQLite-backed order/P&L engine on live market data.',
-    href: 'https://github.com/mithun0524/Apex-AI-Trading-Platform',
-  },
-  {
-    index: '06',
-    title: 'Emotion-Aware Tutor',
-    role: 'Creator',
-    year: '2025',
-    tags: ['Next.js', 'FastAPI', 'Computer Vision'],
-    blurb:
-      'A tutor that reads the room. Captures webcam frames, detects emotion (DeepFace / OpenCV) through a FastAPI backend, and adapts the tutoring experience in real time.',
-    href: 'https://github.com/mithun0524/Emotion-Aware-AI-Tutor',
-  },
 ]
