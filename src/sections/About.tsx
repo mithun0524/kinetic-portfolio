@@ -18,9 +18,9 @@ export function About() {
     <section className={`section ${styles.about}`} id="about">
       <span className="eyebrow">( About )</span>
       <p ref={statement} className={`display ${styles.statement}`} style={{ opacity: 0 }}>
-        I build things that ship — autonomous AI agents, browser-based dev
-        tools and adaptive learning. Full-stack, end to end, where every
-        interaction feels <span className="chrome-text">intentional</span>.
+        I like building things that actually ship. Mostly AI agents, developer
+        tools and web apps I can put in front of
+        <span className="chrome-text"> real people</span>.
       </p>
     </section>
   )

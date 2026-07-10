@@ -59,9 +59,9 @@ export function Hero({ ready }: { ready: boolean }) {
 
       <div ref={meta} className={styles.meta}>
         <p>
-          I build AI agents, developer tools and full-stack products — from an
-          autonomous terminal coding agent to a browser-based AI code editor and
-          adaptive learning platforms.
+          I build AI agents, dev tools and full-stack apps. Lately I&apos;ve
+          been deep in a terminal coding agent and an AI code editor that runs
+          right in the browser.
         </p>
         <a ref={cue} href="#work" className={styles.cue} data-cursor="grow">
           <span>Scroll</span>
