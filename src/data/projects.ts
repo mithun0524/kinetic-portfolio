@@ -52,7 +52,7 @@ export const projects: Project[] = [
     tags: ['Next.js', 'Voice AI', 'Firebase'],
     blurb:
       'Practice interviews out loud with an AI. It runs technical and behavioral rounds by voice, scores you right after, and keeps every session so you can look back on how you did.',
-    href: 'https://interprep-kappa.vercel.app',
+    href: 'https://interpreppy.vercel.app/',
     image: '/previews/interprep.png',
   },
 ]

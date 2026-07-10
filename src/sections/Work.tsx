@@ -24,21 +24,23 @@ function Card({ project }: { project: Project }) {
           toggleActions: 'play none none reverse',
         },
       })
-      // parallax on the inner visual
-      gsap.fromTo(
-        vis,
-        { yPercent: -6 },
-        {
-          yPercent: 6,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: el,
-            start: 'top bottom',
-            end: 'bottom top',
-            scrub: true,
-          },
-        }
-      )
+      // parallax only on the generated visual; image cards show the full shot
+      if (!project.image) {
+        gsap.fromTo(
+          vis,
+          { yPercent: -6 },
+          {
+            yPercent: 6,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: el,
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub: true,
+            },
+          }
+        )
+      }
     }
 
     // tilt / magnetic on hover (desktop only)
@@ -70,7 +72,7 @@ function Card({ project }: { project: Project }) {
         <div className={styles.visualWrap}>
           <div
             ref={visual}
-            className={styles.visual}
+            className={`${styles.visual} ${project.image ? styles.still : ''}`}
             style={{ ['--seed' as string]: project.index }}
           >
             {project.image ? (
