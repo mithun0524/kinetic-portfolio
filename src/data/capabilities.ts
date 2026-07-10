@@ -17,10 +17,10 @@ export const capabilities: string[] = [
   'LLM Integration',
   'React & Next.js',
   'TypeScript',
-  'AWS Cloud',
-  'Master Data Management',
   'FastAPI & Python',
-  'Full-Stack Systems',
+  'WebContainers',
   'GSAP Motion',
+  'Framer Motion',
   'Supabase',
+  'Computer Vision',
 ]

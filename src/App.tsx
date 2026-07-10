@@ -9,6 +9,7 @@ import { Marquee } from './sections/Marquee'
 import { About } from './sections/About'
 import { Work } from './sections/Work'
 import { Capabilities } from './sections/Capabilities'
+import { Experience } from './sections/Experience'
 import { Contact } from './sections/Contact'
 
 export default function App() {
@@ -28,6 +29,7 @@ export default function App() {
         <About />
         <Work />
         <Capabilities />
+        <Experience />
         <Contact />
       </main>
     </>

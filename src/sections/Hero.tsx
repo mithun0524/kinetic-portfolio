@@ -45,7 +45,7 @@ export function Hero({ ready }: { ready: boolean }) {
       <div ref={blob} className={styles.blob} aria-hidden />
 
       <span className={`eyebrow ${styles.eyebrow}`}>
-        AI &amp; Full-Stack Engineer — Aquera Labs
+        AI &amp; Full-Stack Developer
       </span>
 
       <h1 className={`display ${styles.title}`}>
@@ -59,9 +59,9 @@ export function Hero({ ready }: { ready: boolean }) {
 
       <div ref={meta} className={styles.meta}>
         <p>
-          Member of Technical Staff at Aquera Labs, Bangalore. I build
-          agentic, AI-powered full-stack applications — working across Master
-          Data Management and AWS to ship products that move.
+          I build AI agents, developer tools and full-stack products — from an
+          autonomous terminal coding agent to a browser-based AI code editor and
+          adaptive learning platforms.
         </p>
         <a ref={cue} href="#work" className={styles.cue} data-cursor="grow">
           <span>Scroll</span>
