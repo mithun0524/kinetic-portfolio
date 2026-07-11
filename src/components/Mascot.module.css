@@ -85,6 +85,26 @@
   overflow: visible;
 }
 
+/* supercharged shimmer while riding the magic carpet */
+.charged .svg {
+  animation: mascotCharge 0.7s linear infinite;
+  transform: scale(1.08);
+}
+@keyframes mascotCharge {
+  0% {
+    filter: hue-rotate(0deg) saturate(1.7) brightness(1.15) drop-shadow(0 0 10px rgba(217, 119, 87, 0.6));
+  }
+  50% {
+    filter: hue-rotate(200deg) saturate(2.1) brightness(1.5) drop-shadow(0 0 22px rgba(150, 190, 255, 0.75));
+  }
+  100% {
+    filter: hue-rotate(360deg) saturate(1.7) brightness(1.15) drop-shadow(0 0 10px rgba(217, 119, 87, 0.6));
+  }
+}
+.charged .carpet {
+  box-shadow: 0 6px 26px rgba(150, 190, 255, 0.55);
+}
+
 /* keep the creature out of the way on narrow screens */
 @media (max-width: 1024px) {
   .mascot {

@@ -190,9 +190,10 @@ export function Mascot({
       const range = document.createRange()
       range.selectNodeContents(el)
       const rects = range.getClientRects()
+      const maxW = window.innerWidth * 0.9 // ignore anything ~full-width (a container, not a word/line)
       for (let i = 0; i < rects.length; i++) {
         const r = rects[i]
-        if (r.width < 40 || r.height < 6) continue
+        if (r.width < 40 || r.height < 6 || r.width > maxW) continue
         raw.push({ left: r.left, right: r.right, top: r.top, bottom: r.bottom })
       }
       range.detach?.()
@@ -591,6 +592,7 @@ export function Mascot({
         legTweens.current.forEach((t) => t.pause()) // stand still on the carpet
         gsap.set([legL.current, legR.current], { y: 0 })
         gsap.set(carpet.current, { autoAlpha: 1, scaleX: 0, transformOrigin: '50% 50%' })
+        root.current?.classList.add(styles.charged) // supercharge + shimmer
         if (emotion.current === 'normal') say(rand(SAY.magic), 1.8)
       })
       tl.to(carpet.current, { scaleX: 1, duration: 0.3, ease: 'back.out(2)' })
@@ -601,7 +603,10 @@ export function Mascot({
         .to(carpet.current, { rotation: 2, duration: 0.6, yoyo: true, repeat: 1, ease: 'sine.inOut' }, '<')
       tl.to(carpet.current, { scaleX: 0, autoAlpha: 0, duration: 0.3, ease: 'power2.in' })
         .to(body.current, { y: 0, duration: 0.2 }, '<')
-        .call(() => legTweens.current.forEach((t) => t.resume()))
+        .call(() => {
+          root.current?.classList.remove(styles.charged)
+          legTweens.current.forEach((t) => t.resume())
+        })
       cx = px
       cy = py
     }
