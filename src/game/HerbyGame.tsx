@@ -49,10 +49,12 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
   const bubbleTxt = useRef<HTMLSpanElement>(null)
 
   const [lines, setLines] = useState<Seg[]>([])
-  const [status, setStatus] = useState<'play' | 'won'>('play')
+  const [status, setStatus] = useState<'play' | 'won' | 'dead'>('play')
   const [face, setFace] = useState<'normal' | 'happy' | 'dizzy' | 'angry'>('normal')
   const [carpets, setCarpets] = useState(CARPETS)
   const [ink, setInk] = useState(0)
+  const [exitX, setExitX] = useState(200)
+  const [ghostArrived, setGhostArrived] = useState(false)
 
   const linesRef = useRef<Seg[]>([])
   linesRef.current = lines
@@ -63,10 +65,10 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
   const level = useRef<{ start: Seg; goal: Seg; fixed: Seg[]; goalX: number; goalY: number; startX: number; startY: number }>()
   const drawing = useRef(false)
   const dstart = useRef<Pt>({ x: 0, y: 0 })
-  const herb = useRef({ x: 0, y: 0, vy: 0, mode: 'walk' as 'walk' | 'fall' | 'hop' | 'carpet' | 'charge' | 'stuck', face: 1, sx: 0, sy: 0, tx: 0, ty: 0, ctx: 0, cty: 0, t: 0, dur: 1 })
+  const herb = useRef({ x: 0, y: 0, vy: 0, mode: 'walk' as 'walk' | 'fall' | 'hop' | 'carpet' | 'charge' | 'stuck', face: 1, sx: 0, sy: 0, tx: 0, ty: 0, ctx: 0, cty: 0, t: 0, dur: 1, spin: 0 })
   const lastSay = useRef(0)
   const raf = useRef(0)
-  const statusRef = useRef<'play' | 'won'>('play')
+  const statusRef = useRef<'play' | 'won' | 'dead'>('play')
   statusRef.current = status
   const faceRef = useRef(face)
   faceRef.current = face
@@ -109,9 +111,11 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
   }
   const resetHerby = () => {
     const L = level.current!
-    herb.current = { ...herb.current, x: L.startX, y: L.startY, vy: 0, mode: 'walk', face: 1, t: 0 }
+    herb.current = { ...herb.current, x: L.startX, y: L.startY, vy: 0, mode: 'walk', face: 1, t: 0, spin: 0 }
+    herbyEl.current?.classList.remove(styles.angry)
     setStatus('play')
     setFace('normal')
+    setGhostArrived(false)
     setCarpets(CARPETS)
   }
   const allSegs = (): Seg[] => {
@@ -169,7 +173,7 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
   const loop = () => {
     const h = herb.current
     const L = level.current
-    if (L && statusRef.current !== 'won') {
+    if (L && statusRef.current === 'play') {
       if (h.mode === 'walk') {
         const nx = h.x + WALK
         const sy = supportY(nx, h.y)
@@ -214,13 +218,23 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
         h.vy = Math.min(h.vy + GRAV, 22)
         const ny = h.y + h.vy
         const land = landingY(h.x, h.y, ny)
-        if (land != null) { h.y = land; h.vy = 0; h.mode = 'walk' }
-        else { h.y = ny; h.x += 0.4 }
+        if (land != null && h.vy >= 0) {
+          h.y = land; h.vy = 0; h.mode = 'walk'; h.spin = 0
+        } else {
+          h.y = ny
+          h.x += 0.4
+          if (h.vy > 12) {
+            // real plummet — tumble + scared
+            h.spin += 16
+            if (faceRef.current !== 'dizzy') setFace('dizzy')
+            say('aaaa!')
+          }
+        }
         if (h.y > dim.current.h + 120) {
-          setFace('dizzy'); say(pick(JUDGE.fall))
-          setTimeout(resetHerby, 700)
-          herb.current.mode = 'walk'
-          herb.current.y = -9999 // park off-screen during the dizzy beat
+          // died — start the ghost sequence
+          setExitX(Math.max(50, Math.min(dim.current.w - 50, h.x)))
+          setGhostArrived(false)
+          setStatus('dead')
         }
       }
     }
@@ -228,7 +242,8 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
     const perf = typeof performance !== 'undefined' ? performance.now() : 0
     if (herbyEl.current) {
       const bob = h.mode === 'walk' ? Math.sin(perf * 0.007) * 2 : 0
-      herbyEl.current.style.transform = `translate(${h.x - 26}px, ${h.y - 46 + bob}px) scaleX(${h.face})`
+      const rot = h.mode === 'fall' ? h.spin : 0
+      herbyEl.current.style.transform = `translate(${h.x - 26}px, ${h.y - 46 + bob}px) scaleX(${h.face}) rotate(${rot}deg)`
     }
     // blink
     if (eyesG.current) {
@@ -327,8 +342,8 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
       } else {
         say(pick(['boop!', 'hehe', 'yay!', 'again!', 'teehee', 'wheee']), true)
         flashFace('happy')
-        if (herb.current.mode === 'walk') {
-          herb.current.vy = -10
+        if (herb.current.mode === 'walk' || herb.current.mode === 'stuck') {
+          herb.current.vy = -11
           herb.current.mode = 'fall'
         }
       }
@@ -481,6 +496,39 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
               <button onClick={resetHerby} data-cursor="grow">Play again</button>
               <button onClick={onClose} className={styles.close} data-cursor="grow">Done</button>
             </div>
+          </div>
+        )}
+
+        {status === 'dead' && (
+          <div className={styles.dead}>
+            {/* ghost Herby floats up from where he fell and zooms toward you */}
+            <div
+              className={styles.ghost}
+              style={{ ['--sx' as string]: `${exitX}px` }}
+              onAnimationEnd={() => setGhostArrived(true)}
+            >
+              <div className={styles.ghostBubble}>{ghostArrived ? 'i became a ghost 👻' : 'wooOOoo~'}</div>
+              <svg viewBox="0 0 200 190" width="120" height="114">
+                <path
+                  d="M28 70 C28 20 172 20 172 70 L172 150 C172 158 162 158 158 150 C154 142 146 142 142 150 C138 158 130 158 126 150 C122 142 114 142 110 150 C106 158 98 158 94 150 C90 142 82 142 78 150 C74 158 66 158 62 150 C58 142 48 142 44 150 C40 158 28 158 28 150 Z"
+                  fill="#ece9e2"
+                  opacity="0.92"
+                />
+                <ellipse cx="82" cy="82" rx="10" ry="13" fill="#20140f" />
+                <ellipse cx="118" cy="82" rx="10" ry="13" fill="#20140f" />
+                <path d="M92 110 Q100 118 108 110" fill="none" stroke="#20140f" strokeWidth="5" strokeLinecap="round" />
+              </svg>
+            </div>
+
+            {ghostArrived && (
+              <div className={styles.deadPanel}>
+                <p className={styles.deadText}>oops — I fell off! wanna try again?</p>
+                <div className={styles.winBtns}>
+                  <button onClick={resetHerby} data-cursor="grow">New game</button>
+                  <button onClick={onClose} className={styles.close} data-cursor="grow">Done</button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

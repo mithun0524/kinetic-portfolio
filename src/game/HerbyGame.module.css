@@ -232,6 +232,67 @@
   100% { filter: hue-rotate(360deg) saturate(1.8) brightness(1.2) drop-shadow(0 0 8px rgba(217,119,87,.6)); }
 }
 
+/* death → ghost comes to you */
+.dead {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+}
+.ghost {
+  position: absolute;
+  left: var(--sx);
+  top: 112%;
+  transform: translate(-50%, -50%) scale(0.35);
+  opacity: 0;
+  filter: drop-shadow(0 0 24px rgba(236, 233, 226, 0.35));
+  animation: ghostCome 2.3s cubic-bezier(0.2, 0.75, 0.2, 1) forwards;
+}
+@keyframes ghostCome {
+  0% { left: var(--sx); top: 112%; transform: translate(-50%, -50%) scale(0.35) rotate(-8deg); opacity: 0; }
+  18% { opacity: 0.9; }
+  60% { left: 50%; top: 46%; transform: translate(-50%, -50%) scale(1.6) rotate(4deg); opacity: 1; }
+  80% { transform: translate(-50%, -50%) scale(2.6) rotate(-3deg); }
+  100% { left: 50%; top: 45%; transform: translate(-50%, -50%) scale(2.4) rotate(0deg); opacity: 1; }
+}
+.ghostBubble {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  margin-bottom: 6px;
+  padding: 6px 12px;
+  border-radius: 12px;
+  background: var(--text);
+  color: var(--bg);
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+.deadPanel {
+  position: absolute;
+  left: 50%;
+  bottom: 12%;
+  transform: translateX(-50%);
+  text-align: center;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  animation: fadeUp 0.5s ease-out;
+}
+.deadText {
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: var(--step-0);
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translate(-50%, 12px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
 .win {
   position: absolute;
   inset: 0;
