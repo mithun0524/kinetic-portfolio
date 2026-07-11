@@ -1,0 +1,40 @@
+.playBtn {
+  position: fixed;
+  left: clamp(1rem, 3vw, 2rem);
+  bottom: clamp(1rem, 3vw, 2rem);
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.7rem 1.2rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(18, 18, 18, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: var(--step--1);
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: transform 0.3s var(--ease-out), background 0.3s var(--ease-out);
+}
+.playBtn:hover {
+  transform: translateY(-2px);
+  background: rgba(217, 119, 87, 0.2);
+}
+
+.playDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #d97757;
+  box-shadow: 0 0 10px #d97757;
+}
+
+@media (max-width: 640px) {
+  .playBtn {
+    font-size: 0.75rem;
+    padding: 0.6rem 1rem;
+  }
+}

@@ -1,0 +1,142 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10002;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: clamp(1.2rem, 3vw, 2rem) clamp(1.2rem, 4vw, 3rem);
+  border-bottom: 1px solid var(--line);
+}
+
+.title {
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  margin-top: 0.3rem;
+}
+
+.hint {
+  color: var(--text-dim);
+  font-size: var(--step--1);
+  margin-top: 0.4rem;
+}
+
+.controls {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.controls button {
+  font-family: var(--font-display);
+  font-size: var(--step--1);
+  color: var(--text);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background 0.25s var(--ease-out), color 0.25s var(--ease-out);
+}
+.controls button:hover {
+  background: var(--text);
+  color: var(--bg);
+}
+.close {
+  border-color: var(--text-dim);
+}
+
+.arena {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  touch-action: none;
+  cursor: crosshair;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(217, 119, 87, 0.05), transparent 60%),
+    var(--bg);
+}
+
+.svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.platform {
+  stroke: var(--text-dim);
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+.drawn {
+  stroke: url(#none);
+  stroke: #d9d9d9;
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+.preview {
+  stroke: var(--text-dim);
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-dasharray: 4 8;
+  opacity: 0;
+}
+
+.flag {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  font-size: 2rem;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
+}
+
+.herby {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+  pointer-events: none;
+  filter: drop-shadow(0 8px 16px rgba(217, 119, 87, 0.25));
+}
+
+.win {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  background: rgba(10, 10, 10, 0.7);
+  backdrop-filter: blur(6px);
+}
+.winTitle {
+  font-size: clamp(2rem, 6vw, 4rem);
+}
+.winBtns {
+  display: flex;
+  gap: 0.8rem;
+}
+.winBtns button {
+  font-family: var(--font-display);
+  font-size: var(--step-0);
+  color: var(--text);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.7rem 1.4rem;
+  cursor: pointer;
+  transition: background 0.25s var(--ease-out), color 0.25s var(--ease-out);
+}
+.winBtns button:hover {
+  background: var(--text);
+  color: var(--bg);
+}
