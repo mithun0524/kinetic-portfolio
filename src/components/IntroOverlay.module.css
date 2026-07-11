@@ -8,10 +8,78 @@
 }
 
 .inner {
+  position: relative;
   width: min(90vw, 900px);
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+/* boot log — right-aligned checklist that fills as the counter climbs */
+.log {
+  position: absolute;
+  right: 0;
+  bottom: 2.4rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  font-family: var(--font-display);
+  font-size: var(--step--1);
+  letter-spacing: 0.04em;
+  text-align: right;
+}
+.log li {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  color: var(--text-dim);
+  opacity: 0.28;
+  transition: opacity 0.4s var(--ease-out), color 0.4s var(--ease-out);
+}
+.log li[data-state='done'] { opacity: 0.55; }
+.log li[data-state='run'] { opacity: 1; color: var(--text); }
+
+.tick {
+  order: 1; /* dot sits to the right of the label */
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  position: relative;
+  flex: none;
+}
+/* completed: filled dot with a check */
+.log li[data-state='done'] .tick {
+  background: var(--chrome);
+  border-color: var(--chrome);
+}
+.log li[data-state='done'] .tick::after {
+  content: '';
+  position: absolute;
+  left: 2.5px;
+  top: 0.5px;
+  width: 2.5px;
+  height: 5px;
+  border: solid var(--bg);
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+}
+/* running: pulsing ring */
+.log li[data-state='run'] .tick {
+  border-color: var(--chrome);
+  animation: tickPulse 0.9s ease-in-out infinite;
+}
+@keyframes tickPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(210, 216, 228, 0.5); }
+  50% { box-shadow: 0 0 0 5px rgba(210, 216, 228, 0); }
+}
+
+@media (max-width: 720px) {
+  .log { display: none; }
 }
 
 .label {
