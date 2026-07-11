@@ -510,24 +510,29 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
             <div
               className={styles.ghost}
               style={{ ['--sx' as string]: `${exitX}px` }}
-              onAnimationEnd={() => setGhostArrived(true)}
+              onAnimationEnd={(e) => { if (e.animationName.includes('ghostCome')) setGhostArrived(true) }}
             >
-              <div className={styles.ghostBubble}>{ghostArrived ? 'i became a ghost 👻' : 'wooOOoo~'}</div>
-              <svg viewBox="0 0 200 190" width="120" height="114">
-                <path
-                  d="M28 70 C28 20 172 20 172 70 L172 150 C172 158 162 158 158 150 C154 142 146 142 142 150 C138 158 130 158 126 150 C122 142 114 142 110 150 C106 158 98 158 94 150 C90 142 82 142 78 150 C74 158 66 158 62 150 C58 142 48 142 44 150 C40 158 28 158 28 150 Z"
-                  fill="#ece9e2"
-                  opacity="0.92"
-                />
-                <ellipse cx="82" cy="82" rx="10" ry="13" fill="#20140f" />
-                <ellipse cx="118" cy="82" rx="10" ry="13" fill="#20140f" />
-                <path d="M92 110 Q100 118 108 110" fill="none" stroke="#20140f" strokeWidth="5" strokeLinecap="round" />
+              <div className={styles.ghostBubble}>{ghostArrived ? 'i couldn’t make it… 🥺' : 'wooOOoo~'}</div>
+              {/* a ghostly, sad Herby */}
+              <svg viewBox="0 0 200 174" width="132" height="115" className={styles.ghostSvg}>
+                <g fill="#ece9e2" opacity="0.9">
+                  <rect x="8" y="82" width="22" height="34" rx="2" />
+                  <rect x="170" y="82" width="22" height="34" rx="2" />
+                  <rect x="62" y="138" width="22" height="30" rx="2" />
+                  <rect x="116" y="138" width="22" height="30" rx="2" />
+                  <rect x="28" y="52" width="144" height="90" rx="5" />
+                </g>
+                <g stroke="#20140f" strokeWidth="7" strokeLinecap="round" fill="none">
+                  <path d="M72 96 Q82 108 92 100" />
+                  <path d="M108 100 Q118 108 128 96" />
+                </g>
+                <ellipse cx="86" cy="116" rx="3.5" ry="6" fill="#bfe3ff" />
               </svg>
             </div>
 
             {ghostArrived && (
               <div className={styles.deadPanel}>
-                <p className={styles.deadText}>oops — I fell off! wanna try again?</p>
+                <p className={styles.deadText}>Herby fell off… try again?</p>
                 <div className={styles.winBtns}>
                   <button onClick={resetHerby} data-cursor="grow">New game</button>
                   <button onClick={onClose} className={styles.close} data-cursor="grow">Done</button>

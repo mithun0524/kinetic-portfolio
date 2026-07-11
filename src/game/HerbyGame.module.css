@@ -242,18 +242,27 @@
 .ghost {
   position: absolute;
   left: var(--sx);
-  top: 112%;
-  transform: translate(-50%, -50%) scale(0.35);
+  top: 116%;
+  transform: translate(-50%, -50%) scale(0.4);
   opacity: 0;
-  filter: drop-shadow(0 0 24px rgba(236, 233, 226, 0.35));
-  animation: ghostCome 2.3s cubic-bezier(0.2, 0.75, 0.2, 1) forwards;
+  filter: drop-shadow(0 0 30px rgba(236, 233, 226, 0.35));
+  animation: ghostCome 4.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
+/* slow, dramatic: rises, drifts across the screen, then closes in on the viewer */
 @keyframes ghostCome {
-  0% { left: var(--sx); top: 112%; transform: translate(-50%, -50%) scale(0.35) rotate(-8deg); opacity: 0; }
-  18% { opacity: 0.9; }
-  60% { left: 50%; top: 46%; transform: translate(-50%, -50%) scale(1.6) rotate(4deg); opacity: 1; }
-  80% { transform: translate(-50%, -50%) scale(2.6) rotate(-3deg); }
-  100% { left: 50%; top: 45%; transform: translate(-50%, -50%) scale(2.4) rotate(0deg); opacity: 1; }
+  0% { left: var(--sx); top: 116%; transform: translate(-50%, -50%) scale(0.4) rotate(-6deg); opacity: 0; }
+  12% { opacity: 0.85; }
+  35% { left: 24%; top: 58%; transform: translate(-50%, -50%) scale(0.75) rotate(4deg); opacity: 0.95; }
+  62% { left: 78%; top: 42%; transform: translate(-50%, -50%) scale(1.15) rotate(-4deg); opacity: 1; }
+  82% { left: 50%; top: 46%; transform: translate(-50%, -50%) scale(1.9) rotate(2deg); }
+  100% { left: 50%; top: 45%; transform: translate(-50%, -50%) scale(2.7) rotate(0deg); opacity: 1; }
+}
+.ghostSvg {
+  animation: ghostFloat 2.4s ease-in-out infinite;
+}
+@keyframes ghostFloat {
+  0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+  50% { transform: translateY(-8px) rotate(1.5deg); }
 }
 .ghostBubble {
   position: absolute;
