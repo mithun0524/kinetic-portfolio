@@ -177,6 +177,34 @@
   background: var(--chrome);
 }
 
+/* shrink the legend on phones so it takes less of the playfield */
+@media (max-width: 640px) {
+  .legend {
+    top: 10px;
+    left: 10px;
+    padding: 9px 11px;
+    max-width: 190px;
+    font-size: 0.72rem;
+    border-radius: 11px;
+  }
+  .legendTitle {
+    font-size: 0.6rem;
+    margin-bottom: 6px;
+  }
+  .legendRow {
+    gap: 6px;
+    margin: 2px 0;
+  }
+  .legendRow span {
+    width: 15px;
+  }
+  .meta {
+    margin-top: 7px;
+    padding-top: 7px;
+    gap: 4px;
+  }
+}
+
 /* in-game speech bubble (follows Herby) */
 .bubble {
   position: absolute;
