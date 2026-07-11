@@ -1,0 +1,115 @@
+.arena {
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* HUD: carpets + progress */
+.hud {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  pointer-events: none;
+}
+.carpets {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  color: var(--text);
+  white-space: nowrap;
+}
+.track {
+  flex: 1;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--line);
+  overflow: hidden;
+}
+.track i {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: var(--chrome);
+}
+
+/* ground platform bar */
+.ground {
+  position: absolute;
+  left: 0;
+  background: linear-gradient(180deg, rgba(217, 119, 87, 0.12), transparent 70%), #171412;
+  border-top: 2px solid #d9d9d9;
+  will-change: transform;
+}
+
+.flag {
+  position: absolute;
+  left: 0;
+  transform: translateX(-9999px);
+  margin-top: -34px;
+  font-size: 2rem;
+  pointer-events: none;
+  will-change: transform;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
+}
+
+.herby {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 52px;
+  height: 45px;
+  z-index: 2;
+  will-change: transform;
+  pointer-events: none;
+  filter: drop-shadow(0 8px 16px rgba(217, 119, 87, 0.25));
+}
+.herby svg { display: block; }
+
+/* running leg bob */
+.bob {
+  animation: bob 0.32s steps(2) infinite;
+}
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+/* magic-carpet supercharge shimmer */
+.charged {
+  filter: drop-shadow(0 0 18px rgba(217, 119, 87, 0.9)) hue-rotate(-12deg) saturate(1.4) brightness(1.15);
+}
+
+/* end-state card */
+.card {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  background: rgba(13, 13, 13, 0.72);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.cardTitle {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 6vw, 2rem);
+  color: var(--text);
+}
+.retry {
+  font-family: var(--font-display);
+  font-size: var(--step-0);
+  color: var(--bg);
+  background: var(--text);
+  border: none;
+  border-radius: 999px;
+  padding: 0.7rem 1.8rem;
+  cursor: pointer;
+}

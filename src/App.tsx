@@ -13,13 +13,24 @@ import { Capabilities } from './sections/Capabilities'
 import { Experience } from './sections/Experience'
 import { Contact } from './sections/Contact'
 import { HerbyGame } from './game/HerbyGame'
+import { HerbyRunner } from './game/HerbyRunner'
 import styles from './App.module.css'
 
 export default function App() {
   const [ready, setReady] = useState(false)
   const [playing, setPlaying] = useState(false)
+  const [onPhone, setOnPhone] = useState(false)
   const curtain = useRef<HTMLDivElement>(null)
   useLenis()
+
+  // phones get the tap-to-hop runner; desktop gets the draw-a-path puzzle
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 1024px)')
+    const set = () => setOnPhone(mq.matches)
+    set()
+    mq.addEventListener('change', set)
+    return () => mq.removeEventListener('change', set)
+  }, [])
 
   // shared coral curtain: cover → swap → reveal. Close mirrors open (reversed).
   const transition = (toPlaying: boolean) => {
@@ -67,7 +78,9 @@ export default function App() {
         <Contact onPlay={() => transition(true)} />
       </main>
 
-      <HerbyGame open={playing} onClose={() => transition(false)} />
+      {onPhone
+        ? <HerbyRunner open={playing} onClose={() => transition(false)} />
+        : <HerbyGame open={playing} onClose={() => transition(false)} />}
       <div ref={curtain} className={styles.curtain} aria-hidden />
     </>
   )
