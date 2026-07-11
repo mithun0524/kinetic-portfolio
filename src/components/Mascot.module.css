@@ -24,9 +24,8 @@
 
 .bubble {
   position: absolute;
-  bottom: 74%;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 72%;
+  left: 52%;
   opacity: 0;
   visibility: hidden;
   white-space: nowrap;
@@ -46,8 +45,7 @@
   content: '';
   position: absolute;
   top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 22px;
   border: 7px solid transparent;
   border-top-color: var(--text);
   margin-top: -1px;

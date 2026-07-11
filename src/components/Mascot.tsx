@@ -51,10 +51,10 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
     gsap.killTweensOf(bubble.current)
     gsap.fromTo(
       bubble.current,
-      { autoAlpha: 0, scale: 0.5, y: 8, xPercent: -50 },
-      { autoAlpha: 1, scale: 1, y: 0, xPercent: -50, duration: 0.25, ease: 'back.out(2.5)' }
+      { autoAlpha: 0, scale: 0.5, y: 8, transformOrigin: '0% 100%' },
+      { autoAlpha: 1, scale: 1, y: 0, duration: 0.25, ease: 'back.out(2.5)' }
     )
-    gsap.to(bubble.current, { autoAlpha: 0, scale: 0.7, xPercent: -50, duration: 0.25, delay: hold })
+    gsap.to(bubble.current, { autoAlpha: 0, scale: 0.7, duration: 0.25, delay: hold })
   }
 
   useGSAP(
