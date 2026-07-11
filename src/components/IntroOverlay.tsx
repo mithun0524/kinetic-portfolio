@@ -57,11 +57,12 @@ export function IntroOverlay({ onDone }: { onDone: () => void }) {
       ease: 'power2.out',
       onUpdate: () => {
         const v = counter.v
-        // each column slides up by its running position; units spins fast,
-        // tens rolls slowly, hundreds flips once at the end.
+        // only the units column rolls continuously (fast = reads as motion);
+        // tens & hundreds snap to whole digits so they stay crisp mid-spin
+        // instead of parking between two glyphs.
         setY(units.current, -v)
-        setY(tens.current, -v / 10)
-        setY(hund.current, -v / 100)
+        setY(tens.current, -Math.floor(v / 10))
+        setY(hund.current, -Math.floor(v / 100))
       },
     })
       .to(`.${styles.bar}`, { scaleX: 1, duration: 1.4, ease: 'power3.inOut' }, 0)
