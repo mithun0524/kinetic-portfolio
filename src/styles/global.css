@@ -55,6 +55,14 @@ a {
   padding: clamp(6rem, 14vh, 12rem) var(--pad);
 }
 
+/* adjacent sections stack their top+bottom padding — halve it on phones so
+   there isn't a huge void between every section */
+@media (max-width: 768px) {
+  .section {
+    padding: clamp(3.5rem, 8vh, 5.5rem) var(--pad);
+  }
+}
+
 .eyebrow {
   font-family: var(--font-display);
   font-size: var(--step--1);
