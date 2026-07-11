@@ -60,6 +60,12 @@ export function Contact() {
         </span>
       </h2>
 
+      {/* ground line the mascot patrols on — right under the headline */}
+      <div className={styles.groundWrap}>
+        <span ref={lineRef} className={styles.groundLine} />
+        <Mascot ground range={160} />
+      </div>
+
       <button
         ref={btn}
         type="button"
@@ -72,12 +78,6 @@ export function Contact() {
           <path d="M4 16L16 4M16 4H6M16 4v10" stroke="currentColor" strokeWidth="1.5" />
         </svg>
       </button>
-
-      {/* ground line the mascot patrols on */}
-      <div className={styles.groundWrap}>
-        <span ref={lineRef} className={styles.groundLine} />
-        <Mascot ground range={160} />
-      </div>
 
       <ContactForm open={formOpen} onClose={() => setFormOpen(false)} />
 
