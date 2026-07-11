@@ -74,12 +74,12 @@ export function MobileHerby() {
     if (prefersReducedMotion()) return
     const now = Date.now()
     taps.current.push(now)
-    taps.current = taps.current.filter((t) => now - t < 1600)
+    taps.current = taps.current.filter((t) => now - t < 2200)
     const rapid = taps.current.length
 
     let m: Mood = 'happy'
-    if (rapid >= 5) m = 'sad' // kept poking after getting mad → he's hurt
-    else if (rapid >= 4) m = 'angry'
+    if (rapid >= 7) m = 'sad' // kept poking after getting mad → he's hurt
+    else if (rapid >= 5) m = 'angry'
     else if (rapid === 3) m = 'blush'
 
     setMoodFor(m, m === 'sad' ? 2.6 : m === 'angry' ? 2 : 2.2)
