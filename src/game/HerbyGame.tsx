@@ -63,7 +63,8 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
   const level = useRef<{ start: Seg; goal: Seg; fixed: Seg[]; goalX: number; goalY: number; startX: number; startY: number }>()
   const drawing = useRef(false)
   const dstart = useRef<Pt>({ x: 0, y: 0 })
-  const herb = useRef({ x: 0, y: 0, vy: 0, mode: 'walk' as 'walk' | 'fall' | 'hop' | 'carpet' | 'charge', face: 1, sx: 0, sy: 0, tx: 0, ty: 0, ctx: 0, cty: 0, t: 0, dur: 1 })
+  const herb = useRef({ x: 0, y: 0, vy: 0, mode: 'walk' as 'walk' | 'fall' | 'hop' | 'carpet' | 'charge' | 'stuck', face: 1, sx: 0, sy: 0, tx: 0, ty: 0, ctx: 0, cty: 0, t: 0, dur: 1 })
+  const lastSay = useRef(0)
   const raf = useRef(0)
   const statusRef = useRef<'play' | 'won'>('play')
   statusRef.current = status
@@ -77,6 +78,9 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
   const cursor = useRef({ x: -9999, y: -9999 })
 
   const say = (text: string) => {
+    const t = typeof performance !== 'undefined' ? performance.now() : 0
+    if (t - lastSay.current < 900) return // cooldown so he doesn't spam
+    lastSay.current = t
     if (bubbleTxt.current) bubbleTxt.current.textContent = text
     if (bubble.current) {
       bubble.current.style.opacity = '1'
@@ -183,12 +187,14 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
               h.mode = 'charge'; h.t = 0; h.ctx = carT.x; h.cty = carT.y
               herbyEl.current?.classList.add(styles.charged)
               say(pick(['hmm… big gap', 'no path?', 'let me try…', 'one sec…', 'watch this…']))
-            } else { h.mode = 'fall'; say(pick(JUDGE.stuck)) }
-          } else { h.mode = 'fall'; say(pick(JUDGE.stuck)) }
+            } else { h.mode = 'stuck'; say(pick(JUDGE.stuck)) }
+          } else { h.mode = 'stuck'; say(pick(JUDGE.stuck)) }
         }
         if (Math.abs(h.x - L.goalX) < 46 && Math.abs(h.y - L.goalY) < 50) {
           setStatus('won'); setFace('happy'); say(pick(JUDGE.win)); herbyEl.current?.classList.remove(styles.charged)
         }
+      } else if (h.mode === 'stuck') {
+        // stand still and wait for the player to draw a new line
       } else if (h.mode === 'charge') {
         // stand still and supercharge (~1s), then launch the carpet with a bubble
         h.t += 1
@@ -295,6 +301,8 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
     const seg = { x1: dstart.current.x, y1: dstart.current.y, x2: p.x, y2: p.y }
     setLines((ls) => [...ls, seg])
     setInk((i) => i + d)
+    // a new line? give Herby another go if he was stuck
+    if (herb.current.mode === 'stuck') herb.current.mode = 'walk'
     // Herby judges the line
     const slope = Math.abs((seg.y2 - seg.y1) / (seg.x2 - seg.x1 || 1))
     if (slope > 1.4) say(pick(JUDGE.steep))
