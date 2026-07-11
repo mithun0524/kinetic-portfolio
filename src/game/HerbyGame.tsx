@@ -55,6 +55,11 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
   const [ink, setInk] = useState(0)
   const [exitX, setExitX] = useState(200)
   const [ghostArrived, setGhostArrived] = useState(false)
+  const [closing, setClosing] = useState(false)
+  const handleClose = () => {
+    setClosing(true)
+    setTimeout(onClose, 560) // let the wipe play before unmounting
+  }
 
   const linesRef = useRef<Seg[]>([])
   linesRef.current = lines
@@ -275,7 +280,7 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
   useEffect(() => {
     if (!open) return
     buildLevel()
-    setLines([]); setInk(0); setCarpets(CARPETS)
+    setLines([]); setInk(0); setCarpets(CARPETS); setClosing(false)
     resetHerby()
     raf.current = requestAnimationFrame(loop)
     const onResize = () => buildLevel()
@@ -400,7 +405,7 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
   const L = level.current
 
   return (
-    <div className={styles.overlay}>
+    <div className={`${styles.overlay} ${closing ? styles.closing : ''}`}>
       <div className={styles.head}>
         <div>
           <span className="eyebrow">( Play )</span>
@@ -410,7 +415,7 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
         <div className={styles.controls}>
           <button onClick={() => { setLines([]); setInk(0) }} data-cursor="grow">Clear</button>
           <button onClick={resetHerby} data-cursor="grow">Restart</button>
-          <button onClick={onClose} className={styles.close} data-cursor="grow">Close ✕</button>
+          <button onClick={handleClose} className={styles.close} data-cursor="grow">Close ✕</button>
         </div>
       </div>
 
@@ -527,7 +532,7 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
                 <h2 className={`display ${styles.winTitle}`}>Herby&apos;s home! 🎉</h2>
                 <div className={styles.winBtns}>
                   <button onClick={resetHerby} data-cursor="grow">Play again</button>
-                  <button onClick={onClose} className={styles.close} data-cursor="grow">Done</button>
+                  <button onClick={handleClose} className={styles.close} data-cursor="grow">Done</button>
                 </div>
               </div>
             )}
@@ -565,7 +570,7 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
                 <p className={styles.deadText}>Herby fell off… try again?</p>
                 <div className={styles.winBtns}>
                   <button onClick={resetHerby} data-cursor="grow">New game</button>
-                  <button onClick={onClose} className={styles.close} data-cursor="grow">Done</button>
+                  <button onClick={handleClose} className={styles.close} data-cursor="grow">Done</button>
                 </div>
               </div>
             )}

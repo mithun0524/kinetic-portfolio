@@ -48,11 +48,10 @@ export function Contact({ onPlay }: { onPlay: () => void }) {
           label.style.top = `${y - 26}px`
         }
         if (playRef.current) {
-          // right-align to the home line so the big button grows leftward (stays on screen)
-          const lineRightRel = tr.right - cr.left
-          playRef.current.style.left = 'auto'
-          playRef.current.style.right = `${cr.width - lineRightRel}px`
-          playRef.current.style.top = `${y + 40}px`
+          // just below the home line, aligned with its left edge
+          playRef.current.style.right = 'auto'
+          playRef.current.style.left = `${x}px`
+          playRef.current.style.top = `${y + 36}px`
         }
       }
 
