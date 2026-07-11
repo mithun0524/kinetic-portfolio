@@ -71,8 +71,10 @@ export function Hero({ ready }: { ready: boolean }) {
     <header className={styles.hero}>
       <div ref={blob} className={styles.blob} aria-hidden />
 
-      <span className={styles.homeLabel}>HOME</span>
-      <span ref={heroLine} className={styles.homeLine} data-solid />
+      <div className={styles.homeWrap}>
+        <span className={styles.homeLabel}>HOME</span>
+        <span ref={heroLine} className={styles.homeLine} data-solid />
+      </div>
       <Mascot homeRef={heroLine} />
 
       <span ref={eyebrow} className={`eyebrow ${styles.eyebrow}`} style={{ opacity: 0 }}>
