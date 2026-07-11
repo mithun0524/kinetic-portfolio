@@ -4,7 +4,7 @@ import styles from './ContactForm.module.css'
 
 // Optional: paste a Web3Forms access key (https://web3forms.com — free, no backend)
 // to send silently. If empty, submitting falls back to opening a prefilled email.
-const WEB3FORMS_ACCESS_KEY = ''
+const WEB3FORMS_ACCESS_KEY = 'eac8983f-fe6f-4cbc-acb6-37a821caa31c'
 const EMAIL = 'mithun.chavan.a24@gmail.com'
 
 type Status = 'idle' | 'sending' | 'sent' | 'error'
