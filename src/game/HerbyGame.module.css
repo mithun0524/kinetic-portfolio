@@ -102,8 +102,13 @@
   position: absolute;
   top: 0;
   left: 0;
+  width: 52px;
+  height: 45px;
   will-change: transform;
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 2;
+  touch-action: none;
   filter: drop-shadow(0 8px 16px rgba(217, 119, 87, 0.25));
 }
 .sprite {

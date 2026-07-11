@@ -271,6 +271,41 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
+  // Herby is pokeable but NOT draggable in the game
+  const hi = useRef({ down: false, x: 0, y: 0, moved: false })
+  const flashFace = (f: 'happy' | 'dizzy') => {
+    setFace(f)
+    setTimeout(() => { if (statusRef.current !== 'won') setFace('normal') }, 1000)
+  }
+  const onHerbyEnter = (e: React.PointerEvent) => {
+    e.stopPropagation()
+    say(pick(['hi!', 'hehe~', '^-^', 'watchin me?', 'boop me!']))
+    flashFace('happy')
+  }
+  const onHerbyDown = (e: React.PointerEvent) => {
+    e.stopPropagation()
+    hi.current = { down: true, x: e.clientX, y: e.clientY, moved: false }
+    herbyEl.current?.setPointerCapture(e.pointerId)
+  }
+  const onHerbyMove = (e: React.PointerEvent) => {
+    if (!hi.current.down) return
+    e.stopPropagation()
+    if (!hi.current.moved && Math.hypot(e.clientX - hi.current.x, e.clientY - hi.current.y) > 6) {
+      hi.current.moved = true
+      say(pick(['no cheating! 😤', 'nice try~', 'i walk myself!', 'no shortcuts!', 'hey!! >:(']))
+      flashFace('dizzy')
+    }
+  }
+  const onHerbyUp = (e: React.PointerEvent) => {
+    e.stopPropagation()
+    herbyEl.current?.releasePointerCapture?.(e.pointerId)
+    if (hi.current.down && !hi.current.moved) {
+      say(pick(['boop!', 'hehe', 'yay!', 'again!', 'teehee']))
+      flashFace('happy')
+    }
+    hi.current.down = false
+  }
+
   const rel = (e: React.PointerEvent) => {
     const r = area.current!.getBoundingClientRect()
     return { x: e.clientX - r.left, y: e.clientY - r.top }
@@ -361,7 +396,14 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
           <div className={styles.flag} style={{ left: L.goalX, top: L.goalY }}><span>🏁</span></div>
         )}
 
-        <div ref={herbyEl} className={styles.herby}>
+        <div
+          ref={herbyEl}
+          className={styles.herby}
+          onPointerEnter={onHerbyEnter}
+          onPointerDown={onHerbyDown}
+          onPointerMove={onHerbyMove}
+          onPointerUp={onHerbyUp}
+        >
           <div ref={bubble} className={styles.bubble}><span ref={bubbleTxt} /></div>
           <svg viewBox="0 0 200 174" width="52" height="45" className={styles.sprite}>
             <g fill="#d97757">
