@@ -16,3 +16,11 @@
 .statement .chrome-text {
   font-style: italic;
 }
+
+@media (max-width: 1024px) {
+  .about {
+    min-height: auto;
+    justify-content: flex-start;
+    gap: 1.5rem;
+  }
+}
