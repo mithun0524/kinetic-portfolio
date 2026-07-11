@@ -31,6 +31,8 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
   const [face, setFace] = useState<'normal' | 'happy' | 'dizzy'>('normal')
   const [exitX, setExitX] = useState(0)
   const [ghostArrived, setGhostArrived] = useState(false)
+  const [finalScore, setFinalScore] = useState(0)
+  const scoreEl = useRef<HTMLSpanElement>(null)
 
   // world / physics state kept in refs (per-frame, no re-render)
   const W = useRef(0)
@@ -102,7 +104,8 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
 
     // simulate only while playing; ready/dead/won just keep painting the scene
     if (statusRef.current === 'play') {
-      speed.current = Math.min(5, 4 + worldX.current * 0.0002)
+      // start near cruising speed (no sluggish intro), ramp gently
+      speed.current = Math.min(5.4, 4.4 + worldX.current * 0.00016)
       worldX.current += speed.current
 
       vy.current += GRAV
@@ -146,11 +149,13 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
       flagEl.current.style.transform = `translateX(${flagX.current - worldX.current}px)`
     }
     if (fill.current) fill.current.style.width = `${Math.min(100, (herbWorld / flagX.current) * 100)}%`
+    if (scoreEl.current) scoreEl.current.textContent = `${Math.floor(worldX.current / 24)} m`
   }
 
   const win = () => {
     statusRef.current = 'won'
     setExitX(SX.current)
+    setFinalScore(Math.floor(worldX.current / 24))
     setGhostArrived(false)
     setStatus('won')
     setFace('happy')
@@ -158,6 +163,7 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
   const die = () => {
     statusRef.current = 'dead'
     setExitX(SX.current)
+    setFinalScore(Math.floor(worldX.current / 24))
     setGhostArrived(false)
     setStatus('dead')
     setFace('dizzy')
@@ -223,6 +229,7 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
         <div className={styles.hud}>
           <span className={styles.carpets}>Carpets: {'✦'.repeat(carpets) || '—'}</span>
           <span className={styles.track}><i ref={fill} /></span>
+          <span ref={scoreEl} className={styles.score}>0 m</span>
         </div>
 
         {/* ground platforms */}
@@ -311,6 +318,7 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
             {ghostArrived && (
               <div className={g.deadPanel}>
                 <h2 className={`display ${g.winTitle}`}>Herby&apos;s home! 🎉</h2>
+                <p className={styles.scoreLine}>score · {finalScore} m</p>
                 <div className={g.winBtns}>
                   <button onClick={build} data-cursor="grow">Play again</button>
                   <button onClick={onClose} className={g.close} data-cursor="grow">Done</button>
@@ -347,6 +355,7 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
             {ghostArrived && (
               <div className={g.deadPanel}>
                 <p className={g.deadText}>Herby fell off… try again?</p>
+                <p className={styles.scoreLine}>score · {finalScore} m</p>
                 <div className={g.winBtns}>
                   <button onClick={build} data-cursor="grow">New game</button>
                   <button onClick={onClose} className={g.close} data-cursor="grow">Done</button>
