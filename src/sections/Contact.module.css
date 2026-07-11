@@ -25,6 +25,16 @@
   will-change: transform;
 }
 
+/* highlighter marker on "move?" */
+.marker {
+  display: inline-block;
+  background: var(--text);
+  color: var(--bg);
+  padding: 0 0.1em;
+  border-radius: 4px;
+  -webkit-text-fill-color: var(--bg);
+}
+
 .cta {
   align-self: flex-start;
   display: inline-flex;

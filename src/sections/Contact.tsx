@@ -14,6 +14,7 @@ export function Contact({ onPlay }: { onPlay: () => void }) {
   const btn = useMagnetic<HTMLButtonElement>(0.5)
   const lineRef = useRef<HTMLSpanElement>(null)
   const labelRef = useRef<HTMLSpanElement>(null)
+  const markRef = useRef<HTMLSpanElement>(null)
   const playRef = useMagnetic<HTMLButtonElement>(0.4)
   const [formOpen, setFormOpen] = useState(false)
 
@@ -67,6 +68,19 @@ export function Contact({ onPlay }: { onPlay: () => void }) {
         },
       })
 
+      // marker stroke sweeps in behind "move?"
+      gsap.from(markRef.current, {
+        clipPath: 'inset(0 100% 0 0)',
+        duration: 0.9,
+        ease: 'power3.inOut',
+        delay: 0.35,
+        scrollTrigger: {
+          trigger: root.current,
+          start: 'top 70%',
+          toggleActions: 'play none none reverse',
+        },
+      })
+
       gsap.delayedCall(0.5, place)
       window.addEventListener('resize', place)
       const onScroll = () => place()
@@ -96,7 +110,7 @@ export function Contact({ onPlay }: { onPlay: () => void }) {
         </span>
         <span className={styles.lineMask}>
           <span ref={l3} className={styles.lineInner}>
-            should <span className="chrome-text">move?</span>
+            should <span ref={markRef} className={styles.marker}>move?</span>
           </span>
         </span>
       </h2>
