@@ -468,6 +468,7 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
                 <g stroke="#20140f" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" fill="none">
                   <path d="M72 90 L92 100 L72 110" />
                   <path d="M128 90 L108 100 L128 110" />
+                  <path d="M86 120 Q100 134 114 120" strokeWidth="5" />
                 </g>
               ) : face === 'angry' ? (
                 <g>
@@ -477,11 +478,13 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
                   </g>
                   <ellipse cx="84" cy="105" rx="7" ry="8" fill="#20140f" />
                   <ellipse cx="116" cy="105" rx="7" ry="8" fill="#20140f" />
+                  <path d="M90 126 Q100 118 110 126" fill="none" stroke="#20140f" strokeWidth="4.5" strokeLinecap="round" />
                 </g>
               ) : face === 'dizzy' ? (
                 <g stroke="#20140f" strokeWidth="6" strokeLinecap="round">
                   <path d="M76 92 L92 108" /><path d="M92 92 L76 108" />
                   <path d="M108 92 L124 108" /><path d="M124 92 L108 108" />
+                  <path d="M90 122 q5 -6 10 0 q5 6 10 0" fill="none" strokeWidth="4.5" />
                 </g>
               ) : (
                 <g ref={eyesG}>
@@ -489,6 +492,7 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
                   <ellipse cx="118" cy="97" rx="11" ry="13" fill="#20140f" />
                   <circle ref={pupilLeft} cx="85" cy="94" r="3.2" fill="#fff" />
                   <circle ref={pupilRight} cx="121" cy="94" r="3.2" fill="#fff" />
+                  <path d="M89 124 Q100 131 111 124" fill="none" stroke="#20140f" strokeWidth="4.5" strokeLinecap="round" />
                 </g>
               )}
             </g>

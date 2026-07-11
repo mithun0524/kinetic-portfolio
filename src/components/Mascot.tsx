@@ -773,10 +773,14 @@ function MascotBase(
                 <g ref={eyesHappy} stroke="#20140f" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" fill="none">
                   <path d="M72 86 L92 99 L72 112" />
                   <path d="M128 86 L108 99 L128 112" />
+                  {/* big grin */}
+                  <path d="M86 118 Q100 132 114 118" strokeWidth="5" />
                 </g>
                 <g ref={faceBlush} stroke="#20140f" strokeWidth="7" strokeLinecap="round" fill="none">
                   <path d="M72 100 Q82 90 92 100" />
                   <path d="M108 100 Q118 90 128 100" />
+                  {/* shy little smile */}
+                  <path d="M93 120 Q100 126 107 120" strokeWidth="4.5" />
                 </g>
                 <g ref={faceAngry}>
                   <g stroke="#20140f" strokeWidth="7" strokeLinecap="round">
@@ -785,6 +789,8 @@ function MascotBase(
                   </g>
                   <ellipse cx="84" cy="105" rx="7" ry="8" fill="#20140f" />
                   <ellipse cx="116" cy="105" rx="7" ry="8" fill="#20140f" />
+                  {/* gritted frown */}
+                  <path d="M90 124 Q100 116 110 124" fill="none" stroke="#20140f" strokeWidth="4.5" strokeLinecap="round" />
                 </g>
                 <g ref={faceSad}>
                   <g stroke="#20140f" strokeWidth="7" strokeLinecap="round" fill="none">
@@ -792,16 +798,22 @@ function MascotBase(
                     <path d="M108 100 Q118 108 128 96" />
                   </g>
                   <ellipse cx="86" cy="116" rx="3.5" ry="6" fill="#bfe3ff" />
+                  {/* wobbly frown */}
+                  <path d="M90 126 Q100 116 110 126" fill="none" stroke="#20140f" strokeWidth="4.5" strokeLinecap="round" />
                 </g>
                 <g ref={faceBored} stroke="#20140f" strokeWidth="7" strokeLinecap="round">
                   <path d="M70 100 L94 100" />
                   <path d="M106 100 L130 100" />
+                  {/* small yawn */}
+                  <ellipse cx="100" cy="122" rx="6" ry="7" fill="#20140f" stroke="none" />
                 </g>
                 <g ref={faceDizzy} stroke="#20140f" strokeWidth="6" strokeLinecap="round">
                   <path d="M76 92 L92 108" />
                   <path d="M92 92 L76 108" />
                   <path d="M108 92 L124 108" />
                   <path d="M124 92 L108 108" />
+                  {/* woozy squiggle */}
+                  <path d="M90 122 q5 -6 10 0 q5 6 10 0" fill="none" strokeWidth="4.5" />
                 </g>
               </g>
             </svg>
