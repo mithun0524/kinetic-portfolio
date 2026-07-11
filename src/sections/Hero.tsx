@@ -21,6 +21,7 @@ export function Hero({ ready }: { ready: boolean }) {
   const chat = useRef<HTMLDivElement>(null)
   const introRan = useRef(false)
   const [msgs, setMsgs] = useState<{ t: string; tx: boolean }[]>([])
+  const [typing, setTyping] = useState<boolean | null>(null)
 
   // a persistent iMessage-style thread at the home base; Herby peeks at his name
   useGSAP(
@@ -30,17 +31,19 @@ export function Hero({ ready }: { ready: boolean }) {
       const push = (t: string, tx: boolean) => setMsgs((p) => [...p, { t, tx }])
       const clear = () => gsap.to(chat.current, { autoAlpha: 0, y: -12, duration: 0.35, onComplete: () => setMsgs([]) })
       const m = () => herby.current
-      gsap
-        .timeline({ delay: 1.4 })
-        .call(() => push('home?', false))
-        .to({}, { duration: 2.2 })
-        .call(() => push('whose home?', true))
-        .to({}, { duration: 2.4 })
-        .call(() => { push("Herby's home.", false); m()?.peek() })
-        .to({}, { duration: 3.0 })
-        .call(() => push("who's Herby?", true))
-        .to({}, { duration: 2.6 })
-        .call(() => { clear(); m()?.duck() })
+      const tl = gsap.timeline({ delay: 1.4 })
+      // show the typing bubble on `tx`'s side, then land the message + optional hook
+      const line = (t: string, tx: boolean, after?: () => void) => {
+        tl.call(() => setTyping(tx))
+          .to({}, { duration: 1.1 })
+          .call(() => { setTyping(null); push(t, tx); after?.() })
+          .to({}, { duration: 1.3 })
+      }
+      line('home?', false)
+      line('whose home?', true)
+      line("Herby's home.", false, () => m()?.peek())
+      line("who's Herby?", true)
+      tl.call(() => { clear(); m()?.duck() })
         .to({}, { duration: 1.3 })
         .call(() => m()?.arrive())
     },
@@ -105,6 +108,11 @@ export function Hero({ ready }: { ready: boolean }) {
           {msgs.map((mm, i) => (
             <span key={i} className={`${styles.msg} ${mm.tx ? styles.tx : styles.rx}`}>{mm.t}</span>
           ))}
+          {typing !== null && (
+            <span className={`${styles.msg} ${styles.typing} ${typing ? styles.tx : styles.rx}`}>
+              <i /><i /><i />
+            </span>
+          )}
         </div>
         <span className={styles.homeLabel}>HOME</span>
         <span ref={heroLine} className={styles.homeLine} data-solid />
