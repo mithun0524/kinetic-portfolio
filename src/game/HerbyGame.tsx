@@ -63,7 +63,7 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
   const level = useRef<{ start: Seg; goal: Seg; fixed: Seg[]; goalX: number; goalY: number; startX: number; startY: number }>()
   const drawing = useRef(false)
   const dstart = useRef<Pt>({ x: 0, y: 0 })
-  const herb = useRef({ x: 0, y: 0, vy: 0, mode: 'walk' as 'walk' | 'fall' | 'hop' | 'carpet', face: 1, sx: 0, sy: 0, tx: 0, ty: 0, t: 0, dur: 1 })
+  const herb = useRef({ x: 0, y: 0, vy: 0, mode: 'walk' as 'walk' | 'fall' | 'hop' | 'carpet' | 'charge', face: 1, sx: 0, sy: 0, tx: 0, ty: 0, ctx: 0, cty: 0, t: 0, dur: 1 })
   const raf = useRef(0)
   const statusRef = useRef<'play' | 'won'>('play')
   statusRef.current = status
@@ -177,13 +177,22 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
           if (hopT) startArc(hopT, 'hop')
           else if (carpetsRef.current > 0) {
             const carT = findTarget(CARPET_X)
-            if (carT) { setCarpets((c) => c - 1); startArc(carT, 'carpet') }
-            else { h.mode = 'fall'; say(pick(JUDGE.stuck)) }
+            if (carT) {
+              // stop, react, and charge up before flying
+              setCarpets((c) => c - 1)
+              h.mode = 'charge'; h.t = 0; h.ctx = carT.x; h.cty = carT.y
+              herbyEl.current?.classList.add(styles.charged)
+              say(pick(['hmm… big gap', 'no path?', 'let me try…', 'one sec…', 'watch this…']))
+            } else { h.mode = 'fall'; say(pick(JUDGE.stuck)) }
           } else { h.mode = 'fall'; say(pick(JUDGE.stuck)) }
         }
         if (Math.abs(h.x - L.goalX) < 46 && Math.abs(h.y - L.goalY) < 50) {
           setStatus('won'); setFace('happy'); say(pick(JUDGE.win)); herbyEl.current?.classList.remove(styles.charged)
         }
+      } else if (h.mode === 'charge') {
+        // stand still and supercharge (~1s), then launch the carpet with a bubble
+        h.t += 1
+        if (h.t >= 60) startArc({ x: h.ctx, y: h.cty }, 'carpet')
       } else if (h.mode === 'hop' || h.mode === 'carpet') {
         h.t += 1 / h.dur
         const t = Math.min(h.t, 1)
