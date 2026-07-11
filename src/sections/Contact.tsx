@@ -65,7 +65,7 @@ export function Contact() {
         {/* ground line the mascot patrols on — beside the headline */}
         <div className={styles.groundWrap}>
           <span ref={lineRef} className={styles.groundLine} data-solid />
-          <Mascot ground range={110} />
+          <Mascot ground range={80} />
         </div>
       </div>
 

@@ -491,14 +491,18 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
 
     const tl = gsap.timeline({
       onComplete: () => {
-        // hard-reset every offset so it sits exactly on its home line (no drift)
+        // hard-reset every offset AND recenter the patrol so it sits exactly
+        // on its home line every time (no drift / walking off the line)
         gsap.set(drag.current, { x: 0, y: 0 })
         gsap.set(jump.current, { y: 0 })
+        gsap.set(facer.current, { x: 0, rotation: 0 })
         gsap.set(body.current, { x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0 })
+        gsap.set(walker.current, { x: 0 })
         busy.current = false
         setEmotion('happy', 1.4)
+        walkTl.current?.restart()
         if (hovering.current) stopWalking()
-        else startWalking()
+        else legTweens.current.forEach((t) => t.resume())
       },
     })
     const clampX = (s: { left: number; right: number }) => gsap.utils.clamp(s.left + 18, s.right - 18, homeFeetX)

@@ -55,7 +55,7 @@
 .groundWrap {
   position: relative;
   flex: 1;
-  min-width: 220px;
+  min-width: 340px;
   height: clamp(130px, 18vh, 190px);
 }
 
