@@ -216,7 +216,12 @@ export function Mascot({
       range.selectNodeContents(homeRef.current)
       const r = range.getBoundingClientRect()
       range.detach?.()
-      if (r.width > 20) return { left: r.left, right: r.right, top: r.top }
+      if (r.width > 20) {
+        // home sits BESIDE the text (to its right), on the same baseline
+        const gap = 48
+        const width = 190
+        return { left: r.right + gap, right: r.right + gap + width, top: r.top }
+      }
     }
     const ax = feetCenterX() - getX()
     const ay = feetBottom() - getY()
