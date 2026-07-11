@@ -77,9 +77,9 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
   const pupilRight = useRef<SVGCircleElement>(null)
   const cursor = useRef({ x: -9999, y: -9999 })
 
-  const say = (text: string) => {
+  const say = (text: string, force = false) => {
     const t = typeof performance !== 'undefined' ? performance.now() : 0
-    if (t - lastSay.current < 900) return // cooldown so he doesn't spam
+    if (!force && t - lastSay.current < 900) return // cooldown so he doesn't spam
     lastSay.current = t
     if (bubbleTxt.current) bubbleTxt.current.textContent = text
     if (bubble.current) {
@@ -292,7 +292,7 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
     e.stopPropagation()
     if (!hi.current.moved && Math.hypot(e.clientX - hi.current.x, e.clientY - hi.current.y) > 6) {
       hi.current.moved = true
-      say(pick(['no cheating! 😤', 'nice try~', 'i walk myself!', 'no shortcuts!', 'hey!! >:(']))
+      say(pick(['no cheating! 😤', 'nice try~', 'i walk myself!', 'no shortcuts!', 'hey!! >:(']), true)
       flashFace('dizzy')
     }
   }
@@ -300,8 +300,13 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
     e.stopPropagation()
     herbyEl.current?.releasePointerCapture?.(e.pointerId)
     if (hi.current.down && !hi.current.moved) {
-      say(pick(['boop!', 'hehe', 'yay!', 'again!', 'teehee']))
+      say(pick(['boop!', 'hehe', 'yay!', 'again!', 'teehee', 'wheee']), true)
       flashFace('happy')
+      // little jump on poke
+      if (herb.current.mode === 'walk') {
+        herb.current.vy = -10
+        herb.current.mode = 'fall'
+      }
     }
     hi.current.down = false
   }
