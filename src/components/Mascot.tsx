@@ -288,9 +288,9 @@ export function Mascot({
     walkOn.current = false
     snapHome()
     gsap.set(facer.current, { autoAlpha: 0 }) // sprite hidden; bubble at the empty home
-    gsap.delayedCall(0.9, () => say('home?', true))
-    gsap.delayedCall(2.3, () => say('…whose home?', true))
-    gsap.delayedCall(3.7, () => say('hmm…', true))
+    gsap.delayedCall(0.9, () => say('home?'))
+    gsap.delayedCall(2.3, () => say('…whose home?'))
+    gsap.delayedCall(3.7, () => say('hmm…'))
     gsap.delayedCall(4.9, () => {
       // Herby peeks in from the top above his home
       const h = homeRect()
@@ -298,7 +298,7 @@ export function Mascot({
       const ay = feetBottom() - getY()
       gsap.set(drag.current, { x: (h.left + h.right) / 2 - ax, y: 60 - ay })
       gsap.set(facer.current, { autoAlpha: 1 })
-      say('oh! there it is!', true)
+      say('oh! there it is!')
       gsap.to(drag.current, {
         y: h.top - ay,
         duration: 0.85,
@@ -309,7 +309,7 @@ export function Mascot({
             .to(body.current, { scaleY: 1, scaleX: 1, duration: 0.35, ease: 'elastic.out(1, 0.4)' })
           gsap.set(spark.current, { autoAlpha: 1, scale: 0.3, y: 20, transformOrigin: '50% 50%' })
           gsap.timeline().to(spark.current, { scale: 0.9, y: -6, duration: 0.4, ease: 'power2.out' }).to(spark.current, { autoAlpha: 0, duration: 0.3 }, '-=0.1')
-          gsap.delayedCall(0.25, () => say("hi! i'm Herby ^-^", true))
+          gsap.delayedCall(0.25, () => say("hi! i'm Herby ^-^"))
           gsap.delayedCall(2.0, () => { busy.current = false; startWalking() })
         },
       })
