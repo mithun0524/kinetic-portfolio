@@ -21,6 +21,7 @@
 
 .lineInner {
   display: block;
+  white-space: nowrap;
   will-change: transform;
 }
 
@@ -50,12 +51,12 @@
   display: flex;
   align-items: flex-end;
   gap: clamp(1.5rem, 5vw, 4rem);
+  flex-wrap: wrap;
 }
 
 .groundWrap {
   position: relative;
-  flex: 1;
-  min-width: 340px;
+  flex: 1 1 320px;
   height: clamp(130px, 18vh, 190px);
 }
 
@@ -67,6 +68,12 @@
   height: 1px;
   background: var(--line);
   transform-origin: 0 50%;
+}
+
+@media (max-width: 768px) {
+  .lineInner {
+    white-space: normal;
+  }
 }
 
 @media (max-width: 1024px) {
