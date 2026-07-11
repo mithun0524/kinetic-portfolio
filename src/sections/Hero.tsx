@@ -15,6 +15,7 @@ export function Hero({ ready }: { ready: boolean }) {
   const line2 = useRef<HTMLSpanElement>(null)
   const intro = useRef<HTMLParagraphElement>(null)
   const blob = useRef<HTMLDivElement>(null)
+  const heroLine = useRef<HTMLSpanElement>(null)
   const cue = useMagnetic<HTMLAnchorElement>(0.6)
 
   useGSAP(
@@ -70,7 +71,9 @@ export function Hero({ ready }: { ready: boolean }) {
     <header className={styles.hero}>
       <div ref={blob} className={styles.blob} aria-hidden />
 
-      <Mascot />
+      <span className={styles.homeLabel}>HOME</span>
+      <span ref={heroLine} className={styles.homeLine} data-solid />
+      <Mascot homeRef={heroLine} />
 
       <span ref={eyebrow} className={`eyebrow ${styles.eyebrow}`} style={{ opacity: 0 }}>
         Full-Stack AI Engineer
