@@ -21,18 +21,22 @@ export default function App() {
   const curtain = useRef<HTMLDivElement>(null)
   useLenis()
 
-  // one shared coral curtain: cover → swap → reveal, used for both open & close
+  // shared coral curtain: cover → swap → reveal. Close mirrors open (reversed).
   const transition = (toPlaying: boolean) => {
     const el = curtain.current
     if (!el) { setPlaying(toPlaying); return }
+    // open wipes upward (cover from bottom, reveal off the top);
+    // close reverses it (cover from top, reveal off the bottom)
+    const coverOrigin = toPlaying ? '50% 100%' : '50% 0%'
+    const revealOrigin = toPlaying ? '50% 0%' : '50% 100%'
     gsap.killTweensOf(el)
-    gsap.set(el, { visibility: 'visible', transformOrigin: '50% 100%', scaleY: 0 })
+    gsap.set(el, { visibility: 'visible', transformOrigin: coverOrigin, scaleY: 0 })
     gsap
       .timeline()
       .to(el, { scaleY: 1, duration: 0.42, ease: 'power3.in' })
       .add(() => {
         setPlaying(toPlaying)
-        gsap.set(el, { transformOrigin: '50% 0%' })
+        gsap.set(el, { transformOrigin: revealOrigin })
       })
       .to(el, { scaleY: 0, duration: 0.55, ease: 'power3.out', delay: 0.05 })
       .set(el, { visibility: 'hidden' })
