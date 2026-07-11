@@ -237,6 +237,22 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
     return r ? r.left + r.width / 2 : 0
   }
 
+  // every real text block becomes a ledge; skip moving strips + the mascots
+  const getSurfaces = () => {
+    const els = document.querySelectorAll<HTMLElement>(
+      'main h1, main h2, main h3, main h4, main p, main li, main a, [data-solid]'
+    )
+    const out: { left: number; right: number; top: number }[] = []
+    els.forEach((el) => {
+      if (el.closest('[data-nofloor]')) return
+      const r = el.getBoundingClientRect()
+      if (r.width < 50 || r.height < 8) return
+      if (!(el.textContent || '').trim() && !el.hasAttribute('data-solid')) return
+      out.push({ left: r.left, right: r.right, top: r.top })
+    })
+    return out
+  }
+
   const dropAndFall = () => {
     busy.current = true
     walkTl.current?.pause()
@@ -249,8 +265,7 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
     const startFeet = feetBottom()
     const fx = feetCenterX()
     let target = window.innerHeight - 6 // floor fallback
-    document.querySelectorAll<HTMLElement>('[data-solid]').forEach((el) => {
-      const r = el.getBoundingClientRect()
+    getSurfaces().forEach((r) => {
       if (fx >= r.left && fx <= r.right && r.top >= startFeet - 2 && r.top < target) {
         target = r.top
       }
@@ -294,10 +309,7 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
     const toDragX = (px: number) => px - homeFeetX
     const toDragY = (py: number) => py - homeFeetY
 
-    const surfaces = Array.from(document.querySelectorAll<HTMLElement>('[data-solid]')).map((el) => {
-      const r = el.getBoundingClientRect()
-      return { left: r.left, right: r.right, top: r.top }
-    })
+    const surfaces = getSurfaces()
 
     let cx = feetCenterX()
     let cy = feetBottom()
@@ -370,6 +382,7 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
       ref={root}
       className={`${styles.mascot} ${ground ? styles.ground : ''}`}
       aria-hidden
+      data-nofloor
       onPointerEnter={() => hover(true)}
       onPointerLeave={() => hover(false)}
       onPointerDown={onDown}

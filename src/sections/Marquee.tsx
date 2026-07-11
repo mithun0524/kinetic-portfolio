@@ -46,7 +46,7 @@ export function Marquee() {
 
   const items = [...WORDS, ...WORDS]
   return (
-    <div className={styles.wrap} aria-hidden>
+    <div className={styles.wrap} aria-hidden data-nofloor>
       <div ref={track} className={styles.track}>
         {items.map((w, i) => (
           <span key={i} className={`display ${styles.item}`}>

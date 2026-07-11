@@ -137,7 +137,7 @@ export function Capabilities() {
         ))}
       </div>
 
-      <div className={styles.strip}>
+      <div className={styles.strip} data-nofloor>
         <span className={`eyebrow ${styles.stripLabel}`}>( Capabilities )</span>
 
         <div ref={rowA} className={styles.panel}>

@@ -132,7 +132,7 @@ export function ContactForm({ open, onClose }: { open: boolean; onClose: () => v
   )
 
   return (
-    <div ref={root} className={styles.overlay} role="dialog" aria-modal="true">
+    <div ref={root} className={styles.overlay} role="dialog" aria-modal="true" data-nofloor>
       <div className={styles.backdrop} onClick={onClose} />
       <div ref={panel} className={styles.panel}>
         <button className={styles.close} onClick={onClose} aria-label="Close" data-cursor="grow">
