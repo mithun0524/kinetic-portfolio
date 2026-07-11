@@ -108,7 +108,7 @@ export function MobileHerby() {
     taps.current = taps.current.filter((t) => now - t < 2200)
     const rapid = taps.current.length
 
-    if (rapid >= 13) return leave() // last straw — he walks off
+    if (rapid >= 10) return leave() // last straw — he walks off
 
     let m: Mood = 'happy'
     if (rapid >= 7) m = 'sad' // kept poking after getting mad → he's hurt
