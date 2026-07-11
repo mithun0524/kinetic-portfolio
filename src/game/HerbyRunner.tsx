@@ -25,7 +25,7 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
   const fill = useRef<HTMLDivElement>(null)
   const raf = useRef(0)
 
-  const [status, setStatus] = useState<'play' | 'dead' | 'won'>('play')
+  const [status, setStatus] = useState<'ready' | 'play' | 'dead' | 'won'>('ready')
   const [carpets, setCarpets] = useState(CARPETS)
   const [face, setFace] = useState<'normal' | 'happy' | 'dizzy'>('normal')
 
@@ -43,7 +43,7 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
   const onGround = useRef(true)
   const carpetUsed = useRef(false)
   const carpetsRef = useRef(CARPETS)
-  const statusRef = useRef<'play' | 'dead' | 'won'>('play')
+  const statusRef = useRef<'ready' | 'play' | 'dead' | 'won'>('ready')
   const segEls = useRef<(HTMLDivElement | null)[]>([])
   const [segCount, setSegCount] = useState(0)
 
@@ -81,9 +81,9 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
     onGround.current = true
     carpetUsed.current = false
     carpetsRef.current = CARPETS
-    statusRef.current = 'play'
+    statusRef.current = 'ready'
     setCarpets(CARPETS)
-    setStatus('play')
+    setStatus('ready')
     setFace('normal')
   }
 
@@ -92,39 +92,36 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
 
   const loop = () => {
     raf.current = requestAnimationFrame(loop)
-    if (statusRef.current !== 'play') return
 
-    // ramp speed slightly with distance
-    speed.current = Math.min(6, 3.6 + worldX.current * 0.00035)
-    worldX.current += speed.current
+    // simulate only while playing; ready/dead/won just keep painting the scene
+    if (statusRef.current === 'play') {
+      speed.current = Math.min(6, 3.6 + worldX.current * 0.00035)
+      worldX.current += speed.current
 
-    // physics
-    vy.current += GRAV
-    y.current += vy.current
-    const herbWorld = worldX.current + SX.current
-    if (y.current >= GY.current) {
-      if (groundAt(herbWorld)) {
-        y.current = GY.current
-        vy.current = 0
-        onGround.current = true
-        carpetUsed.current = false
+      vy.current += GRAV
+      y.current += vy.current
+      const hw = worldX.current + SX.current
+      if (y.current >= GY.current) {
+        if (groundAt(hw)) {
+          y.current = GY.current
+          vy.current = 0
+          onGround.current = true
+          carpetUsed.current = false
+        } else {
+          onGround.current = false // over a gap → keep falling
+        }
       } else {
-        onGround.current = false // over a gap → keep falling
+        onGround.current = false
       }
-    } else {
-      onGround.current = false
+
+      if (hw >= flagX.current) win()
+      else if (y.current > H.current + 80) die()
     }
 
-    // win / lose
-    if (herbWorld >= flagX.current) return win()
-    if (y.current > H.current + 80) return die()
-
-    // paint
-    const hx = SX.current
-    const hy = y.current - HERB_H
+    // paint (always) so the ready screen shows the level and end screens freeze it
+    const herbWorld = worldX.current + SX.current
     const he = herbyEl.current
-    if (he) he.style.transform = `translate(${hx}px, ${hy}px)`
-    // ground segments
+    if (he) he.style.transform = `translate(${SX.current}px, ${y.current - HERB_H}px)`
     segs.current.forEach((s, i) => {
       const node = segEls.current[i]
       if (!node) return
@@ -153,6 +150,11 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
   }
 
   const tap = () => {
+    if (statusRef.current === 'ready') {
+      statusRef.current = 'play'
+      setStatus('play')
+      return
+    }
     if (statusRef.current !== 'play') return
     if (onGround.current) {
       vy.current = -JUMP
@@ -252,9 +254,18 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
           </svg>
         </div>
 
+        {/* start screen */}
+        {status === 'ready' && (
+          <div className={styles.card} onPointerDown={(e) => e.stopPropagation()}>
+            <p className={styles.cardTitle}>Run Herby Home</p>
+            <p className={styles.cardSub}>Tap to hop the gaps · tap again mid-air for his carpet</p>
+            <button className={styles.retry} onClick={tap} data-cursor="grow">Tap to start</button>
+          </div>
+        )}
+
         {/* end states */}
-        {status !== 'play' && (
-          <div className={styles.card}>
+        {(status === 'won' || status === 'dead') && (
+          <div className={styles.card} onPointerDown={(e) => e.stopPropagation()}>
             <p className={styles.cardTitle}>{status === 'won' ? 'Herby’s home! 🎉' : 'oops — he fell!'}</p>
             <button className={styles.retry} onClick={build} data-cursor="grow">
               {status === 'won' ? 'Play again' : 'Try again'}
