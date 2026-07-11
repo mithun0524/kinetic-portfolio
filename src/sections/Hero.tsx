@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { gsap, useGSAP, prefersReducedMotion } from '../lib/gsap'
 import { useMagnetic } from '../hooks/useMagnetic'
-import { Mascot } from '../components/Mascot'
+import { Mascot, type MascotHandle } from '../components/Mascot'
 import styles from './Hero.module.css'
 
 /**
@@ -17,6 +17,40 @@ export function Hero({ ready }: { ready: boolean }) {
   const blob = useRef<HTMLDivElement>(null)
   const heroLine = useRef<HTMLSpanElement>(null)
   const cue = useMagnetic<HTMLAnchorElement>(0.6)
+  const herby = useRef<MascotHandle>(null)
+  const chatL = useRef<HTMLDivElement>(null)
+  const chatR = useRef<HTMLDivElement>(null)
+  const introRan = useRef(false)
+
+  // two mystery voices chat about the empty home; Herby peeks at his name
+  useGSAP(
+    () => {
+      if (!ready || prefersReducedMotion() || introRan.current) return
+      introRan.current = true
+      const bub = (el: HTMLDivElement | null, text: string, hold: number) => {
+        if (!el) return
+        const s = el.querySelector('span')
+        if (s) s.textContent = text
+        gsap.fromTo(el, { autoAlpha: 0, y: 10, scale: 0.85 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.35, ease: 'back.out(2)' })
+        gsap.to(el, { autoAlpha: 0, duration: 0.3, delay: hold })
+      }
+      const m = () => herby.current
+      gsap
+        .timeline({ delay: 1.4 })
+        .call(() => bub(chatL.current, 'home?', 2.4))
+        .to({}, { duration: 3 })
+        .call(() => bub(chatR.current, 'whose home?', 2.4))
+        .to({}, { duration: 3 })
+        .call(() => { bub(chatL.current, "Herby's home.", 2.8); m()?.peek() })
+        .to({}, { duration: 3 })
+        .call(() => bub(chatR.current, "who's Herby?", 2.4))
+        .to({}, { duration: 2.6 })
+        .call(() => m()?.duck())
+        .to({}, { duration: 1.2 })
+        .call(() => m()?.arrive())
+    },
+    { dependencies: [ready] }
+  )
 
   useGSAP(
     () => {
@@ -75,7 +109,11 @@ export function Hero({ ready }: { ready: boolean }) {
         <span className={styles.homeLabel}>HOME</span>
         <span ref={heroLine} className={styles.homeLine} data-solid />
       </div>
-      <Mascot homeRef={heroLine} intro />
+
+      <div ref={chatL} className={`${styles.chat} ${styles.chatL}`} aria-hidden><span /></div>
+      <div ref={chatR} className={`${styles.chat} ${styles.chatR}`} aria-hidden><span /></div>
+
+      <Mascot ref={herby} homeRef={heroLine} intro />
 
       <span ref={eyebrow} className={`eyebrow ${styles.eyebrow}`} style={{ opacity: 0 }}>
         Full-Stack AI Engineer

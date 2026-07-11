@@ -1,6 +1,12 @@
-import { useRef, type RefObject } from 'react'
+import { useRef, forwardRef, useImperativeHandle, type RefObject } from 'react'
 import { gsap, useGSAP, prefersReducedMotion } from '../lib/gsap'
 import styles from './Mascot.module.css'
+
+export interface MascotHandle {
+  peek: () => void
+  duck: () => void
+  arrive: () => void
+}
 
 // cute, non-human blurbs per mood
 const SAY: Record<string, string[]> = {
@@ -25,15 +31,18 @@ const rand = (a: string[]) => a[Math.floor(Math.random() * a.length)]
  * only ever standing on visible text (never invisible layout boxes).
  * Moods: happy/blush/angry/sad/bored/dizzy. Speech bubbles throughout.
  */
-export function Mascot({
-  ground = false,
-  homeRef,
-  intro = false,
-}: {
-  ground?: boolean
-  homeRef?: RefObject<HTMLElement | null>
-  intro?: boolean
-} = {}) {
+function MascotBase(
+  {
+    ground = false,
+    homeRef,
+    intro = false,
+  }: {
+    ground?: boolean
+    homeRef?: RefObject<HTMLElement | null>
+    intro?: boolean
+  },
+  ref: React.Ref<MascotHandle>
+) {
   const root = useRef<HTMLDivElement>(null)
   const drag = useRef<HTMLDivElement>(null)
   const jump = useRef<HTMLDivElement>(null)
@@ -282,59 +291,64 @@ export function Mascot({
     gsap.set(drag.current, { x: (h.left + h.right) / 2 - ax, y: h.top - ay })
   }
 
-  // cinematic hero intro: empty home muses, Herby peeks upside-down, then drops in
-  const runIntro = () => {
-    busy.current = true
-    walkOn.current = false
-    snapHome()
-    // capture the home anchor once (rotation 0) so positioning stays consistent
-    const homeCx = (homeRect().left + homeRect().right) / 2
-    const homeTop = homeRect().top
-    const ax0 = feetCenterX() - getX()
-    const ay0 = feetBottom() - getY()
-    const setFeet = (px: number, py: number) => gsap.set(drag.current, { x: px - ax0, y: py - ay0 })
-    gsap.set(facer.current, { autoAlpha: 0, rotation: 0 })
-
-    const tl = gsap.timeline({ defaults: { ease: 'power2.inOut' } })
-    // --- slow chat from the empty home ---
-    tl.call(() => say('home?', 2.6))
-      .to({}, { duration: 3 })
-      .call(() => say('…whose home?', 2.6))
-      .to({}, { duration: 3.2 })
-      .call(() => say('hmm…', 2.4))
-      .to({}, { duration: 3 })
-      // --- peek upside-down from the top (only eyes), hold ~2s ---
-      .call(() => {
-        gsap.set(facer.current, { autoAlpha: 1, rotation: 180 })
-        setFeet(homeCx, homeTop - 250) // hangs from above; upper body clipped by the hero
-      })
-      .fromTo(pupilL.current, { y: 0 }, { y: 3, duration: 0.9, yoyo: true, repeat: 1 }, '<')
-      .fromTo(pupilR.current, { y: 0 }, { y: 3, duration: 0.9, yoyo: true, repeat: 1 }, '<')
-      .to({}, { duration: 2 })
-      // --- duck back up ---
-      .call(() => setFeet(homeCx, homeTop - 520))
-      .to({}, { duration: 1.1 })
-      .call(() => gsap.set(facer.current, { autoAlpha: 0, rotation: 0 }))
-      .to({}, { duration: 0.6 })
-      // --- come in full: drop from the top onto home (slow) ---
-      .call(() => {
-        gsap.set(facer.current, { autoAlpha: 1 })
-        setFeet(homeCx, 30)
-        say('there it is!', 2)
-      })
-      .to(drag.current, { y: homeTop - ay0, duration: 1.15, ease: 'bounce.out' })
-      .call(() => {
+  // --- hero intro, driven imperatively by the Hero chat ---
+  const setFeet = (px: number, py: number) => {
+    const ax = feetCenterX() - getX()
+    const ay = feetBottom() - getY()
+    gsap.set(drag.current, { x: px - ax, y: py - ay })
+  }
+  // Herby peeks upside-down from the top (only his eyes, hero clips the rest)
+  const peek = () => {
+    if (prefersReducedMotion()) return
+    const h = homeRect()
+    gsap.set(facer.current, { autoAlpha: 1, rotation: 180 })
+    setFeet((h.left + h.right) / 2, h.top - 240)
+    gsap.killTweensOf([pupilL.current, pupilR.current])
+    gsap.fromTo([pupilL.current, pupilR.current], { y: 0 }, { y: 3, duration: 0.9, yoyo: true, repeat: -1, ease: 'sine.inOut' })
+  }
+  const duck = () => {
+    if (prefersReducedMotion()) return
+    const h = homeRect()
+    gsap.killTweensOf([pupilL.current, pupilR.current])
+    gsap.set([pupilL.current, pupilR.current], { y: 0 })
+    setFeet((h.left + h.right) / 2, h.top - 240)
+    gsap.to(drag.current, {
+      y: `-=${300}`,
+      duration: 0.9,
+      ease: 'power2.in',
+      onComplete: () => gsap.set(facer.current, { autoAlpha: 0, rotation: 0 }),
+    })
+  }
+  // Herby drops in full, lands, introduces himself, then starts pacing
+  const arrive = () => {
+    if (prefersReducedMotion()) {
+      snapHome()
+      gsap.set(facer.current, { autoAlpha: 1, rotation: 0 })
+      busy.current = false
+      startWalking()
+      return
+    }
+    const h = homeRect()
+    gsap.set(facer.current, { autoAlpha: 1, rotation: 0 })
+    setFeet((h.left + h.right) / 2, 30)
+    say('there it is!', 2)
+    const ay = feetBottom() - getY()
+    gsap.to(drag.current, {
+      y: h.top - ay,
+      duration: 1.15,
+      ease: 'bounce.out',
+      onComplete: () => {
         gsap.timeline()
           .to(body.current, { scaleY: 0.68, scaleX: 1.28, transformOrigin: '50% 100%', duration: 0.1 })
           .to(body.current, { scaleY: 1, scaleX: 1, duration: 0.4, ease: 'elastic.out(1, 0.4)' })
         gsap.set(spark.current, { autoAlpha: 1, scale: 0.3, y: 20, transformOrigin: '50% 50%' })
         gsap.timeline().to(spark.current, { scale: 0.9, y: -6, duration: 0.4, ease: 'power2.out' }).to(spark.current, { autoAlpha: 0, duration: 0.3 }, '-=0.1')
-      })
-      .to({}, { duration: 0.8 })
-      .call(() => say("hi! i'm Herby ^-^", 2.4))
-      .to({}, { duration: 2.6 })
-      .call(() => { busy.current = false; startWalking() })
+        gsap.delayedCall(0.8, () => say("hi! i'm Herby ^-^", 2.4))
+        gsap.delayedCall(3.2, () => { busy.current = false; startWalking() })
+      },
+    })
   }
+  useImperativeHandle(ref, () => ({ peek, duck, arrive }))
 
   useGSAP(
     () => {
@@ -404,10 +418,14 @@ export function Mascot({
       }
       window.addEventListener('pointermove', onMove)
 
-      // settle onto home once ready; intro waits for the loader to lift
-      gsap.delayedCall(intro ? 2.8 : 0.6, () => {
-        if (intro) runIntro()
-        else {
+      // settle onto home; in intro mode stay hidden until Hero drives arrive()
+      gsap.delayedCall(0.6, () => {
+        if (intro) {
+          busy.current = true
+          walkOn.current = false
+          snapHome()
+          gsap.set(facer.current, { autoAlpha: 0 })
+        } else {
           snapHome()
           patrol()
         }
@@ -785,3 +803,5 @@ export function Mascot({
     </div>
   )
 }
+
+export const Mascot = forwardRef(MascotBase)

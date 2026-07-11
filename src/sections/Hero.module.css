@@ -84,8 +84,43 @@
   white-space: nowrap;
 }
 
+/* intro chat: two mystery voices */
+.chat {
+  position: absolute;
+  z-index: 2;
+  opacity: 0;
+  visibility: hidden;
+  padding: 0.55rem 1rem;
+  border-radius: 14px;
+  background: var(--text);
+  color: var(--bg);
+  font-family: var(--font-display);
+  font-size: clamp(0.9rem, 1.4vw, 1.3rem);
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.chat::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  border: 7px solid transparent;
+  border-top-color: var(--text);
+}
+.chatL {
+  left: clamp(2rem, 10vw, 12rem);
+  top: 30%;
+}
+.chatL::after { left: 22px; }
+.chatR {
+  right: clamp(4rem, 14vw, 18rem);
+  top: 46%;
+}
+.chatR::after { right: 22px; }
+
 @media (max-width: 1024px) {
-  .homeWrap {
+  .homeWrap,
+  .chat {
     display: none;
   }
 }
