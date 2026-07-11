@@ -2,6 +2,16 @@ import { useRef } from 'react'
 import { gsap, useGSAP, prefersReducedMotion } from '../lib/gsap'
 import styles from './Mascot.module.css'
 
+// cute, non-human blurbs
+const SAY = {
+  idle: ['beep!', 'boop~', 'la la la', 'hmm?', 'ooo', '*wiggle*', 'wheee', 'hi hi!', '^-^', 'nyoom', '*hums*'],
+  hover: ['hi!', 'you again? ^-^', 'pat pat?', 'ooh a cursor!', 'sup!', '*blinks*', 'hehe~', 'hi friend!', 'boop me!'],
+  click: ['boing!', 'wheee!', 'yay!', '*giggles*', 'hop hop!', 'again! again!', 'weee~', 'eee!'],
+  climb: ['up we go!', 'climbing!', 'almost home~', 'hup!', 'wooo', '*determined*', 'nearly there!', 'so high!'],
+  land: ['oof!', 'ta-da!', '*lands*', 'phew~', 'ow- jk!'],
+}
+const rand = (a: string[]) => a[Math.floor(Math.random() * a.length)]
+
 /**
  * A blocky little buddy (Claude-Code-ish) in the hero's empty space.
  * - Idle: strolls left/right with stepping legs + a waddle, eyes follow cursor, blinks.
@@ -24,6 +34,8 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
   const legL = useRef<SVGRectElement>(null)
   const legR = useRef<SVGRectElement>(null)
   const spark = useRef<SVGGElement>(null)
+  const bubble = useRef<HTMLDivElement>(null)
+  const bubbleText = useRef<HTMLSpanElement>(null)
   const walkTl = useRef<gsap.core.Timeline | null>(null)
   const legTweens = useRef<gsap.core.Tween[]>([])
 
@@ -32,6 +44,18 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
   const drag_ = useRef({ active: false, moved: false, sx: 0, sy: 0, ox: 0, oy: 0 })
 
   const face = (dir: number) => gsap.to(facer.current, { scaleX: dir, duration: 0.25, overwrite: 'auto' })
+
+  const say = (text: string, hold = 1.8) => {
+    if (prefersReducedMotion() || !bubble.current) return
+    if (bubbleText.current) bubbleText.current.textContent = text
+    gsap.killTweensOf(bubble.current)
+    gsap.fromTo(
+      bubble.current,
+      { autoAlpha: 0, scale: 0.5, y: 8 },
+      { autoAlpha: 1, scale: 1, y: 0, duration: 0.25, ease: 'back.out(2.5)' }
+    )
+    gsap.to(bubble.current, { autoAlpha: 0, scale: 0.7, duration: 0.25, delay: hold })
+  }
 
   useGSAP(
     () => {
@@ -91,6 +115,15 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
       }
       idle()
 
+      // random cute chatter
+      const talk = () => {
+        gsap.delayedCall(6 + Math.random() * 9, () => {
+          if (!drag_.current.active) say(rand(SAY.idle))
+          talk()
+        })
+      }
+      talk()
+
       // pupils follow cursor
       const track = (p: SVGGElement | null, e: PointerEvent, max: number) => {
         if (!p) return
@@ -145,6 +178,7 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
       stopWalking()
       showHappy(true)
       lean(true)
+      say(rand(SAY.hover))
     } else {
       startWalking()
       showHappy(false)
@@ -157,6 +191,7 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
     busy.current = true
     stopWalking()
     showHappy(true)
+    say(rand(SAY.click))
     gsap
       .timeline({
         onComplete: () => {
@@ -307,11 +342,13 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
     // dust sparkle
     gsap.set(spark.current, { autoAlpha: 1, scale: 0.3, y: 20, transformOrigin: '50% 50%' })
     gsap.timeline().to(spark.current, { scale: 0.9, y: -6, duration: 0.4, ease: 'power2.out' }).to(spark.current, { autoAlpha: 0, duration: 0.3 }, '-=0.1')
-    gsap.delayedCall(0.5, returnHome)
+    say(rand(SAY.land))
+    gsap.delayedCall(0.7, returnHome)
   }
 
   const returnHome = () => {
     legTweens.current.forEach((t) => t.resume())
+    say(rand(SAY.climb), 2.4)
 
     // map between viewport pixels and the drag transform (home = drag 0,0)
     const dragX0 = (gsap.getProperty(drag.current, 'x') as number) || 0
@@ -341,26 +378,31 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
       const d = Math.abs(px - cx)
       if (d < 3) return
       face(px < cx ? -1 : 1)
-      tl.to(drag.current, { x: toDragX(px), duration: gsap.utils.clamp(0.2, 0.9, d / 260), ease: 'power2.inOut' })
+      // slower, steady pace so it reads as walking
+      tl.to(drag.current, { x: toDragX(px), duration: gsap.utils.clamp(0.45, 1.6, d / 150), ease: 'none' })
       cx = px
     }
     const hopTo = (px: number, py: number) => {
       face(px < cx ? -1 : 1)
-      const up = gsap.utils.clamp(60, 140, cy - py + 34)
-      tl.to(body.current, { scaleY: 0.8, scaleX: 1.2, transformOrigin: '50% 100%', duration: 0.08 })
-        .to(drag.current, { x: toDragX(px), duration: 0.55, ease: 'power1.inOut' })
+      tl.call(() => {
+        if (Math.random() < 0.4) say(rand(SAY.climb), 1.4)
+      })
+      const up = gsap.utils.clamp(50, 100, cy - py + 24)
+      tl.to(body.current, { scaleY: 0.82, scaleX: 1.18, transformOrigin: '50% 100%', duration: 0.1, ease: 'power2.in' })
+        .to(drag.current, { x: toDragX(px), duration: 0.42, ease: 'power1.inOut' })
         .to(
           drag.current,
           {
             keyframes: [
-              { y: toDragY(py) - up, duration: 0.26, ease: 'power2.out' },
-              { y: toDragY(py), duration: 0.3, ease: 'power2.in' },
+              { y: toDragY(py) - up, duration: 0.19, ease: 'power2.out' },
+              { y: toDragY(py), duration: 0.21, ease: 'power2.in' },
             ],
           },
           '<'
         )
-        .to(body.current, { scaleY: 1.12, scaleX: 0.9, duration: 0.2 }, '<')
-        .to(body.current, { scaleY: 1, scaleX: 1, duration: 0.3, ease: 'elastic.out(1, 0.4)' })
+        .to(body.current, { scaleY: 1.1, scaleX: 0.92, duration: 0.14 }, '<')
+        .to(body.current, { scaleY: 0.86, scaleX: 1.14, duration: 0.08 }) // impact squash
+        .to(body.current, { scaleY: 1, scaleX: 1, duration: 0.3, ease: 'elastic.out(1, 0.5)' })
       cx = px
       cy = py
     }
@@ -416,7 +458,10 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
     >
       <div ref={drag}>
         <div ref={walker}>
-          <div ref={jump}>
+          <div ref={jump} className={styles.layer}>
+            <div ref={bubble} className={styles.bubble}>
+              <span ref={bubbleText} />
+            </div>
             <div ref={facer}>
               <svg viewBox="0 0 200 174" className={styles.svg}>
                 <g ref={spark} fill="var(--m)">
