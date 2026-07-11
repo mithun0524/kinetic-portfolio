@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { gsap, useGSAP, prefersReducedMotion } from '../lib/gsap'
 import { useMagnetic } from '../hooks/useMagnetic'
 import { ContactForm } from '../components/ContactForm'
+import { Mascot } from '../components/Mascot'
 import styles from './Contact.module.css'
 
 /** Contact: masked outro headline + magnetic link + footer meta. */
@@ -32,6 +33,7 @@ export function Contact() {
 
   return (
     <footer ref={root} className={`section ${styles.contact}`} id="contact">
+      <Mascot />
       <span className="eyebrow">( Let&apos;s build )</span>
 
       <h2 className={`display ${styles.line}`}>

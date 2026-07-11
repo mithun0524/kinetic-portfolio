@@ -60,6 +60,36 @@ export function Mascot() {
       }
       gsap.delayedCall(2.6, blink)
 
+      // random idle antics — occasional hop or look-around
+      const lookAround = () => {
+        const dirs = [
+          [-4, -2],
+          [4, -2],
+          [0, 3],
+          [-4, 2],
+          [4, 2],
+        ]
+        const [dx, dy] = dirs[Math.floor(Math.random() * dirs.length)]
+        gsap.to([pupilL.current, pupilR.current], {
+          x: dx,
+          y: dy,
+          duration: 0.3,
+          yoyo: true,
+          repeat: 1,
+          ease: 'power2.inOut',
+        })
+      }
+      const idle = () => {
+        gsap.delayedCall(3 + Math.random() * 4, () => {
+          if (!busy.current && !hovering.current && !drag_.current.active) {
+            if (Math.random() < 0.55) hop()
+            else lookAround()
+          }
+          idle()
+        })
+      }
+      idle()
+
       // pupils follow cursor
       const track = (p: SVGGElement | null, e: PointerEvent, max: number) => {
         if (!p) return
