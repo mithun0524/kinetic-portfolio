@@ -14,7 +14,7 @@ export function Contact({ onPlay }: { onPlay: () => void }) {
   const btn = useMagnetic<HTMLButtonElement>(0.5)
   const lineRef = useRef<HTMLSpanElement>(null)
   const labelRef = useRef<HTMLSpanElement>(null)
-  const playRef = useRef<HTMLButtonElement>(null)
+  const playRef = useMagnetic<HTMLButtonElement>(0.4)
   const [formOpen, setFormOpen] = useState(false)
 
   useGSAP(
@@ -106,9 +106,9 @@ export function Contact({ onPlay }: { onPlay: () => void }) {
       <span ref={labelRef} className={styles.homeLabel}>HOME</span>
       <span ref={lineRef} className={styles.homeLine} data-solid />
       <Mascot ground homeRef={lineRef} />
-      <button ref={playRef} className={`${styles.cta} ${styles.playHere}`} onClick={onPlay} data-cursor="grow">
+      <button ref={playRef} className={styles.playHere} onClick={onPlay} data-cursor="grow">
         <span>Play with Herby</span>
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <svg width="15" height="15" viewBox="0 0 20 20" fill="none">
           <path d="M7 5l8 5-8 5V5z" fill="currentColor" />
         </svg>
       </button>
