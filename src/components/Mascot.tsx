@@ -28,9 +28,11 @@ const rand = (a: string[]) => a[Math.floor(Math.random() * a.length)]
 export function Mascot({
   ground = false,
   homeRef,
+  intro = false,
 }: {
   ground?: boolean
   homeRef?: RefObject<HTMLElement | null>
+  intro?: boolean
 } = {}) {
   const root = useRef<HTMLDivElement>(null)
   const drag = useRef<HTMLDivElement>(null)
@@ -280,6 +282,40 @@ export function Mascot({
     gsap.set(drag.current, { x: (h.left + h.right) / 2 - ax, y: h.top - ay })
   }
 
+  // cinematic hero intro: empty home muses, then Herby drops in & says hi
+  const runIntro = () => {
+    busy.current = true
+    walkOn.current = false
+    snapHome()
+    gsap.set(facer.current, { autoAlpha: 0 }) // sprite hidden; bubble at the empty home
+    gsap.delayedCall(0.9, () => say('home?', true))
+    gsap.delayedCall(2.3, () => say('…whose home?', true))
+    gsap.delayedCall(3.7, () => say('hmm…', true))
+    gsap.delayedCall(4.9, () => {
+      // Herby peeks in from the top above his home
+      const h = homeRect()
+      const ax = feetCenterX() - getX()
+      const ay = feetBottom() - getY()
+      gsap.set(drag.current, { x: (h.left + h.right) / 2 - ax, y: 60 - ay })
+      gsap.set(facer.current, { autoAlpha: 1 })
+      say('oh! there it is!', true)
+      gsap.to(drag.current, {
+        y: h.top - ay,
+        duration: 0.85,
+        ease: 'bounce.out',
+        onComplete: () => {
+          gsap.timeline()
+            .to(body.current, { scaleY: 0.68, scaleX: 1.28, transformOrigin: '50% 100%', duration: 0.09 })
+            .to(body.current, { scaleY: 1, scaleX: 1, duration: 0.35, ease: 'elastic.out(1, 0.4)' })
+          gsap.set(spark.current, { autoAlpha: 1, scale: 0.3, y: 20, transformOrigin: '50% 50%' })
+          gsap.timeline().to(spark.current, { scale: 0.9, y: -6, duration: 0.4, ease: 'power2.out' }).to(spark.current, { autoAlpha: 0, duration: 0.3 }, '-=0.1')
+          gsap.delayedCall(0.25, () => say("hi! i'm Herby ^-^", true))
+          gsap.delayedCall(2.0, () => { busy.current = false; startWalking() })
+        },
+      })
+    })
+  }
+
   useGSAP(
     () => {
       lastInteract.current = now()
@@ -348,10 +384,13 @@ export function Mascot({
       }
       window.addEventListener('pointermove', onMove)
 
-      // settle onto home once fonts/layout are ready, then start pacing
-      gsap.delayedCall(0.6, () => {
-        snapHome()
-        patrol()
+      // settle onto home once ready; intro waits for the loader to lift
+      gsap.delayedCall(intro ? 2.8 : 0.6, () => {
+        if (intro) runIntro()
+        else {
+          snapHome()
+          patrol()
+        }
       })
       return () => window.removeEventListener('pointermove', onMove)
     },

@@ -75,7 +75,7 @@ export function Hero({ ready }: { ready: boolean }) {
         <span className={styles.homeLabel}>HOME</span>
         <span ref={heroLine} className={styles.homeLine} data-solid />
       </div>
-      <Mascot homeRef={heroLine} />
+      <Mascot homeRef={heroLine} intro />
 
       <span ref={eyebrow} className={`eyebrow ${styles.eyebrow}`} style={{ opacity: 0 }}>
         Full-Stack AI Engineer
