@@ -28,6 +28,8 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
   const [status, setStatus] = useState<'ready' | 'play' | 'dead' | 'won'>('ready')
   const [carpets, setCarpets] = useState(CARPETS)
   const [face, setFace] = useState<'normal' | 'happy' | 'dizzy'>('normal')
+  const [exitX, setExitX] = useState(0)
+  const [ghostArrived, setGhostArrived] = useState(false)
 
   // world / physics state kept in refs (per-frame, no re-render)
   const W = useRef(0)
@@ -85,6 +87,7 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
     setCarpets(CARPETS)
     setStatus('ready')
     setFace('normal')
+    setGhostArrived(false)
   }
 
   const groundAt = (worldPos: number) =>
@@ -140,11 +143,15 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
 
   const win = () => {
     statusRef.current = 'won'
+    setExitX(SX.current)
+    setGhostArrived(false)
     setStatus('won')
     setFace('happy')
   }
   const die = () => {
     statusRef.current = 'dead'
+    setExitX(SX.current)
+    setGhostArrived(false)
     setStatus('dead')
     setFace('dizzy')
   }
@@ -263,13 +270,77 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
           </div>
         )}
 
-        {/* end states */}
-        {(status === 'won' || status === 'dead') && (
-          <div className={styles.card} onPointerDown={(e) => e.stopPropagation()}>
-            <p className={styles.cardTitle}>{status === 'won' ? 'Herby’s home! 🎉' : 'oops — he fell!'}</p>
-            <button className={styles.retry} onClick={build} data-cursor="grow">
-              {status === 'won' ? 'Play again' : 'Try again'}
-            </button>
+        {/* win: happy Herby flies in + confetti (same as desktop) */}
+        {status === 'won' && (
+          <div className={g.dead}>
+            <div className={g.confetti} aria-hidden>
+              {Array.from({ length: 14 }).map((_, i) => <span key={i} />)}
+            </div>
+            <div
+              className={g.winHerby}
+              style={{ ['--sx' as string]: `${exitX}px` }}
+              onAnimationEnd={(e) => { if (e.animationName.includes('winCome')) setGhostArrived(true) }}
+            >
+              <div className={g.ghostBubble}>{ghostArrived ? 'we made it! ^-^' : 'wheeee!'}</div>
+              <svg viewBox="0 0 200 174" width="132" height="115" className={g.ghostSvg}>
+                <g fill="#d97757">
+                  <rect x="8" y="82" width="22" height="34" rx="2" />
+                  <rect x="170" y="82" width="22" height="34" rx="2" />
+                  <rect x="62" y="138" width="22" height="30" rx="2" />
+                  <rect x="116" y="138" width="22" height="30" rx="2" />
+                  <rect x="28" y="52" width="144" height="90" rx="5" />
+                </g>
+                <g stroke="#20140f" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" fill="none">
+                  <path d="M72 90 L92 100 L72 110" />
+                  <path d="M128 90 L108 100 L128 110" />
+                </g>
+              </svg>
+            </div>
+            {ghostArrived && (
+              <div className={g.deadPanel}>
+                <h2 className={`display ${g.winTitle}`}>Herby&apos;s home! 🎉</h2>
+                <div className={g.winBtns}>
+                  <button onClick={build} data-cursor="grow">Play again</button>
+                  <button onClick={onClose} className={g.close} data-cursor="grow">Done</button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* death: ghost Herby drifts across then closes in (same as desktop) */}
+        {status === 'dead' && (
+          <div className={g.dead}>
+            <div
+              className={g.ghost}
+              style={{ ['--sx' as string]: `${exitX}px` }}
+              onAnimationEnd={(e) => { if (e.animationName.includes('ghostCome')) setGhostArrived(true) }}
+            >
+              <div className={g.ghostBubble}>{ghostArrived ? 'i couldn’t make it… 🥺' : 'wooOOoo~'}</div>
+              <svg viewBox="0 0 200 174" width="132" height="115" className={g.ghostSvg}>
+                <g fill="#ece9e2" opacity="0.9">
+                  <rect x="8" y="82" width="22" height="34" rx="2" />
+                  <rect x="170" y="82" width="22" height="34" rx="2" />
+                  <rect x="62" y="138" width="22" height="30" rx="2" />
+                  <rect x="116" y="138" width="22" height="30" rx="2" />
+                  <rect x="28" y="52" width="144" height="90" rx="5" />
+                </g>
+                <g stroke="#20140f" strokeWidth="7" strokeLinecap="round" fill="none">
+                  <path d="M72 96 Q82 108 92 100" />
+                  <path d="M108 100 Q118 108 128 96" />
+                </g>
+                <ellipse cx="86" cy="116" rx="3.5" ry="6" fill="#bfe3ff" />
+              </svg>
+            </div>
+            {ghostArrived && (
+              <div className={g.deadPanel}>
+                <p className={g.deadText}>Herby fell off… try again?</p>
+                <div className={g.winBtns}>
+                  <button onClick={build} data-cursor="grow">New game</button>
+                  <button onClick={onClose} className={g.close} data-cursor="grow">Done</button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
