@@ -10,6 +10,7 @@ export function Contact() {
   const root = useRef<HTMLElement>(null)
   const l1 = useRef<HTMLSpanElement>(null)
   const l2 = useRef<HTMLSpanElement>(null)
+  const l3 = useRef<HTMLSpanElement>(null)
   const btn = useMagnetic<HTMLButtonElement>(0.5)
   const lineRef = useRef<HTMLSpanElement>(null)
   const [formOpen, setFormOpen] = useState(false)
@@ -17,7 +18,7 @@ export function Contact() {
   useGSAP(
     () => {
       if (prefersReducedMotion()) return
-      gsap.from([l1.current, l2.current], {
+      gsap.from([l1.current, l2.current, l3.current], {
         yPercent: 115,
         duration: 1,
         ease: 'power4.out',
@@ -49,14 +50,18 @@ export function Contact() {
 
       <div className={styles.row}>
         <h2 className={`display ${styles.line}`} data-solid>
-
           <span className={styles.lineMask}>
             <span ref={l1} className={styles.lineInner}>
-              Have something that
+              Have something
             </span>
           </span>
           <span className={styles.lineMask}>
             <span ref={l2} className={styles.lineInner}>
+              that
+            </span>
+          </span>
+          <span className={styles.lineMask}>
+            <span ref={l3} className={styles.lineInner}>
               should <span className="chrome-text">move?</span>
             </span>
           </span>
