@@ -151,6 +151,17 @@
   .homeWrap {
     display: none;
   }
+  /* stop centering in 100svh — flow content from the top so there's no
+     dead space between the name and the paragraph on tall phones */
+  .hero {
+    min-height: auto;
+    justify-content: flex-start;
+    padding-top: clamp(5rem, 15vh, 8rem);
+    padding-bottom: 2.5rem;
+  }
+  .meta {
+    margin-top: 2.5rem;
+  }
 }
 
 .line {
