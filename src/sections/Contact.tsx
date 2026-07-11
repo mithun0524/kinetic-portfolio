@@ -12,7 +12,6 @@ export function Contact() {
   const l2 = useRef<HTMLSpanElement>(null)
   const l3 = useRef<HTMLSpanElement>(null)
   const btn = useMagnetic<HTMLButtonElement>(0.5)
-  const lineRef = useRef<HTMLSpanElement>(null)
   const [formOpen, setFormOpen] = useState(false)
 
   useGSAP(
@@ -29,17 +28,6 @@ export function Contact() {
           toggleActions: 'play none none reverse',
         },
       })
-      // draw the ground line in
-      gsap.from(lineRef.current, {
-        scaleX: 0,
-        duration: 1.1,
-        ease: 'power3.inOut',
-        scrollTrigger: {
-          trigger: lineRef.current,
-          start: 'top 90%',
-          toggleActions: 'play none none reverse',
-        },
-      })
     },
     { scope: root }
   )
@@ -48,31 +36,26 @@ export function Contact() {
     <footer ref={root} className={`section ${styles.contact}`} id="contact">
       <span className="eyebrow">( Let&apos;s build )</span>
 
-      <div className={styles.row}>
-        <h2 className={`display ${styles.line}`} data-solid>
-          <span className={styles.lineMask}>
-            <span ref={l1} className={styles.lineInner}>
-              Have something
-            </span>
+      <h2 className={`display ${styles.line}`}>
+        <span className={styles.lineMask}>
+          <span ref={l1} className={styles.lineInner}>
+            Have something
           </span>
-          <span className={styles.lineMask}>
-            <span ref={l2} className={styles.lineInner}>
-              that
-            </span>
+        </span>
+        <span className={styles.lineMask}>
+          <span ref={l2} className={styles.lineInner}>
+            that
           </span>
-          <span className={styles.lineMask}>
-            <span ref={l3} className={styles.lineInner}>
-              should <span className="chrome-text">move?</span>
-            </span>
+        </span>
+        <span className={styles.lineMask}>
+          <span ref={l3} className={styles.lineInner}>
+            should <span className="chrome-text">move?</span>
           </span>
-        </h2>
+        </span>
+      </h2>
 
-        {/* ground line the mascot patrols on — beside the headline */}
-        <div className={styles.groundWrap}>
-          <span ref={lineRef} className={styles.groundLine} data-solid />
-          <Mascot ground range={80} />
-        </div>
-      </div>
+      {/* free-roaming buddy — wanders across the visible text of this section */}
+      <Mascot ground />
 
       <button
         ref={btn}
