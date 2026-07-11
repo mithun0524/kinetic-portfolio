@@ -767,6 +767,8 @@ function MascotBase(
                   <g ref={pupilR}>
                     <circle cx="121" cy="94" r="3.2" fill="#fff" />
                   </g>
+                  {/* little smile */}
+                  <path d="M91 120 Q100 127 109 120" fill="none" stroke="#20140f" strokeWidth="4.5" strokeLinecap="round" />
                 </g>
                 <g ref={eyesHappy} stroke="#20140f" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" fill="none">
                   <path d="M72 86 L92 99 L72 112" />

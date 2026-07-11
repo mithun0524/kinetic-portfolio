@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { gsap, useGSAP, prefersReducedMotion } from '../lib/gsap'
 import { useMagnetic } from '../hooks/useMagnetic'
 import { Mascot, type MascotHandle } from '../components/Mascot'
@@ -20,39 +20,27 @@ export function Hero({ ready }: { ready: boolean }) {
   const herby = useRef<MascotHandle>(null)
   const chat = useRef<HTMLDivElement>(null)
   const introRan = useRef(false)
+  const [msgs, setMsgs] = useState<{ t: string; tx: boolean }[]>([])
 
-  // a little chat at the home base — each line slides up; Herby peeks at his name
+  // a persistent iMessage-style thread at the home base; Herby peeks at his name
   useGSAP(
     () => {
       if (!ready || prefersReducedMotion() || introRan.current) return
       introRan.current = true
-      let first = true
-      const msg = (text: string, tx: boolean) => {
-        const el = chat.current
-        if (!el) return
-        const s = el.querySelector('span')
-        const enter = () => {
-          if (s) s.textContent = text
-          el.classList.toggle(styles.tx, tx)
-          el.classList.toggle(styles.rx, !tx)
-          gsap.fromTo(el, { autoAlpha: 0, y: 20, scale: 0.85, xPercent: -50 }, { autoAlpha: 1, y: 0, scale: 1, xPercent: -50, duration: 0.4, ease: 'back.out(1.8)' })
-        }
-        if (first) { first = false; enter() }
-        else gsap.to(el, { autoAlpha: 0, y: -20, xPercent: -50, duration: 0.28, ease: 'power2.in', onComplete: enter })
-      }
-      const hide = () => gsap.to(chat.current, { autoAlpha: 0, y: -20, xPercent: -50, duration: 0.3 })
+      const push = (t: string, tx: boolean) => setMsgs((p) => [...p, { t, tx }])
+      const clear = () => gsap.to(chat.current, { autoAlpha: 0, y: -12, duration: 0.35, onComplete: () => setMsgs([]) })
       const m = () => herby.current
       gsap
         .timeline({ delay: 1.4 })
-        .call(() => msg('home?', false))
+        .call(() => push('home?', false))
+        .to({}, { duration: 2.2 })
+        .call(() => push('whose home?', true))
         .to({}, { duration: 2.4 })
-        .call(() => msg('whose home?', true))
-        .to({}, { duration: 2.6 })
-        .call(() => { msg("Herby's home.", false); m()?.peek() })
+        .call(() => { push("Herby's home.", false); m()?.peek() })
         .to({}, { duration: 3.0 })
-        .call(() => msg("who's Herby?", true))
+        .call(() => push("who's Herby?", true))
         .to({}, { duration: 2.6 })
-        .call(() => { hide(); m()?.duck() })
+        .call(() => { clear(); m()?.duck() })
         .to({}, { duration: 1.3 })
         .call(() => m()?.arrive())
     },
@@ -113,7 +101,11 @@ export function Hero({ ready }: { ready: boolean }) {
       <div ref={blob} className={styles.blob} aria-hidden />
 
       <div className={styles.homeWrap}>
-        <div ref={chat} className={styles.homeChat} aria-hidden><span /></div>
+        <div ref={chat} className={styles.homeChat} aria-hidden>
+          {msgs.map((mm, i) => (
+            <span key={i} className={`${styles.msg} ${mm.tx ? styles.tx : styles.rx}`}>{mm.t}</span>
+          ))}
+        </div>
         <span className={styles.homeLabel}>HOME</span>
         <span ref={heroLine} className={styles.homeLine} data-solid />
       </div>
