@@ -32,7 +32,18 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
   const [exitX, setExitX] = useState(0)
   const [ghostArrived, setGhostArrived] = useState(false)
   const [finalScore, setFinalScore] = useState(0)
+  const [best, setBest] = useState(0)
+  const [isNewBest, setIsNewBest] = useState(false)
+  const bestRef = useRef(0)
   const scoreEl = useRef<HTMLSpanElement>(null)
+
+  // load persisted high score once
+  useEffect(() => {
+    try {
+      const b = Number(localStorage.getItem('herbyRunnerBest') || 0)
+      if (b > 0) { bestRef.current = b; setBest(b) }
+    } catch { /* localStorage blocked — just skip */ }
+  }, [])
 
   // world / physics state kept in refs (per-frame, no re-render)
   const W = useRef(0)
@@ -152,10 +163,22 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
     if (scoreEl.current) scoreEl.current.textContent = `${Math.floor(worldX.current / 24)} m`
   }
 
+  const record = () => {
+    const s = Math.floor(worldX.current / 24)
+    setFinalScore(s)
+    if (s > bestRef.current) {
+      bestRef.current = s
+      setBest(s)
+      setIsNewBest(true)
+      try { localStorage.setItem('herbyRunnerBest', String(s)) } catch { /* ignore */ }
+    } else {
+      setIsNewBest(false)
+    }
+  }
   const win = () => {
     statusRef.current = 'won'
     setExitX(SX.current)
-    setFinalScore(Math.floor(worldX.current / 24))
+    record()
     setGhostArrived(false)
     setStatus('won')
     setFace('happy')
@@ -163,7 +186,7 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
   const die = () => {
     statusRef.current = 'dead'
     setExitX(SX.current)
-    setFinalScore(Math.floor(worldX.current / 24))
+    record()
     setGhostArrived(false)
     setStatus('dead')
     setFace('dizzy')
@@ -229,6 +252,7 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
         <div className={styles.hud}>
           <span className={styles.carpets}>Carpets: {'✦'.repeat(carpets) || '—'}</span>
           <span className={styles.track}><i ref={fill} /></span>
+          {best > 0 && <span className={styles.best}>★ {best}</span>}
           <span ref={scoreEl} className={styles.score}>0 m</span>
         </div>
 
@@ -318,7 +342,9 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
             {ghostArrived && (
               <div className={g.deadPanel}>
                 <h2 className={`display ${g.winTitle}`}>Herby&apos;s home! 🎉</h2>
-                <p className={styles.scoreLine}>score · {finalScore} m</p>
+                <p className={styles.scoreLine}>
+                  {isNewBest ? `🏆 new best · ${finalScore} m` : `score · ${finalScore} m  ·  best ${best} m`}
+                </p>
                 <div className={g.winBtns}>
                   <button onClick={build} data-cursor="grow">Play again</button>
                   <button onClick={onClose} className={g.close} data-cursor="grow">Done</button>
@@ -355,7 +381,9 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
             {ghostArrived && (
               <div className={g.deadPanel}>
                 <p className={g.deadText}>Herby fell off… try again?</p>
-                <p className={styles.scoreLine}>score · {finalScore} m</p>
+                <p className={styles.scoreLine}>
+                  {isNewBest ? `🏆 new best · ${finalScore} m` : `score · ${finalScore} m  ·  best ${best} m`}
+                </p>
                 <div className={g.winBtns}>
                   <button onClick={build} data-cursor="grow">New game</button>
                   <button onClick={onClose} className={g.close} data-cursor="grow">Done</button>
