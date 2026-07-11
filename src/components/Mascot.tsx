@@ -95,8 +95,15 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
   })
   const showFace = (name: string) => {
     const m = FACE() as Record<string, SVGGElement | null>
-    Object.entries(m).forEach(([k, el]) => gsap.to(el, { autoAlpha: k === name ? 1 : 0, duration: 0.12 }))
-    gsap.to(cheeks.current, { autoAlpha: name === 'blush' ? 1 : 0, duration: 0.15 })
+    Object.entries(m).forEach(([k, el]) => {
+      gsap.killTweensOf(el)
+      // hide the previous face instantly, only fade the new one in — prevents
+      // two faces overlapping for a frame during a mood change
+      if (k === name) gsap.to(el, { autoAlpha: 1, duration: 0.12 })
+      else gsap.set(el, { autoAlpha: 0 })
+    })
+    gsap.killTweensOf(cheeks.current)
+    gsap.set(cheeks.current, { autoAlpha: name === 'blush' ? 1 : 0 })
   }
 
   const reaction = (name: string) => {
