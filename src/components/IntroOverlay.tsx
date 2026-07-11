@@ -110,7 +110,7 @@ export function IntroOverlay({ onDone }: { onDone: () => void }) {
             </li>
           ))}
         </ul>
-        <span className={styles.label}>Loading portfolio</span>
+        <span className={styles.label}>Loading experience</span>
         <div className={styles.num}>
           <Column refEl={hund} count={1} />
           <Column refEl={tens} count={10} />
