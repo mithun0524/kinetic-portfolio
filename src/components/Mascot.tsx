@@ -432,6 +432,8 @@ function MascotBase(
           legTweens.current.forEach((t) => t.pause()) // no waddle until he arrives
           snapHome()
           gsap.set(facer.current, { autoAlpha: 0 })
+          // safety: if arrive() never fires (e.g. a dropped timeline), don't stay invisible
+          gsap.delayedCall(12, () => { if (busy.current) arrive() })
         } else {
           snapHome()
           patrol()

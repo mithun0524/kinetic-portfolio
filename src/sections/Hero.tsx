@@ -19,15 +19,18 @@ export function Hero({ ready }: { ready: boolean }) {
   const cue = useMagnetic<HTMLAnchorElement>(0.6)
   const herby = useRef<MascotHandle>(null)
   const chat = useRef<HTMLDivElement>(null)
-  const introRan = useRef(false)
   const [msgs, setMsgs] = useState<{ t: string; tx: boolean }[]>([])
   const [typing, setTyping] = useState<boolean | null>(null)
 
-  // a persistent iMessage-style thread at the home base; Herby peeks at his name
+  // a persistent iMessage-style thread at the home base; Herby peeks at his name.
+  // No manual run-once guard: useGSAP reverts on cleanup, so under StrictMode the
+  // first (discarded) mount's timeline is killed and the persistent mount's one
+  // runs — keeping it paired with the Mascot's own arrive() call.
   useGSAP(
     () => {
-      if (!ready || prefersReducedMotion() || introRan.current) return
-      introRan.current = true
+      if (!ready || prefersReducedMotion()) return
+      setMsgs([])
+      setTyping(null)
       const push = (t: string, tx: boolean) => setMsgs((p) => [...p, { t, tx }])
       const clear = () => gsap.to(chat.current, { autoAlpha: 0, y: -12, duration: 0.35, onComplete: () => setMsgs([]) })
       const m = () => herby.current
