@@ -471,6 +471,12 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
     legTweens.current.forEach((t) => t.resume())
     if (emotion.current === 'normal') say(rand(SAY.climb), 2.4)
 
+    // zero transient offsets so the home measurement isn't polluted by
+    // emotion/hop transforms (drag keeps the thrown position)
+    gsap.set(jump.current, { y: 0 })
+    gsap.set(facer.current, { x: 0, rotation: 0 })
+    gsap.set(body.current, { x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0 })
+
     const dragX0 = (gsap.getProperty(drag.current, 'x') as number) || 0
     const dragY0 = (gsap.getProperty(drag.current, 'y') as number) || 0
     const homeFeetX = feetCenterX() - dragX0
@@ -539,7 +545,11 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
         const targetX = clampX(s)
         walkTo(targetX)
         hopTo(targetX, s.top)
+      } else if (Math.abs(cx - homeFeetX) > 6) {
+        // no ledge reachable here — walk along this level toward home, then re-check
+        walkTo(homeFeetX)
       } else {
+        // under home with nothing between — one hop up onto the home line
         hopTo(homeFeetX, homeFeetY)
         break
       }
