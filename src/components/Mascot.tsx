@@ -414,21 +414,22 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
 
   const getSurfaces = () => {
     const els = document.querySelectorAll<HTMLElement>('main h1, main h2, main h3, main h4, main p, main li, main a, [data-solid]')
-    const raw: { left: number; right: number; top: number }[] = []
+    const raw: { left: number; right: number; top: number; bottom: number }[] = []
     els.forEach((el) => {
       if (el.closest('[data-nofloor]')) return
       const r = el.getBoundingClientRect()
       if (r.width < 50 || r.height < 8) return
       if (!(el.textContent || '').trim() && !el.hasAttribute('data-solid')) return
-      raw.push({ left: r.left, right: r.right, top: r.top })
+      raw.push({ left: r.left, right: r.right, top: r.top, bottom: r.bottom })
     })
     raw.sort((a, b) => a.top - b.top)
-    const merged: { left: number; right: number; top: number }[] = []
+    const merged: { left: number; right: number; top: number; bottom: number }[] = []
     for (const s of raw) {
       const m = merged.find((x) => Math.abs(x.top - s.top) < 10 && s.left < x.right + 24 && s.right > x.left - 24)
       if (m) {
         m.left = Math.min(m.left, s.left)
         m.right = Math.max(m.right, s.right)
+        m.bottom = Math.max(m.bottom, s.bottom)
       } else merged.push({ ...s })
     }
     return merged
@@ -443,8 +444,28 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
 
     const startFeet = feetBottom()
     const fx = feetCenterX()
+    const surfs = getSurfaces()
+
+    // grab-the-word: dropped with feet inside a word's box → snap up onto it
+    let grabTop: number | null = null
+    surfs.forEach((r) => {
+      if (fx >= r.left && fx <= r.right && startFeet >= r.top - 24 && startFeet <= r.bottom + 12) {
+        if (grabTop === null || r.top < grabTop) grabTop = r.top
+      }
+    })
+    if (grabTop !== null) {
+      const over = feetBottom() - grabTop
+      gsap.to(drag.current, {
+        y: ((gsap.getProperty(drag.current, 'y') as number) || 0) - over,
+        duration: 0.18,
+        ease: 'power2.out',
+        onComplete: land,
+      })
+      return
+    }
+
     let target = window.innerHeight - 6
-    getSurfaces().forEach((r) => {
+    surfs.forEach((r) => {
       if (fx >= r.left && fx <= r.right && r.top >= startFeet - 2 && r.top < target) target = r.top
     })
 
