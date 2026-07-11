@@ -233,6 +233,8 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
 
   if (!open) return null
 
+  const ended = status === 'won' || status === 'dead'
+
   return (
     <div className={g.overlay}>
       <div className={g.head}>
@@ -249,7 +251,7 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
 
       <div ref={area} className={`${g.arena} ${styles.arena}`} onPointerDown={tap}>
         {/* HUD */}
-        <div className={styles.hud}>
+        <div className={styles.hud} style={{ visibility: ended ? 'hidden' : 'visible' }}>
           <span className={styles.carpets}>Carpets: {'✦'.repeat(carpets) || '—'}</span>
           <span className={styles.track}><i ref={fill} /></span>
           {best > 0 && <span className={styles.best}>★ {best}</span>}
@@ -257,7 +259,7 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
         </div>
 
         {/* ground platforms */}
-        <div ref={groundWrap}>
+        <div ref={groundWrap} style={{ visibility: ended ? 'hidden' : 'visible' }}>
           {Array.from({ length: segCount }).map((_, i) => (
             <div
               key={i}
@@ -269,10 +271,10 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
         </div>
 
         {/* flag */}
-        <div ref={flagEl} className={styles.flag} style={{ top: GY.current }}><span>🏁</span></div>
+        <div ref={flagEl} className={styles.flag} style={{ top: GY.current, visibility: ended ? 'hidden' : 'visible' }}><span>🏁</span></div>
 
         {/* Herby */}
-        <div ref={herbyEl} className={styles.herby}>
+        <div ref={herbyEl} className={styles.herby} style={{ visibility: ended ? 'hidden' : 'visible' }}>
           <svg viewBox="0 0 200 174" width={HERB_W} height={HERB_H} className={status === 'play' ? styles.bob : ''}>
             <g fill="#d97757">
               <rect x="8" y="82" width="22" height="34" rx="2" />
