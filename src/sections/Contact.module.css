@@ -33,6 +33,9 @@
   padding: 0.8rem 1.6rem;
   border: 1px solid var(--line);
   border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
   will-change: transform;
   transition: background 0.3s var(--ease-out), color 0.3s var(--ease-out);
 }

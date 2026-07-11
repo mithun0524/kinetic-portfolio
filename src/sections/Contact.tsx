@@ -1,6 +1,7 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { gsap, useGSAP, prefersReducedMotion } from '../lib/gsap'
 import { useMagnetic } from '../hooks/useMagnetic'
+import { ContactForm } from '../components/ContactForm'
 import styles from './Contact.module.css'
 
 /** Contact: masked outro headline + magnetic link + footer meta. */
@@ -8,7 +9,8 @@ export function Contact() {
   const root = useRef<HTMLElement>(null)
   const l1 = useRef<HTMLSpanElement>(null)
   const l2 = useRef<HTMLSpanElement>(null)
-  const btn = useMagnetic<HTMLAnchorElement>(0.5)
+  const btn = useMagnetic<HTMLButtonElement>(0.5)
+  const [formOpen, setFormOpen] = useState(false)
 
   useGSAP(
     () => {
@@ -45,17 +47,20 @@ export function Contact() {
         </span>
       </h2>
 
-      <a
+      <button
         ref={btn}
-        href="mailto:mithun.chavan.a24@gmail.com"
+        type="button"
+        onClick={() => setFormOpen(true)}
         className={styles.cta}
         data-cursor="grow"
       >
-        <span>mithun.chavan.a24@gmail.com</span>
+        <span>Get in touch</span>
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
           <path d="M4 16L16 4M16 4H6M16 4v10" stroke="currentColor" strokeWidth="1.5" />
         </svg>
-      </a>
+      </button>
+
+      <ContactForm open={formOpen} onClose={() => setFormOpen(false)} />
 
       <div className={styles.meta}>
         <span>© 2026 Mithun Chavan A — Bangalore, India</span>
