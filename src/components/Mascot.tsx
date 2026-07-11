@@ -494,7 +494,7 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
     const surfaces = getSurfaces()
     let cx = feetCenterX()
     let cy = feetBottom()
-    const REACH = 320
+    const REACH = 190 // smaller reach → more, smaller hops → reads as climbing/walking
 
     const tl = gsap.timeline({
       onComplete: () => {
@@ -525,10 +525,10 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
       tl.call(() => {
         if (emotion.current === 'normal' && Math.random() < 0.4) say(rand(SAY.climb), 1.4)
       })
-      const up = gsap.utils.clamp(50, 100, cy - py + 24)
+      const up = gsap.utils.clamp(36, 72, cy - py + 18)
       tl.to(body.current, { scaleY: 0.82, scaleX: 1.18, transformOrigin: '50% 100%', duration: 0.1, ease: 'power2.in' })
-        .to(drag.current, { x: toDragX(px), duration: 0.42, ease: 'power1.inOut' })
-        .to(drag.current, { keyframes: [{ y: toDragY(py) - up, duration: 0.19, ease: 'power2.out' }, { y: toDragY(py), duration: 0.21, ease: 'power2.in' }] }, '<')
+        .to(drag.current, { x: toDragX(px), duration: 0.34, ease: 'power1.inOut' })
+        .to(drag.current, { keyframes: [{ y: toDragY(py) - up, duration: 0.16, ease: 'power2.out' }, { y: toDragY(py), duration: 0.18, ease: 'power2.in' }] }, '<')
         .to(body.current, { scaleY: 1.1, scaleX: 0.92, duration: 0.14 }, '<')
         .to(body.current, { scaleY: 0.86, scaleX: 1.14, duration: 0.08 })
         .to(body.current, { scaleY: 1, scaleX: 1, duration: 0.3, ease: 'elastic.out(1, 0.5)' })
@@ -537,7 +537,7 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
     }
 
     let guard = 0
-    while (guard++ < 16) {
+    while (guard++ < 26) {
       if (Math.abs(cy - homeFeetY) < 8) {
         walkTo(homeFeetX)
         break
