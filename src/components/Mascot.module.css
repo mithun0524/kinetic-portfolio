@@ -22,6 +22,23 @@
   position: relative;
 }
 
+/* magic-carpet line the buddy conjures when it has no path home */
+.carpet {
+  position: absolute;
+  bottom: 4%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 118px;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--chrome);
+  box-shadow: 0 6px 18px rgba(217, 119, 87, 0.35);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: -1;
+}
+
 .bubble {
   position: absolute;
   bottom: 79%;

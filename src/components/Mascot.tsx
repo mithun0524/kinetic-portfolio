@@ -15,6 +15,7 @@ const SAY: Record<string, string[]> = {
   sad: ['aww…', 'why…', '*sniff*', ':(', 'so far…', 'oof…'],
   bored: ['*yawn*', 'so bored…', 'zzz', 'anything fun?', '…', '*sigh*'],
   dizzy: ['woah…', '@_@', 'so dizzy…', 'spinny!', 'ugh…', 'wobble~'],
+  magic: ['✨magic✨', 'whoosh!', 'no path? no problem!', 'watch this~', 'wheee!', 'i can fly!'],
 }
 const rand = (a: string[]) => a[Math.floor(Math.random() * a.length)]
 
@@ -41,6 +42,7 @@ export function Mascot({
   const legL = useRef<SVGRectElement>(null)
   const legR = useRef<SVGRectElement>(null)
   const spark = useRef<SVGGElement>(null)
+  const carpet = useRef<HTMLDivElement>(null)
   const bubble = useRef<HTMLDivElement>(null)
   const bubbleText = useRef<HTMLSpanElement>(null)
 
@@ -283,6 +285,7 @@ export function Mascot({
       ;[eyesHappy, faceBlush, faceAngry, faceSad, faceBored, faceDizzy, cheeks, spark].forEach((r) =>
         gsap.set(r.current, { autoAlpha: 0 })
       )
+      gsap.set(carpet.current, { autoAlpha: 0, scaleX: 0 })
       if (prefersReducedMotion()) return
 
       const stepL = gsap.to(legL.current, { y: -7, duration: 0.28, repeat: -1, yoyo: true, ease: 'sine.inOut' })
@@ -581,6 +584,27 @@ export function Mascot({
       cx = px
       cy = py
     }
+    // no path? conjure a line and ride it home like a magic carpet
+    const carpetTo = (px: number, py: number) => {
+      face(px < cx ? -1 : 1)
+      tl.call(() => {
+        legTweens.current.forEach((t) => t.pause()) // stand still on the carpet
+        gsap.set([legL.current, legR.current], { y: 0 })
+        gsap.set(carpet.current, { autoAlpha: 1, scaleX: 0, transformOrigin: '50% 50%' })
+        if (emotion.current === 'normal') say(rand(SAY.magic), 1.8)
+      })
+      tl.to(carpet.current, { scaleX: 1, duration: 0.3, ease: 'back.out(2)' })
+        .to(body.current, { y: -3, duration: 0.2 }, '<')
+      const midY = Math.min(cy, py) - 90
+      tl.to(drag.current, { x: toDX(px), duration: 1.3, ease: 'power1.inOut' })
+        .to(drag.current, { keyframes: [{ y: toDY(midY), duration: 0.65, ease: 'sine.out' }, { y: toDY(py), duration: 0.65, ease: 'sine.in' }] }, '<')
+        .to(carpet.current, { rotation: 2, duration: 0.6, yoyo: true, repeat: 1, ease: 'sine.inOut' }, '<')
+      tl.to(carpet.current, { scaleX: 0, autoAlpha: 0, duration: 0.3, ease: 'power2.in' })
+        .to(body.current, { y: 0, duration: 0.2 }, '<')
+        .call(() => legTweens.current.forEach((t) => t.resume()))
+      cx = px
+      cy = py
+    }
 
     let guard = 0
     while (guard++ < 26) {
@@ -606,7 +630,8 @@ export function Mascot({
       } else if (Math.abs(cx - homeFeetX) > 6) {
         walkTo(homeFeetX)
       } else {
-        hopTo(homeFeetX, homeFeetY)
+        // stuck with no ledge between here and home → magic carpet the rest
+        carpetTo(homeFeetX, homeFeetY)
         break
       }
     }
@@ -629,6 +654,7 @@ export function Mascot({
           <div ref={bubble} className={styles.bubble}>
             <span ref={bubbleText} />
           </div>
+          <div ref={carpet} className={styles.carpet} aria-hidden />
           <div ref={facer}>
             <svg viewBox="0 0 200 174" className={styles.svg}>
               <g ref={spark} fill="var(--m)">
