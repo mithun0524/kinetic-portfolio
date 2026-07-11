@@ -104,7 +104,7 @@ export function MobileHerby() {
 
   return (
     <div className={styles.root} aria-hidden>
-      <div ref={wrap} className={`${styles.wrap} ${styles['mood_' + mood]}`} onPointerDown={poke} role="button">
+      <div ref={wrap} className={`${styles.wrap} ${mood !== 'normal' ? styles['mood_' + mood] : ''}`} onPointerDown={poke} role="button">
         <div ref={bubble} className={styles.bubble}>{line}</div>
         <div className={styles.line} />
         <div ref={jump} className={styles.jump}>
