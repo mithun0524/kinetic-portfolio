@@ -417,10 +417,26 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
     const raw: { left: number; right: number; top: number; bottom: number }[] = []
     els.forEach((el) => {
       if (el.closest('[data-nofloor]')) return
-      const r = el.getBoundingClientRect()
-      if (r.width < 50 || r.height < 8) return
-      if (!(el.textContent || '').trim() && !el.hasAttribute('data-solid')) return
-      raw.push({ left: r.left, right: r.right, top: r.top, bottom: r.bottom })
+      const txt = (el.textContent || '').trim()
+      if (!txt) {
+        // non-text solid (e.g. the ground line) → use its box
+        if (el.hasAttribute('data-solid')) {
+          const r = el.getBoundingClientRect()
+          if (r.width >= 40) raw.push({ left: r.left, right: r.right, top: r.top, bottom: r.bottom })
+        }
+        return
+      }
+      // text element → tight per-line rectangles of the actual glyphs,
+      // so the "ground" matches what's visible, not the full layout box
+      const range = document.createRange()
+      range.selectNodeContents(el)
+      const rects = range.getClientRects()
+      for (let i = 0; i < rects.length; i++) {
+        const r = rects[i]
+        if (r.width < 40 || r.height < 6) continue
+        raw.push({ left: r.left, right: r.right, top: r.top, bottom: r.bottom })
+      }
+      range.detach?.()
     })
     raw.sort((a, b) => a.top - b.top)
     const merged: { left: number; right: number; top: number; bottom: number }[] = []
@@ -429,6 +445,7 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
       if (m) {
         m.left = Math.min(m.left, s.left)
         m.right = Math.max(m.right, s.right)
+        m.top = Math.min(m.top, s.top)
         m.bottom = Math.max(m.bottom, s.bottom)
       } else merged.push({ ...s })
     }
