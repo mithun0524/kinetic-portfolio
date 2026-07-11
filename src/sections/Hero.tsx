@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { gsap, useGSAP, prefersReducedMotion } from '../lib/gsap'
 import { useMagnetic } from '../hooks/useMagnetic'
 import { Mascot, type MascotHandle } from '../components/Mascot'
+import { MobileHerby } from '../components/MobileHerby'
 import styles from './Hero.module.css'
 
 /**
@@ -151,6 +152,9 @@ export function Hero({ ready }: { ready: boolean }) {
           </svg>
         </a>
       </div>
+
+      {/* touch devices get a static, tappable Herby (physics mascot is desktop-only) */}
+      <MobileHerby />
     </header>
   )
 }

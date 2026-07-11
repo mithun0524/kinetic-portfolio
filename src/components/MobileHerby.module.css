@@ -1,0 +1,71 @@
+/* mobile-only tappable Herby — hidden on desktop where the physics mascot runs */
+.root {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .root {
+    display: flex;
+    justify-content: center;
+    margin-top: 2.5rem;
+  }
+}
+
+.wrap {
+  position: relative;
+  width: 128px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  will-change: transform;
+}
+
+.jump {
+  will-change: transform;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 0 34px rgba(217, 119, 87, 0.3));
+}
+
+/* little ground line under him */
+.line {
+  position: absolute;
+  bottom: -8px;
+  left: 8%;
+  width: 84%;
+  height: 2px;
+  background: var(--chrome);
+  border-radius: 2px;
+  opacity: 0.8;
+}
+
+.bubble {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 6px;
+  white-space: nowrap;
+  background: #f3f0ea;
+  color: #20140f;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.35rem 0.7rem;
+  border-radius: 12px;
+  opacity: 0;
+  pointer-events: none;
+}
+.bubble::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #f3f0ea;
+}
