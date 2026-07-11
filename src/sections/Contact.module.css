@@ -85,6 +85,22 @@
   }
 }
 
+.homeLine {
+  position: absolute;
+  width: 190px;
+  height: 2px;
+  background: var(--chrome);
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@media (max-width: 1024px) {
+  .homeLine {
+    display: none;
+  }
+}
+
 .meta {
   margin-top: clamp(1.5rem, 4vh, 3rem);
   padding-top: clamp(1.5rem, 4vh, 2.5rem);

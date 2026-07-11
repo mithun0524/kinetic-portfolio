@@ -12,6 +12,7 @@ export function Contact() {
   const l2 = useRef<HTMLSpanElement>(null)
   const l3 = useRef<HTMLSpanElement>(null)
   const btn = useMagnetic<HTMLButtonElement>(0.5)
+  const lineRef = useRef<HTMLSpanElement>(null)
   const [formOpen, setFormOpen] = useState(false)
 
   useGSAP(
@@ -28,6 +29,26 @@ export function Contact() {
           toggleActions: 'play none none reverse',
         },
       })
+
+      // place the home ground-line just to the right of "should move?"
+      const place = () => {
+        const line = lineRef.current
+        const el = l3.current
+        const box = root.current
+        if (!line || !el || !box) return
+        const cr = box.getBoundingClientRect()
+        const range = document.createRange()
+        range.selectNodeContents(el)
+        const r = range.getBoundingClientRect()
+        range.detach?.()
+        if (r.width < 10) return
+        line.style.left = `${r.right - cr.left + 48}px`
+        line.style.top = `${r.bottom - cr.top - 4}px`
+      }
+      gsap.delayedCall(0.7, place)
+      gsap.delayedCall(1.6, place)
+      window.addEventListener('resize', place)
+      return () => window.removeEventListener('resize', place)
     },
     { scope: root }
   )
@@ -54,8 +75,9 @@ export function Contact() {
         </span>
       </h2>
 
-      {/* buddy lives on the "should move?" line and finds its way back when dragged */}
-      <Mascot ground homeRef={l3} />
+      {/* home ground-line beside "should move?" + the buddy that lives on it */}
+      <span ref={lineRef} className={styles.homeLine} data-solid />
+      <Mascot ground homeRef={lineRef} />
 
       <button
         ref={btn}
