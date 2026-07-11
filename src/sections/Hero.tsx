@@ -27,31 +27,33 @@ export function Hero({ ready }: { ready: boolean }) {
       if (!ready || prefersReducedMotion() || introRan.current) return
       introRan.current = true
       let first = true
-      const msg = (text: string) => {
+      const msg = (text: string, tx: boolean) => {
         const el = chat.current
         if (!el) return
         const s = el.querySelector('span')
         const enter = () => {
           if (s) s.textContent = text
-          gsap.fromTo(el, { autoAlpha: 0, y: 18, scale: 0.9, xPercent: -50 }, { autoAlpha: 1, y: 0, scale: 1, xPercent: -50, duration: 0.35, ease: 'back.out(2)' })
+          el.classList.toggle(styles.tx, tx)
+          el.classList.toggle(styles.rx, !tx)
+          gsap.fromTo(el, { autoAlpha: 0, y: 20, scale: 0.85, xPercent: -50 }, { autoAlpha: 1, y: 0, scale: 1, xPercent: -50, duration: 0.4, ease: 'back.out(1.8)' })
         }
         if (first) { first = false; enter() }
-        else gsap.to(el, { autoAlpha: 0, y: -18, xPercent: -50, duration: 0.25, ease: 'power2.in', onComplete: enter })
+        else gsap.to(el, { autoAlpha: 0, y: -20, xPercent: -50, duration: 0.28, ease: 'power2.in', onComplete: enter })
       }
-      const hide = () => gsap.to(chat.current, { autoAlpha: 0, y: -18, xPercent: -50, duration: 0.3 })
+      const hide = () => gsap.to(chat.current, { autoAlpha: 0, y: -20, xPercent: -50, duration: 0.3 })
       const m = () => herby.current
       gsap
         .timeline({ delay: 1.4 })
-        .call(() => msg('home?'))
+        .call(() => msg('home?', false))
         .to({}, { duration: 2.4 })
-        .call(() => msg('whose home?'))
+        .call(() => msg('whose home?', true))
         .to({}, { duration: 2.6 })
-        .call(() => { msg("Herby's home."); m()?.peek() })
-        .to({}, { duration: 2.8 })
-        .call(() => msg("who's Herby?"))
+        .call(() => { msg("Herby's home.", false); m()?.peek() })
+        .to({}, { duration: 3.0 })
+        .call(() => msg("who's Herby?", true))
         .to({}, { duration: 2.6 })
         .call(() => { hide(); m()?.duck() })
-        .to({}, { duration: 1.2 })
+        .to({}, { duration: 1.3 })
         .call(() => m()?.arrive())
     },
     { dependencies: [ready] }

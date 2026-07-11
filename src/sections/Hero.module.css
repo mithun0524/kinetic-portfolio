@@ -84,21 +84,19 @@
   white-space: nowrap;
 }
 
-/* intro chat at the home base — lines slide up */
+/* intro chat at the home base — iMessage-style bubbles that slide up */
 .homeChat {
   position: absolute;
   left: 50%;
-  bottom: calc(100% + 0.5rem);
+  bottom: calc(100% + 0.6rem);
   transform: translateX(-50%);
   opacity: 0;
   visibility: hidden;
-  padding: 0.55rem 1rem;
-  border-radius: 14px;
-  background: var(--text);
-  color: var(--bg);
-  font-family: var(--font-display);
-  font-size: clamp(0.9rem, 1.4vw, 1.25rem);
-  font-weight: 600;
+  padding: 0.5rem 0.95rem;
+  border-radius: 18px;
+  font-family: var(--font-body);
+  font-size: clamp(0.9rem, 1.4vw, 1.2rem);
+  font-weight: 500;
   white-space: nowrap;
   pointer-events: none;
 }
@@ -108,9 +106,21 @@
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
-  border: 7px solid transparent;
-  border-top-color: var(--text);
+  border: 6px solid transparent;
+  margin-top: -1px;
 }
+/* received (grey) */
+.rx {
+  background: #e9e9eb;
+  color: #111;
+}
+.rx::after { border-top-color: #e9e9eb; }
+/* sent (blue) */
+.tx {
+  background: #0b84fe;
+  color: #fff;
+}
+.tx::after { border-top-color: #0b84fe; }
 
 @media (max-width: 1024px) {
   .homeWrap {

@@ -297,25 +297,28 @@ function MascotBase(
     const ay = feetBottom() - getY()
     gsap.set(drag.current, { x: px - ax, y: py - ay })
   }
-  // Herby peeks upside-down from the top — only his eyes show below the top edge
+  // Herby smoothly peeks upside-down from the top — only his eyes show
   const peek = () => {
     if (prefersReducedMotion()) return
     legTweens.current.forEach((t) => t.pause()) // stop the waddle so the flip sticks
-    gsap.set(facer.current, { autoAlpha: 1, rotation: 180 })
     const h = homeRect()
-    setFeet((h.left + h.right) / 2, h.top) // rough x/y first
-    // shift so the (flipped) head/eyes sit just below the top edge, rest clipped above
+    gsap.set(facer.current, { rotation: 180 })
+    setFeet((h.left + h.right) / 2, h.top)
     const r = body.current?.getBoundingClientRect()
-    if (r) gsap.set(drag.current, { y: `+=${118 - r.bottom}` })
+    if (!r) return
+    // start fully above the top edge, then slide down so only the eyes peek in
+    gsap.set(drag.current, { y: `+=${-30 - r.bottom}` })
+    gsap.set(facer.current, { autoAlpha: 1 })
+    gsap.to(drag.current, { y: '+=150', duration: 1.1, ease: 'power2.out' })
     gsap.killTweensOf([pupilL.current, pupilR.current])
-    gsap.fromTo([pupilL.current, pupilR.current], { y: 0 }, { y: 3, duration: 0.9, yoyo: true, repeat: -1, ease: 'sine.inOut' })
+    gsap.fromTo([pupilL.current, pupilR.current], { y: 0 }, { y: 3, duration: 0.9, yoyo: true, repeat: -1, ease: 'sine.inOut', delay: 1.0 })
   }
   const duck = () => {
     if (prefersReducedMotion()) return
     gsap.killTweensOf([pupilL.current, pupilR.current])
     gsap.set([pupilL.current, pupilR.current], { y: 0 })
     gsap.to(drag.current, {
-      y: '-=260',
+      y: '-=190',
       duration: 0.9,
       ease: 'power2.in',
       onComplete: () => gsap.set(facer.current, { autoAlpha: 0, rotation: 0 }),
