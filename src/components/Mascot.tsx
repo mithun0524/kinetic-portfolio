@@ -337,7 +337,7 @@ function MascotBase(
     const h = homeRect()
     gsap.set(facer.current, { autoAlpha: 1, rotation: 0 })
     setFeet((h.left + h.right) / 2, 30)
-    say('there it is!', 2)
+    say("that's me!", 2)
     const ay = feetBottom() - getY()
     gsap.to(drag.current, {
       y: h.top - ay,
