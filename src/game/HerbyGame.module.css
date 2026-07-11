@@ -106,6 +106,115 @@
   pointer-events: none;
   filter: drop-shadow(0 8px 16px rgba(217, 119, 87, 0.25));
 }
+.sprite {
+  display: block;
+}
+
+/* legend / resources */
+.legend {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 3;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(18, 18, 18, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-size: var(--step--1);
+  color: var(--text-dim);
+  pointer-events: none;
+  max-width: 240px;
+}
+.legendTitle {
+  font-family: var(--font-display);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text);
+  font-size: 0.7rem;
+  margin-bottom: 8px;
+}
+.legendRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+}
+.legendRow span {
+  width: 18px;
+  text-align: center;
+}
+.meta {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--text);
+}
+.inkWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.inkBar {
+  flex: 1;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--line);
+  overflow: hidden;
+}
+.inkBar i {
+  display: block;
+  height: 100%;
+  background: var(--chrome);
+}
+
+/* in-game speech bubble (follows Herby) */
+.bubble {
+  position: absolute;
+  bottom: 96%;
+  left: 50%;
+  transform: translateX(-50%) scale(0.7);
+  opacity: 0;
+  white-space: nowrap;
+  padding: 5px 10px;
+  border-radius: 10px;
+  background: var(--text);
+  color: var(--bg);
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 600;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+/* magic-carpet line + supercharge shimmer */
+.carpet {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 46px;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--chrome);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.charged .carpet {
+  opacity: 1;
+  box-shadow: 0 4px 14px rgba(150, 190, 255, 0.6);
+}
+.charged .sprite {
+  animation: herbyCharge 0.7s linear infinite;
+}
+@keyframes herbyCharge {
+  0% { filter: hue-rotate(0deg) saturate(1.8) brightness(1.2) drop-shadow(0 0 8px rgba(217,119,87,.6)); }
+  50% { filter: hue-rotate(200deg) saturate(2.2) brightness(1.5) drop-shadow(0 0 16px rgba(150,190,255,.75)); }
+  100% { filter: hue-rotate(360deg) saturate(1.8) brightness(1.2) drop-shadow(0 0 8px rgba(217,119,87,.6)); }
+}
 
 .win {
   position: absolute;

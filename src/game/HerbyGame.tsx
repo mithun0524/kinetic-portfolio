@@ -1,14 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import styles from './HerbyGame.module.css'
 
-interface Seg {
-  x1: number
-  y1: number
-  x2: number
-  y2: number
-}
+interface Seg { x1: number; y1: number; x2: number; y2: number }
+interface Pt { x: number; y: number }
 
-/** y of a segment at a given x (null if x outside its span) */
 function yAt(s: Seg, x: number): number | null {
   const lo = Math.min(s.x1, s.x2)
   const hi = Math.max(s.x1, s.x2)
@@ -16,68 +11,107 @@ function yAt(s: Seg, x: number): number | null {
   const t = (x - s.x1) / (s.x2 - s.x1 || 1)
   return s.y1 + t * (s.y2 - s.y1)
 }
+const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)]
 
 const GRAV = 0.6
-const WALK = 1.7
-const SNAP = 18 // how far below the feet we still count as "on" a line (slope tolerance)
+const WALK = 1.8
+const SNAP = 18
+const HOP_X = 155      // max gap he'll hop
+const HOP_UP = 105
+const HOP_DOWN = 165
+const CARPET_X = 620   // max gap the carpet crosses
+const HOP_H = 66
+const CARPET_H = 150
+const INK_MAX = 1900
+const CARPETS = 2
+
+const JUDGE = {
+  steep: ['too steep!', 'whoa, steep!', 'cliff!!'],
+  long: ['big bridge!', 'nice ramp~', 'looong'],
+  ok: ['ooh a line!', 'nice!', 'thanks!', 'good one'],
+  hop: ['hop!', 'up!', 'wheee', 'boing'],
+  carpet: ['✨magic✨', 'i can fly!', 'no path? no problem!', 'whoosh~'],
+  stuck: ['uh oh…', 'no way across…', 'help?'],
+  win: ['home! ^-^', 'yay!! 🎉', 'made it!'],
+  fall: ['woahh', '@_@', 'aaa!'],
+}
 
 /**
- * Draw Herby Home — a physics puzzle. Herby auto-walks right under gravity;
- * you draw platform lines with the mouse to bridge gaps and ramp him up to the
- * goal flag. Uses his walk / gravity / line-riding abilities.
+ * Draw Herby Home — a physics puzzle. Draw platform lines; Herby judges them
+ * and picks the right move: WALK on them, HOP small gaps, or deploy his
+ * FLYING CARPET (limited) for big gaps. Reach the flag to win.
  */
 export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => void }) {
   const area = useRef<HTMLDivElement>(null)
   const herbyEl = useRef<HTMLDivElement>(null)
   const preview = useRef<SVGLineElement>(null)
+  const bubble = useRef<HTMLDivElement>(null)
+  const bubbleTxt = useRef<HTMLSpanElement>(null)
+
   const [lines, setLines] = useState<Seg[]>([])
   const [status, setStatus] = useState<'play' | 'won'>('play')
+  const [face, setFace] = useState<'normal' | 'happy' | 'dizzy'>('normal')
+  const [carpets, setCarpets] = useState(CARPETS)
+  const [ink, setInk] = useState(0)
+
   const linesRef = useRef<Seg[]>([])
   linesRef.current = lines
+  const carpetsRef = useRef(CARPETS)
+  carpetsRef.current = carpets
 
   const dim = useRef({ w: 0, h: 0 })
   const level = useRef<{ start: Seg; goal: Seg; fixed: Seg[]; goalX: number; goalY: number; startX: number; startY: number }>()
   const drawing = useRef(false)
-  const dstart = useRef({ x: 0, y: 0 })
-  const herb = useRef({ x: 0, y: 0, vy: 0, ground: false, face: 1 })
+  const dstart = useRef<Pt>({ x: 0, y: 0 })
+  const herb = useRef({ x: 0, y: 0, vy: 0, mode: 'walk' as 'walk' | 'fall' | 'hop' | 'carpet', face: 1, sx: 0, sy: 0, tx: 0, ty: 0, t: 0, dur: 1 })
   const raf = useRef(0)
+  const statusRef = useRef<'play' | 'won'>('play')
+  statusRef.current = status
+
+  const say = (text: string) => {
+    if (bubbleTxt.current) bubbleTxt.current.textContent = text
+    if (bubble.current) {
+      bubble.current.style.opacity = '1'
+      bubble.current.style.transform = 'translateX(-50%) scale(1)'
+      clearTimeout((bubble.current as any)._t)
+      ;(bubble.current as any)._t = setTimeout(() => {
+        if (bubble.current) {
+          bubble.current.style.opacity = '0'
+          bubble.current.style.transform = 'translateX(-50%) scale(0.7)'
+        }
+      }, 1500)
+    }
+  }
 
   const buildLevel = () => {
     const el = area.current!
     const w = el.clientWidth
     const hgt = el.clientHeight
     dim.current = { w, h: hgt }
-    const start: Seg = { x1: 30, y1: hgt - 70, x2: 200, y2: hgt - 70 }
-    const goal: Seg = { x1: w - 210, y1: 150, x2: w - 40, y2: 150 }
-    const fixed: Seg[] = [
-      { x1: w * 0.42, y1: hgt - 190, x2: w * 0.58, y2: hgt - 190 },
-    ]
     level.current = {
-      start, goal, fixed,
-      goalX: w - 120, goalY: 150,
-      startX: 90, startY: hgt - 70,
+      start: { x1: 30, y1: hgt - 70, x2: 200, y2: hgt - 70 },
+      goal: { x1: w - 210, y1: 150, x2: w - 40, y2: 150 },
+      fixed: [{ x1: w * 0.44, y1: hgt - 210, x2: w * 0.6, y2: hgt - 210 }],
+      goalX: w - 120, goalY: 150, startX: 90, startY: hgt - 70,
     }
   }
-
   const resetHerby = () => {
     const L = level.current!
-    herb.current = { x: L.startX, y: L.startY, vy: 0, ground: true, face: 1 }
+    herb.current = { ...herb.current, x: L.startX, y: L.startY, vy: 0, mode: 'walk', face: 1, t: 0 }
     setStatus('play')
+    setFace('normal')
+    setCarpets(CARPETS)
   }
-
   const allSegs = (): Seg[] => {
     const L = level.current!
     return [L.start, L.goal, ...L.fixed, ...linesRef.current]
   }
-
   const supportY = (x: number, y: number): number | null => {
     let best: number | null = null
     for (const s of allSegs()) {
       const sy = yAt(s, x)
       if (sy == null) continue
-      if (sy >= y - 4 && sy <= y + SNAP) {
-        if (best == null || sy < best) best = sy
-      }
+      if (sy >= y - 4 && sy <= y + SNAP) if (best == null || sy < best) best = sy
     }
     return best
   }
@@ -86,49 +120,90 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
     for (const s of allSegs()) {
       const sy = yAt(s, x)
       if (sy == null) continue
-      if (sy >= prevY - 2 && sy <= newY + 2) {
-        if (best == null || sy < best) best = sy
-      }
+      if (sy >= prevY - 2 && sy <= newY + 2) if (best == null || sy < best) best = sy
     }
     return best
+  }
+  // nearest reachable landing point ahead (to the right), within reach
+  const findTarget = (reach: number): Pt | null => {
+    const h = herb.current
+    let best: Pt | null = null
+    let bd = Infinity
+    for (const s of allSegs()) {
+      const minx = Math.min(s.x1, s.x2)
+      const maxx = Math.max(s.x1, s.x2)
+      if (maxx <= h.x + 6) continue
+      const lx = Math.max(minx, h.x + 8)
+      if (lx > h.x + reach) continue
+      const ly = yAt(s, lx)
+      if (ly == null || ly < h.y - HOP_UP || ly > h.y + HOP_DOWN) continue
+      const d = lx - h.x
+      if (d < bd) { bd = d; best = { x: lx, y: ly } }
+    }
+    return best
+  }
+  const startArc = (t: Pt, mode: 'hop' | 'carpet') => {
+    const h = herb.current
+    h.sx = h.x; h.sy = h.y; h.tx = t.x; h.ty = t.y; h.t = 0
+    h.dur = Math.max(18, Math.hypot(t.x - h.x, t.y - h.y) / (mode === 'carpet' ? 6 : 5))
+    h.mode = mode
+    h.face = 1
+    if (mode === 'carpet') {
+      herbyEl.current?.classList.add(styles.charged)
+      say(pick(JUDGE.carpet))
+    } else say(pick(JUDGE.hop))
   }
 
   const loop = () => {
     const h = herb.current
     const L = level.current
-    if (L && status !== 'won') {
-      if (h.ground) {
+    if (L && statusRef.current !== 'won') {
+      if (h.mode === 'walk') {
         const nx = h.x + WALK
-        h.face = 1
         const sy = supportY(nx, h.y)
         if (sy != null) {
-          h.x = nx
-          h.y = sy
-          h.vy = 0
+          h.x = nx; h.y = sy; h.vy = 0
         } else {
-          h.ground = false // walked off the edge
+          // edge — judge & choose a power
+          const hopT = findTarget(HOP_X)
+          if (hopT) startArc(hopT, 'hop')
+          else if (carpetsRef.current > 0) {
+            const carT = findTarget(CARPET_X)
+            if (carT) { setCarpets((c) => c - 1); startArc(carT, 'carpet') }
+            else { h.mode = 'fall'; say(pick(JUDGE.stuck)) }
+          } else { h.mode = 'fall'; say(pick(JUDGE.stuck)) }
+        }
+        if (Math.abs(h.x - L.goalX) < 46 && Math.abs(h.y - L.goalY) < 50) {
+          setStatus('won'); setFace('happy'); say(pick(JUDGE.win)); herbyEl.current?.classList.remove(styles.charged)
+        }
+      } else if (h.mode === 'hop' || h.mode === 'carpet') {
+        h.t += 1 / h.dur
+        const t = Math.min(h.t, 1)
+        const H = h.mode === 'carpet' ? CARPET_H : HOP_H
+        h.x = h.sx + (h.tx - h.sx) * t
+        h.y = h.sy + (h.ty - h.sy) * t - H * Math.sin(Math.PI * t)
+        if (t >= 1) {
+          h.x = h.tx; h.y = h.ty; h.vy = 0; h.mode = 'walk'
+          herbyEl.current?.classList.remove(styles.charged)
         }
       } else {
+        // fall
         h.vy = Math.min(h.vy + GRAV, 22)
         const ny = h.y + h.vy
         const land = landingY(h.x, h.y, ny)
-        if (land != null && h.vy >= 0) {
-          h.y = land
-          h.vy = 0
-          h.ground = true
-        } else {
-          h.y = ny
-          h.x += 0.4 // slight forward drift while falling
+        if (land != null) { h.y = land; h.vy = 0; h.mode = 'walk' }
+        else { h.y = ny; h.x += 0.4 }
+        if (h.y > dim.current.h + 120) {
+          setFace('dizzy'); say(pick(JUDGE.fall))
+          setTimeout(resetHerby, 700)
+          herb.current.mode = 'walk'
+          herb.current.y = -9999 // park off-screen during the dizzy beat
         }
       }
-      // fell out of the world
-      if (h.y > dim.current.h + 120) resetHerby()
-      // reached the goal
-      if (Math.abs(h.x - L.goalX) < 46 && Math.abs(h.y - L.goalY) < 46) setStatus('won')
     }
 
     if (herbyEl.current) {
-      herbyEl.current.style.transform = `translate(${herb.current.x - 26}px, ${herb.current.y - 46}px) scaleX(${herb.current.face})`
+      herbyEl.current.style.transform = `translate(${h.x - 26}px, ${h.y - 46}px) scaleX(${h.face})`
     }
     raf.current = requestAnimationFrame(loop)
   }
@@ -136,7 +211,7 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
   useEffect(() => {
     if (!open) return
     buildLevel()
-    setLines([])
+    setLines([]); setInk(0); setCarpets(CARPETS)
     resetHerby()
     raf.current = requestAnimationFrame(loop)
     const onResize = () => buildLevel()
@@ -148,15 +223,14 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
       document.body.style.overflow = ''
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, status])
+  }, [open])
 
-  // drawing
   const rel = (e: React.PointerEvent) => {
     const r = area.current!.getBoundingClientRect()
     return { x: e.clientX - r.left, y: e.clientY - r.top }
   }
   const onDown = (e: React.PointerEvent) => {
-    if (status === 'won') return
+    if (status === 'won' || ink >= INK_MAX) return
     drawing.current = true
     dstart.current = rel(e)
     area.current?.setPointerCapture(e.pointerId)
@@ -176,7 +250,16 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
     if (preview.current) preview.current.style.opacity = '0'
     const p = rel(e)
     const d = Math.hypot(p.x - dstart.current.x, p.y - dstart.current.y)
-    if (d > 24) setLines((ls) => [...ls, { x1: dstart.current.x, y1: dstart.current.y, x2: p.x, y2: p.y }])
+    if (d <= 24) return
+    if (ink + d > INK_MAX) { say('out of ink!'); return }
+    const seg = { x1: dstart.current.x, y1: dstart.current.y, x2: p.x, y2: p.y }
+    setLines((ls) => [...ls, seg])
+    setInk((i) => i + d)
+    // Herby judges the line
+    const slope = Math.abs((seg.y2 - seg.y1) / (seg.x2 - seg.x1 || 1))
+    if (slope > 1.4) say(pick(JUDGE.steep))
+    else if (d > 340) say(pick(JUDGE.long))
+    else say(pick(JUDGE.ok))
   }
 
   if (!open) return null
@@ -188,22 +271,28 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
         <div>
           <span className="eyebrow">( Play )</span>
           <h3 className={`display ${styles.title}`}>Draw Herby Home</h3>
-          <p className={styles.hint}>Drag to draw lines. Herby walks right — build ramps & bridges to the flag.</p>
+          <p className={styles.hint}>Drag to draw lines. Herby reads them and walks, hops, or flies to the flag.</p>
         </div>
         <div className={styles.controls}>
-          <button onClick={() => setLines([])} data-cursor="grow">Clear</button>
+          <button onClick={() => { setLines([]); setInk(0) }} data-cursor="grow">Clear</button>
           <button onClick={resetHerby} data-cursor="grow">Restart</button>
           <button onClick={onClose} className={styles.close} data-cursor="grow">Close ✕</button>
         </div>
       </div>
 
-      <div
-        ref={area}
-        className={styles.arena}
-        onPointerDown={onDown}
-        onPointerMove={onMove}
-        onPointerUp={onUp}
-      >
+      <div ref={area} className={styles.arena} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp}>
+        {/* abilities hint + resources */}
+        <div className={styles.legend}>
+          <div className={styles.legendTitle}>Herby can</div>
+          <div className={styles.legendRow}><span>🚶</span> walk on your lines</div>
+          <div className={styles.legendRow}><span>⤴</span> hop small gaps</div>
+          <div className={styles.legendRow}><span>🪄</span> fly a carpet over big gaps</div>
+          <div className={styles.meta}>
+            <span>Carpets: {'✦'.repeat(carpets) || '—'}</span>
+            <span className={styles.inkWrap}>Ink <i className={styles.inkBar}><i style={{ width: `${100 - (ink / INK_MAX) * 100}%` }} /></i></span>
+          </div>
+        </div>
+
         <svg className={styles.svg}>
           {L && (
             <>
@@ -220,28 +309,40 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
           <line ref={preview} className={styles.preview} />
         </svg>
 
-        {/* goal flag */}
         {L && (
-          <div className={styles.flag} style={{ left: L.goalX, top: L.goalY }}>
-            <span>🏁</span>
-          </div>
+          <div className={styles.flag} style={{ left: L.goalX, top: L.goalY }}><span>🏁</span></div>
         )}
 
-        {/* Herby sprite */}
         <div ref={herbyEl} className={styles.herby}>
-          <svg viewBox="0 0 200 174" width="52" height="45">
+          <div ref={bubble} className={styles.bubble}><span ref={bubbleTxt} /></div>
+          <svg viewBox="0 0 200 174" width="52" height="45" className={styles.sprite}>
             <g fill="#d97757">
               <rect x="8" y="82" width="22" height="34" rx="2" />
               <rect x="170" y="82" width="22" height="34" rx="2" />
               <rect x="62" y="138" width="22" height="30" rx="2" />
               <rect x="116" y="138" width="22" height="30" rx="2" />
               <rect x="28" y="52" width="144" height="90" rx="5" />
-              <ellipse cx="82" cy="97" rx="11" ry="13" fill="#20140f" />
-              <ellipse cx="118" cy="97" rx="11" ry="13" fill="#20140f" />
-              <circle cx="85" cy="94" r="3.2" fill="#fff" />
-              <circle cx="121" cy="94" r="3.2" fill="#fff" />
+              {face === 'happy' ? (
+                <g stroke="#20140f" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" fill="none">
+                  <path d="M72 90 L92 100 L72 110" />
+                  <path d="M128 90 L108 100 L128 110" />
+                </g>
+              ) : face === 'dizzy' ? (
+                <g stroke="#20140f" strokeWidth="6" strokeLinecap="round">
+                  <path d="M76 92 L92 108" /><path d="M92 92 L76 108" />
+                  <path d="M108 92 L124 108" /><path d="M124 92 L108 108" />
+                </g>
+              ) : (
+                <>
+                  <ellipse cx="82" cy="97" rx="11" ry="13" fill="#20140f" />
+                  <ellipse cx="118" cy="97" rx="11" ry="13" fill="#20140f" />
+                  <circle cx="85" cy="94" r="3.2" fill="#fff" />
+                  <circle cx="121" cy="94" r="3.2" fill="#fff" />
+                </>
+              )}
             </g>
           </svg>
+          <span className={styles.carpet} />
         </div>
 
         {status === 'won' && (
