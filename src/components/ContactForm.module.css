@@ -139,6 +139,15 @@
   font-size: var(--step--1);
 }
 
+.fieldErr {
+  color: #ff8a75;
+  font-size: var(--step--1);
+}
+
+.input[aria-invalid='true'] {
+  border-bottom-color: #ff8a75;
+}
+
 /* success */
 .sent {
   display: flex;

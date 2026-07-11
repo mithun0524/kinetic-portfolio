@@ -14,6 +14,9 @@ export function ContactForm({ open, onClose }: { open: boolean; onClose: () => v
   const panel = useRef<HTMLDivElement>(null)
   const [status, setStatus] = useState<Status>('idle')
   const [form, setForm] = useState({ name: '', email: '', message: '' })
+  const [emailErr, setEmailErr] = useState('')
+
+  const validEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())
 
   useGSAP(
     () => {
@@ -58,7 +61,12 @@ export function ContactForm({ open, onClose }: { open: boolean; onClose: () => v
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!form.name || !form.email || !form.message) return
+    if (!form.name || !form.message) return
+    if (!validEmail(form.email)) {
+      setEmailErr('Please enter a valid email address.')
+      return
+    }
+    setEmailErr('')
     setStatus('sending')
 
     if (WEB3FORMS_ACCESS_KEY) {
@@ -107,11 +115,16 @@ export function ContactForm({ open, onClose }: { open: boolean; onClose: () => v
           className={styles.input}
           type={type}
           value={form[key]}
-          onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+          onChange={(e) => {
+            setForm({ ...form, [key]: e.target.value })
+            if (key === 'email' && emailErr) setEmailErr('')
+          }}
+          aria-invalid={key === 'email' && !!emailErr}
           required
         />
       )}
       <span className={styles.underline} />
+      {key === 'email' && emailErr && <span className={styles.fieldErr}>{emailErr}</span>}
     </label>
   )
 
