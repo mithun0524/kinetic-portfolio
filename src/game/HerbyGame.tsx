@@ -179,8 +179,12 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
         const sy = supportY(nx, h.y)
         if (sy != null) {
           h.x = nx; h.y = sy; h.vy = 0
+        } else if (supportY(h.x, h.y) == null) {
+          // ground vanished from under him (e.g. you cleared his line) → fall
+          h.mode = 'fall'
+          h.vy = 1
         } else {
-          // edge — judge & choose a power
+          // real edge (still standing) — judge & choose a power
           const hopT = findTarget(HOP_X)
           if (hopT) startArc(hopT, 'hop')
           else if (carpetsRef.current > 0) {
@@ -198,7 +202,8 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
           setStatus('won'); setFace('happy'); say(pick(JUDGE.win)); herbyEl.current?.classList.remove(styles.charged)
         }
       } else if (h.mode === 'stuck') {
-        // stand still and wait for the player to draw a new line
+        // stand still and wait for a new line — unless the ground is pulled away
+        if (supportY(h.x, h.y) == null) { h.mode = 'fall'; h.vy = 1 }
       } else if (h.mode === 'charge') {
         // stand still and supercharge (~1s), then launch the carpet with a bubble
         h.t += 1
