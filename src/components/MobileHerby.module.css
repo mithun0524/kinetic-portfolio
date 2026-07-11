@@ -31,6 +31,21 @@
   width: 100%;
   height: auto;
   filter: drop-shadow(0 0 34px rgba(217, 119, 87, 0.3));
+  transition: filter 0.35s ease;
+}
+
+/* body colour shifts with mood */
+.mood_happy .svg {
+  filter: saturate(1.2) brightness(1.08) drop-shadow(0 0 32px rgba(217, 119, 87, 0.5));
+}
+.mood_blush .svg {
+  filter: saturate(1.25) drop-shadow(0 0 30px rgba(255, 140, 150, 0.55));
+}
+.mood_angry .svg {
+  filter: saturate(3) hue-rotate(-18deg) brightness(0.85) drop-shadow(0 0 22px rgba(255, 60, 40, 0.65));
+}
+.mood_sad .svg {
+  filter: grayscale(0.45) brightness(0.85) drop-shadow(0 0 26px rgba(150, 190, 255, 0.45));
 }
 
 /* little ground line under him */
