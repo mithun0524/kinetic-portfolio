@@ -114,6 +114,65 @@
   border-color: var(--text);
 }
 
+/* hover preview card + tether line */
+.preview {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 40;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  width: 132px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(18, 18, 18, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  will-change: transform;
+}
+
+.previewImg {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+}
+
+.previewLabel {
+  font-family: var(--font-display);
+  font-size: var(--step--1);
+  letter-spacing: 0.04em;
+  color: var(--text);
+  text-align: center;
+}
+
+.tether {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 39;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.tether line {
+  stroke: var(--text-dim);
+  stroke-width: 1;
+  stroke-dasharray: 3 5;
+}
+
+.cap {
+  cursor: pointer;
+}
+
 @media (max-width: 768px) {
   .strip {
     min-height: unset;
