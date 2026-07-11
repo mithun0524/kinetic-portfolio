@@ -48,8 +48,11 @@ export function Contact({ onPlay }: { onPlay: () => void }) {
           label.style.top = `${y - 26}px`
         }
         if (playRef.current) {
-          playRef.current.style.left = `${x}px`
-          playRef.current.style.top = `${y + 34}px`
+          // right-align to the home line so the big button grows leftward (stays on screen)
+          const lineRightRel = tr.right - cr.left
+          playRef.current.style.left = 'auto'
+          playRef.current.style.right = `${cr.width - lineRightRel}px`
+          playRef.current.style.top = `${y + 40}px`
         }
       }
 
@@ -103,8 +106,11 @@ export function Contact({ onPlay }: { onPlay: () => void }) {
       <span ref={labelRef} className={styles.homeLabel}>HOME</span>
       <span ref={lineRef} className={styles.homeLine} data-solid />
       <Mascot ground homeRef={lineRef} />
-      <button ref={playRef} className={styles.playHere} onClick={onPlay} data-cursor="grow">
-        <span className={styles.playDot} /> Play with Herby
+      <button ref={playRef} className={`${styles.cta} ${styles.playHere}`} onClick={onPlay} data-cursor="grow">
+        <span>Play with Herby</span>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M7 5l8 5-8 5V5z" fill="currentColor" />
+        </svg>
       </button>
 
       <button
@@ -122,7 +128,7 @@ export function Contact({ onPlay }: { onPlay: () => void }) {
       </button>
 
       <button className={styles.playMobile} onClick={onPlay} data-cursor="grow">
-        <span className={styles.playDot} /> Play with Herby
+        Play with Herby
       </button>
 
       <ContactForm open={formOpen} onClose={() => setFormOpen(false)} />
