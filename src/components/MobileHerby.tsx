@@ -106,6 +106,11 @@ export function MobileHerby() {
     <div className={styles.root} aria-hidden>
       <div ref={wrap} className={`${styles.wrap} ${mood !== 'normal' ? styles['mood_' + mood] : ''}`} onPointerDown={poke} role="button">
         <div ref={bubble} className={styles.bubble}>{line}</div>
+        {mood === 'blush' && (
+          <div className={styles.hearts} aria-hidden>
+            <span>💗</span><span>💕</span><span>💗</span>
+          </div>
+        )}
         <div className={styles.line} />
         <div ref={jump} className={styles.jump}>
           <svg viewBox="0 0 200 174" className={styles.svg}>

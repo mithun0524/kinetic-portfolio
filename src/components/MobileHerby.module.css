@@ -39,7 +39,30 @@
   filter: saturate(1.2) brightness(1.08) drop-shadow(0 0 32px rgba(217, 119, 87, 0.5));
 }
 .mood_blush .svg {
-  filter: saturate(1.25) drop-shadow(0 0 30px rgba(255, 140, 150, 0.55));
+  /* push the coral toward a clear pink */
+  filter: hue-rotate(-42deg) saturate(1.7) brightness(1.06) drop-shadow(0 0 30px rgba(255, 130, 165, 0.6));
+}
+
+/* floating hearts while blushing */
+.hearts {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+.hearts span {
+  position: absolute;
+  bottom: 52%;
+  opacity: 0;
+  animation: floatHeart 1.5s ease-out forwards;
+}
+.hearts span:nth-child(1) { left: 26%; font-size: 1.1rem; animation-delay: 0s; }
+.hearts span:nth-child(2) { left: 50%; font-size: 0.85rem; animation-delay: 0.22s; }
+.hearts span:nth-child(3) { left: 66%; font-size: 1.25rem; animation-delay: 0.44s; }
+@keyframes floatHeart {
+  0% { opacity: 0; transform: translateY(6px) scale(0.4) rotate(-8deg); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-64px) scale(1.05) rotate(8deg); }
 }
 .mood_angry .svg {
   filter: saturate(3) hue-rotate(-18deg) brightness(0.85) drop-shadow(0 0 22px rgba(255, 60, 40, 0.65));
