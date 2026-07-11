@@ -199,7 +199,8 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
           } else { h.mode = 'stuck'; say(pick(JUDGE.stuck)) }
         }
         if (Math.abs(h.x - L.goalX) < 46 && Math.abs(h.y - L.goalY) < 50) {
-          setStatus('won'); setFace('happy'); say(pick(JUDGE.win)); herbyEl.current?.classList.remove(styles.charged)
+          setStatus('won'); setFace('happy'); setGhostArrived(false); setExitX(L.goalX)
+          say(pick(JUDGE.win)); herbyEl.current?.classList.remove(styles.charged)
         }
       } else if (h.mode === 'stuck') {
         // stand still and wait for a new line — unless the ground is pulled away
@@ -495,12 +496,41 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
         </div>
 
         {status === 'won' && (
-          <div className={styles.win}>
-            <h2 className={`display ${styles.winTitle}`}>Herby&apos;s home! 🎉</h2>
-            <div className={styles.winBtns}>
-              <button onClick={resetHerby} data-cursor="grow">Play again</button>
-              <button onClick={onClose} className={styles.close} data-cursor="grow">Done</button>
+          <div className={styles.dead}>
+            <div className={styles.confetti} aria-hidden>
+              {Array.from({ length: 14 }).map((_, i) => <span key={i} />)}
             </div>
+            {/* happy Herby flies in to you */}
+            <div
+              className={styles.winHerby}
+              style={{ ['--sx' as string]: `${exitX}px` }}
+              onAnimationEnd={(e) => { if (e.animationName.includes('winCome')) setGhostArrived(true) }}
+            >
+              <div className={styles.ghostBubble}>{ghostArrived ? 'we made it! ^-^' : 'wheeee!'}</div>
+              <svg viewBox="0 0 200 174" width="132" height="115" className={styles.ghostSvg}>
+                <g fill="#d97757">
+                  <rect x="8" y="82" width="22" height="34" rx="2" />
+                  <rect x="170" y="82" width="22" height="34" rx="2" />
+                  <rect x="62" y="138" width="22" height="30" rx="2" />
+                  <rect x="116" y="138" width="22" height="30" rx="2" />
+                  <rect x="28" y="52" width="144" height="90" rx="5" />
+                </g>
+                <g stroke="#20140f" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" fill="none">
+                  <path d="M72 90 L92 100 L72 110" />
+                  <path d="M128 90 L108 100 L128 110" />
+                </g>
+              </svg>
+            </div>
+
+            {ghostArrived && (
+              <div className={styles.deadPanel}>
+                <h2 className={`display ${styles.winTitle}`}>Herby&apos;s home! 🎉</h2>
+                <div className={styles.winBtns}>
+                  <button onClick={resetHerby} data-cursor="grow">Play again</button>
+                  <button onClick={onClose} className={styles.close} data-cursor="grow">Done</button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
