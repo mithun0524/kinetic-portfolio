@@ -242,15 +242,27 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
     const els = document.querySelectorAll<HTMLElement>(
       'main h1, main h2, main h3, main h4, main p, main li, main a, [data-solid]'
     )
-    const out: { left: number; right: number; top: number }[] = []
+    const raw: { left: number; right: number; top: number }[] = []
     els.forEach((el) => {
       if (el.closest('[data-nofloor]')) return
       const r = el.getBoundingClientRect()
       if (r.width < 50 || r.height < 8) return
       if (!(el.textContent || '').trim() && !el.hasAttribute('data-solid')) return
-      out.push({ left: r.left, right: r.right, top: r.top })
+      raw.push({ left: r.left, right: r.right, top: r.top })
     })
-    return out
+    // merge text sharing a line into one wide ledge (kills micro-hops)
+    raw.sort((a, b) => a.top - b.top)
+    const merged: { left: number; right: number; top: number }[] = []
+    for (const s of raw) {
+      const m = merged.find(
+        (x) => Math.abs(x.top - s.top) < 10 && s.left < x.right + 24 && s.right > x.left - 24
+      )
+      if (m) {
+        m.left = Math.min(m.left, s.left)
+        m.right = Math.max(m.right, s.right)
+      } else merged.push({ ...s })
+    }
+    return merged
   }
 
   const dropAndFall = () => {
@@ -272,9 +284,9 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
     })
 
     let v = 0
-    const g = 1.5
+    const g = 1.6
     const fall = () => {
-      v += g
+      v = Math.min(v + g, 28) // cap terminal velocity so tall drops stay readable
       const y = (gsap.getProperty(drag.current, 'y') as number) + v
       gsap.set(drag.current, { y })
       if (feetBottom() >= target) {
@@ -313,7 +325,7 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
 
     let cx = feetCenterX()
     let cy = feetBottom()
-    const REACH = 260 // how far horizontally it can reach a ledge to hop onto
+    const REACH = 320 // how far horizontally it can reach a ledge to hop onto
 
     const tl = gsap.timeline({
       onComplete: () => {
@@ -323,16 +335,18 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
       },
     })
 
+    const clampX = (s: { left: number; right: number }) => gsap.utils.clamp(s.left + 18, s.right - 18, homeFeetX)
+
     const walkTo = (px: number) => {
       const d = Math.abs(px - cx)
       if (d < 3) return
       face(px < cx ? -1 : 1)
-      tl.to(drag.current, { x: toDragX(px), duration: gsap.utils.clamp(0.25, 1.2, d / 220), ease: 'power1.inOut' })
+      tl.to(drag.current, { x: toDragX(px), duration: gsap.utils.clamp(0.2, 0.9, d / 260), ease: 'power2.inOut' })
       cx = px
     }
     const hopTo = (px: number, py: number) => {
       face(px < cx ? -1 : 1)
-      const up = Math.max(70, cy - py + 40)
+      const up = gsap.utils.clamp(60, 140, cy - py + 34)
       tl.to(body.current, { scaleY: 0.8, scaleX: 1.2, transformOrigin: '50% 100%', duration: 0.08 })
         .to(drag.current, { x: toDragX(px), duration: 0.55, ease: 'power1.inOut' })
         .to(
@@ -351,20 +365,31 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
       cy = py
     }
 
-    // greedy climb: hop ledge-by-ledge up toward home
+    // climb ledge-by-ledge toward home, biased to move homeward each hop
     let guard = 0
-    while (guard++ < 14) {
-      if (Math.abs(cy - homeFeetY) < 6) {
+    while (guard++ < 16) {
+      // arrived at home level → walk the last stretch
+      if (Math.abs(cy - homeFeetY) < 8) {
         walkTo(homeFeetX)
         break
       }
+      // home is below (rare after a fall): walk over, then drop
+      if (homeFeetY > cy + 8) {
+        walkTo(homeFeetX)
+        tl.to(drag.current, { y: 0, duration: 0.45, ease: 'power2.in' })
+        break
+      }
+      // ledges above, meaningful climb, within reach
       const cands = surfaces.filter(
-        (s) => s.top < cy - 6 && s.top >= homeFeetY - 6 && s.right >= cx - REACH && s.left <= cx + REACH
+        (s) => s.top <= cy - 24 && s.top >= homeFeetY - 8 && s.right >= cx - REACH && s.left <= cx + REACH
       )
       if (cands.length) {
-        cands.sort((a, b) => b.top - a.top) // smallest climb first
-        const s = cands[0]
-        const targetX = gsap.utils.clamp(s.left + 18, s.right - 18, homeFeetX)
+        // take the next level up (highest tops), then the one closest to home x
+        const maxTop = Math.max(...cands.map((c) => c.top))
+        const band = cands.filter((c) => c.top >= maxTop - 70)
+        band.sort((a, b) => Math.abs(clampX(a) - homeFeetX) - Math.abs(clampX(b) - homeFeetX))
+        const s = band[0]
+        const targetX = clampX(s)
         walkTo(targetX)
         hopTo(targetX, s.top)
       } else {
