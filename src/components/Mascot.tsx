@@ -282,38 +282,58 @@ export function Mascot({
     gsap.set(drag.current, { x: (h.left + h.right) / 2 - ax, y: h.top - ay })
   }
 
-  // cinematic hero intro: empty home muses, then Herby drops in & says hi
+  // cinematic hero intro: empty home muses, Herby peeks upside-down, then drops in
   const runIntro = () => {
     busy.current = true
     walkOn.current = false
     snapHome()
-    gsap.set(facer.current, { autoAlpha: 0 }) // sprite hidden; bubble at the empty home
-    gsap.delayedCall(0.9, () => say('home?'))
-    gsap.delayedCall(2.3, () => say('…whose home?'))
-    gsap.delayedCall(3.7, () => say('hmm…'))
-    gsap.delayedCall(4.9, () => {
-      // Herby peeks in from the top above his home
-      const h = homeRect()
-      const ax = feetCenterX() - getX()
-      const ay = feetBottom() - getY()
-      gsap.set(drag.current, { x: (h.left + h.right) / 2 - ax, y: 60 - ay })
-      gsap.set(facer.current, { autoAlpha: 1 })
-      say('oh! there it is!')
-      gsap.to(drag.current, {
-        y: h.top - ay,
-        duration: 0.85,
-        ease: 'bounce.out',
-        onComplete: () => {
-          gsap.timeline()
-            .to(body.current, { scaleY: 0.68, scaleX: 1.28, transformOrigin: '50% 100%', duration: 0.09 })
-            .to(body.current, { scaleY: 1, scaleX: 1, duration: 0.35, ease: 'elastic.out(1, 0.4)' })
-          gsap.set(spark.current, { autoAlpha: 1, scale: 0.3, y: 20, transformOrigin: '50% 50%' })
-          gsap.timeline().to(spark.current, { scale: 0.9, y: -6, duration: 0.4, ease: 'power2.out' }).to(spark.current, { autoAlpha: 0, duration: 0.3 }, '-=0.1')
-          gsap.delayedCall(0.25, () => say("hi! i'm Herby ^-^"))
-          gsap.delayedCall(2.0, () => { busy.current = false; startWalking() })
-        },
+    // capture the home anchor once (rotation 0) so positioning stays consistent
+    const homeCx = (homeRect().left + homeRect().right) / 2
+    const homeTop = homeRect().top
+    const ax0 = feetCenterX() - getX()
+    const ay0 = feetBottom() - getY()
+    const setFeet = (px: number, py: number) => gsap.set(drag.current, { x: px - ax0, y: py - ay0 })
+    gsap.set(facer.current, { autoAlpha: 0, rotation: 0 })
+
+    const tl = gsap.timeline({ defaults: { ease: 'power2.inOut' } })
+    // --- slow chat from the empty home ---
+    tl.call(() => say('home?', 2.6))
+      .to({}, { duration: 3 })
+      .call(() => say('…whose home?', 2.6))
+      .to({}, { duration: 3.2 })
+      .call(() => say('hmm…', 2.4))
+      .to({}, { duration: 3 })
+      // --- peek upside-down from the top (only eyes), hold ~2s ---
+      .call(() => {
+        gsap.set(facer.current, { autoAlpha: 1, rotation: 180 })
+        setFeet(homeCx, homeTop - 250) // hangs from above; upper body clipped by the hero
       })
-    })
+      .fromTo(pupilL.current, { y: 0 }, { y: 3, duration: 0.9, yoyo: true, repeat: 1 }, '<')
+      .fromTo(pupilR.current, { y: 0 }, { y: 3, duration: 0.9, yoyo: true, repeat: 1 }, '<')
+      .to({}, { duration: 2 })
+      // --- duck back up ---
+      .call(() => setFeet(homeCx, homeTop - 520))
+      .to({}, { duration: 1.1 })
+      .call(() => gsap.set(facer.current, { autoAlpha: 0, rotation: 0 }))
+      .to({}, { duration: 0.6 })
+      // --- come in full: drop from the top onto home (slow) ---
+      .call(() => {
+        gsap.set(facer.current, { autoAlpha: 1 })
+        setFeet(homeCx, 30)
+        say('there it is!', 2)
+      })
+      .to(drag.current, { y: homeTop - ay0, duration: 1.15, ease: 'bounce.out' })
+      .call(() => {
+        gsap.timeline()
+          .to(body.current, { scaleY: 0.68, scaleX: 1.28, transformOrigin: '50% 100%', duration: 0.1 })
+          .to(body.current, { scaleY: 1, scaleX: 1, duration: 0.4, ease: 'elastic.out(1, 0.4)' })
+        gsap.set(spark.current, { autoAlpha: 1, scale: 0.3, y: 20, transformOrigin: '50% 50%' })
+        gsap.timeline().to(spark.current, { scale: 0.9, y: -6, duration: 0.4, ease: 'power2.out' }).to(spark.current, { autoAlpha: 0, duration: 0.3 }, '-=0.1')
+      })
+      .to({}, { duration: 0.8 })
+      .call(() => say("hi! i'm Herby ^-^", 2.4))
+      .to({}, { duration: 2.6 })
+      .call(() => { busy.current = false; startWalking() })
   }
 
   useGSAP(
