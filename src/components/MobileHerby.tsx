@@ -28,6 +28,17 @@ export function MobileHerby() {
         gsap.delayedCall(2.2 + Math.random() * 1.5, blink)
       }
       gsap.delayedCall(2, blink)
+
+      // one-time invite so touch users know he's interactive
+      gsap.delayedCall(1.6, () => {
+        setLine('tap me!')
+        gsap.fromTo(
+          bubble.current,
+          { autoAlpha: 0, scale: 0.6, y: 8 },
+          { autoAlpha: 1, scale: 1, y: 0, duration: 0.3, ease: 'back.out(2.5)' }
+        )
+        gsap.to(bubble.current, { autoAlpha: 0, scale: 0.7, duration: 0.3, delay: 2.2 })
+      })
     },
     { scope: wrap }
   )

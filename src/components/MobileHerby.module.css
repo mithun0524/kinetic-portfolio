@@ -7,13 +7,15 @@
   .root {
     display: flex;
     justify-content: center;
-    margin-top: 2.5rem;
+    /* headroom for the tap-bubble above, and separation from the marquee below */
+    margin-top: 4rem;
+    margin-bottom: 1.5rem;
   }
 }
 
 .wrap {
   position: relative;
-  width: 128px;
+  width: 152px;
   cursor: pointer;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
