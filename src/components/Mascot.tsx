@@ -111,8 +111,9 @@ function MascotBase(
     const m = FACE() as Record<string, SVGGElement | null>
     Object.entries(m).forEach(([k, el]) => {
       gsap.killTweensOf(el)
-      if (k === name) gsap.to(el, { autoAlpha: 1, duration: 0.12 })
-      else gsap.set(el, { autoAlpha: 0 })
+      // killing a mid-blink tween can leave scaleY stuck low — always restore it
+      if (k === name) gsap.to(el, { autoAlpha: 1, scaleY: 1, duration: 0.12 })
+      else gsap.set(el, { autoAlpha: 0, scaleY: 1 })
     })
     gsap.killTweensOf(cheeks.current)
     gsap.set(cheeks.current, { autoAlpha: name === 'blush' ? 1 : 0 })
