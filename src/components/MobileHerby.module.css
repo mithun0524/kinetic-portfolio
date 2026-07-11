@@ -64,6 +64,17 @@
   25% { opacity: 1; }
   100% { opacity: 0; transform: translateY(-64px) scale(1.05) rotate(8deg); }
 }
+
+/* sad: broken hearts sink and droop instead of rising */
+.heartsSad span {
+  bottom: 60%;
+  animation: sinkHeart 1.8s ease-in forwards;
+}
+@keyframes sinkHeart {
+  0% { opacity: 0; transform: translateY(-4px) scale(0.5) rotate(0deg); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(46px) scale(0.9) rotate(-12deg); }
+}
 .mood_angry .svg {
   filter: saturate(3) hue-rotate(-18deg) brightness(0.85) drop-shadow(0 0 22px rgba(255, 60, 40, 0.65));
 }

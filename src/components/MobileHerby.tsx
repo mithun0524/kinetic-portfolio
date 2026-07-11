@@ -111,6 +111,11 @@ export function MobileHerby() {
             <span>💗</span><span>💕</span><span>💗</span>
           </div>
         )}
+        {mood === 'sad' && (
+          <div className={`${styles.hearts} ${styles.heartsSad}`} aria-hidden>
+            <span>💔</span><span>💧</span><span>💔</span>
+          </div>
+        )}
         <div className={styles.line} />
         <div ref={jump} className={styles.jump}>
           <svg viewBox="0 0 200 174" className={styles.svg}>
