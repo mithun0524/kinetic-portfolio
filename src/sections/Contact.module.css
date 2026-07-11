@@ -46,6 +46,28 @@
   color: var(--bg);
 }
 
+.groundWrap {
+  position: relative;
+  height: clamp(120px, 16vh, 180px);
+  margin-top: clamp(1rem, 3vh, 2rem);
+}
+
+.groundLine {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background: var(--line);
+  transform-origin: 0 50%;
+}
+
+@media (max-width: 1024px) {
+  .groundWrap {
+    display: none;
+  }
+}
+
 .meta {
   margin-top: clamp(1.5rem, 4vh, 3rem);
   padding-top: clamp(1.5rem, 4vh, 2.5rem);

@@ -10,7 +10,7 @@ import styles from './Mascot.module.css'
  * - Drag: pick it up and drop it anywhere — it waddles back home.
  * Pure SVG + GSAP, no 3D deps.
  */
-export function Mascot() {
+export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range?: number } = {}) {
   const root = useRef<HTMLDivElement>(null)
   const drag = useRef<HTMLDivElement>(null)
   const walker = useRef<HTMLDivElement>(null)
@@ -39,12 +39,13 @@ export function Mascot() {
       gsap.set(spark.current, { autoAlpha: 0 })
       if (prefersReducedMotion()) return
 
+      const span = range / 80 * 4.5
       walkTl.current = gsap
         .timeline({ repeat: -1 })
         .add(() => face(1))
-        .to(walker.current, { x: 80, duration: 4.5, ease: 'none' })
+        .to(walker.current, { x: range, duration: span, ease: 'none' })
         .add(() => face(-1))
-        .to(walker.current, { x: -80, duration: 4.5, ease: 'none' })
+        .to(walker.current, { x: -range, duration: span, ease: 'none' })
 
       // stepping legs + waddle (tracked so drag can freeze them)
       const stepL = gsap.to(legL.current, { y: -7, duration: 0.28, repeat: -1, yoyo: true, ease: 'sine.inOut' })
@@ -251,7 +252,7 @@ export function Mascot() {
   return (
     <div
       ref={root}
-      className={styles.mascot}
+      className={`${styles.mascot} ${ground ? styles.ground : ''}`}
       aria-hidden
       onPointerEnter={() => hover(true)}
       onPointerLeave={() => hover(false)}
@@ -263,7 +264,7 @@ export function Mascot() {
         <div ref={walker}>
           <div ref={jump}>
             <div ref={facer}>
-              <svg viewBox="0 0 200 200" className={styles.svg}>
+              <svg viewBox="0 0 200 174" className={styles.svg}>
                 <g ref={spark} fill="var(--m)">
                   <path d="M100 12 L104 26 L118 30 L104 34 L100 48 L96 34 L82 30 L96 26 Z" />
                 </g>

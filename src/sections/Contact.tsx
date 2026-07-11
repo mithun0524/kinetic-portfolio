@@ -11,6 +11,7 @@ export function Contact() {
   const l1 = useRef<HTMLSpanElement>(null)
   const l2 = useRef<HTMLSpanElement>(null)
   const btn = useMagnetic<HTMLButtonElement>(0.5)
+  const lineRef = useRef<HTMLSpanElement>(null)
   const [formOpen, setFormOpen] = useState(false)
 
   useGSAP(
@@ -27,13 +28,23 @@ export function Contact() {
           toggleActions: 'play none none reverse',
         },
       })
+      // draw the ground line in
+      gsap.from(lineRef.current, {
+        scaleX: 0,
+        duration: 1.1,
+        ease: 'power3.inOut',
+        scrollTrigger: {
+          trigger: lineRef.current,
+          start: 'top 90%',
+          toggleActions: 'play none none reverse',
+        },
+      })
     },
     { scope: root }
   )
 
   return (
     <footer ref={root} className={`section ${styles.contact}`} id="contact">
-      <Mascot />
       <span className="eyebrow">( Let&apos;s build )</span>
 
       <h2 className={`display ${styles.line}`}>
@@ -61,6 +72,12 @@ export function Contact() {
           <path d="M4 16L16 4M16 4H6M16 4v10" stroke="currentColor" strokeWidth="1.5" />
         </svg>
       </button>
+
+      {/* ground line the mascot patrols on */}
+      <div className={styles.groundWrap}>
+        <span ref={lineRef} className={styles.groundLine} />
+        <Mascot ground range={160} />
+      </div>
 
       <ContactForm open={formOpen} onClose={() => setFormOpen(false)} />
 

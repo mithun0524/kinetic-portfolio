@@ -18,6 +18,16 @@
   cursor: grabbing;
 }
 
+/* ground mode: stands on a line inside a positioned wrapper */
+.ground {
+  right: auto;
+  top: auto;
+  left: 50%;
+  bottom: -2px;
+  transform: translateX(-50%);
+  width: clamp(110px, 12vw, 170px);
+}
+
 .svg {
   width: 100%;
   height: auto;
