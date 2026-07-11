@@ -13,7 +13,6 @@ import { Capabilities } from './sections/Capabilities'
 import { Experience } from './sections/Experience'
 import { Contact } from './sections/Contact'
 import { HerbyGame } from './game/HerbyGame'
-import styles from './App.module.css'
 
 export default function App() {
   const [ready, setReady] = useState(false)
@@ -42,13 +41,9 @@ export default function App() {
         <Work />
         <Capabilities />
         <Experience />
-        <Contact />
+        <Contact onPlay={() => setPlaying(true)} />
       </main>
 
-      <button className={styles.playBtn} onClick={() => setPlaying(true)} data-cursor="grow">
-        <span className={styles.playDot} />
-        Play with Herby
-      </button>
       <HerbyGame open={playing} onClose={() => setPlaying(false)} />
     </>
   )

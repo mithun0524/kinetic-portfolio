@@ -6,7 +6,7 @@ import { Mascot } from '../components/Mascot'
 import styles from './Contact.module.css'
 
 /** Contact: masked outro headline + magnetic link + footer meta. */
-export function Contact() {
+export function Contact({ onPlay }: { onPlay: () => void }) {
   const root = useRef<HTMLElement>(null)
   const l1 = useRef<HTMLSpanElement>(null)
   const l2 = useRef<HTMLSpanElement>(null)
@@ -14,6 +14,7 @@ export function Contact() {
   const btn = useMagnetic<HTMLButtonElement>(0.5)
   const lineRef = useRef<HTMLSpanElement>(null)
   const labelRef = useRef<HTMLSpanElement>(null)
+  const playRef = useRef<HTMLButtonElement>(null)
   const [formOpen, setFormOpen] = useState(false)
 
   useGSAP(
@@ -45,6 +46,10 @@ export function Contact() {
         if (label) {
           label.style.left = `${x + 95}px`
           label.style.top = `${y - 26}px`
+        }
+        if (playRef.current) {
+          playRef.current.style.left = `${x}px`
+          playRef.current.style.top = `${y + 34}px`
         }
       }
 
@@ -98,6 +103,9 @@ export function Contact() {
       <span ref={labelRef} className={styles.homeLabel}>HOME</span>
       <span ref={lineRef} className={styles.homeLine} data-solid />
       <Mascot ground homeRef={lineRef} />
+      <button ref={playRef} className={styles.playHere} onClick={onPlay} data-cursor="grow">
+        <span className={styles.playDot} /> Play with Herby
+      </button>
 
       <button
         ref={btn}
@@ -111,6 +119,10 @@ export function Contact() {
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
           <path d="M4 16L16 4M16 4H6M16 4v10" stroke="currentColor" strokeWidth="1.5" />
         </svg>
+      </button>
+
+      <button className={styles.playMobile} onClick={onPlay} data-cursor="grow">
+        <span className={styles.playDot} /> Play with Herby
       </button>
 
       <ContactForm open={formOpen} onClose={() => setFormOpen(false)} />
