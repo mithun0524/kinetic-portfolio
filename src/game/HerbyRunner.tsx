@@ -11,11 +11,12 @@ import styles from './HerbyRunner.module.css'
 interface Seg { x0: number; w: number }
 
 const GRAV = 0.9
-const JUMP = 16
+const JUMP = 17
 const CARPETS = 3
 const SX_RATIO = 0.26 // Herby's fixed screen x
 const HERB_W = 52
 const HERB_H = 45
+const COYOTE = 7 // frames after leaving an edge where a tap still counts as a hop
 
 export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => void }) {
   const area = useRef<HTMLDivElement>(null)
@@ -43,6 +44,7 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
   const y = useRef(0) // feet y
   const vy = useRef(0)
   const onGround = useRef(true)
+  const sinceGround = useRef(0)
   const carpetUsed = useRef(false)
   const carpetsRef = useRef(CARPETS)
   const statusRef = useRef<'ready' | 'play' | 'dead' | 'won'>('ready')
@@ -60,10 +62,12 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
     let x = -80
     list.push({ x0: x, w: SX.current + 260 }) // runway under Herby
     x = list[0].x0 + list[0].w
+    // single-hop reach ≈ speed × airtime. airtime = 2·JUMP/GRAV ≈ 38 frames,
+    // start speed 4 → ~150px reach. Keep gaps comfortably under that so every
+    // gap is clearable with one well-timed hop (carpet is just a save, not required).
     const GAPS = 11
     for (let i = 0; i < GAPS; i++) {
-      const wide = i > 2 && i % 4 === 0 // a few wide (carpet-worthy) gaps
-      const gap = wide ? 150 + Math.random() * 40 : 70 + Math.random() * 45
+      const gap = 55 + Math.random() * 40 // 55–95px, always hoppable
       const plat = 150 + Math.random() * 120
       x += gap
       list.push({ x0: x, w: plat })
@@ -98,7 +102,7 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
 
     // simulate only while playing; ready/dead/won just keep painting the scene
     if (statusRef.current === 'play') {
-      speed.current = Math.min(6, 3.6 + worldX.current * 0.00035)
+      speed.current = Math.min(5, 4 + worldX.current * 0.0002)
       worldX.current += speed.current
 
       vy.current += GRAV
@@ -116,6 +120,9 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
       } else {
         onGround.current = false
       }
+      // coyote-time bookkeeping
+      if (onGround.current) sinceGround.current = 0
+      else sinceGround.current++
 
       if (hw >= flagX.current) win()
       else if (y.current > H.current + 80) die()
@@ -163,9 +170,14 @@ export function HerbyRunner({ open, onClose }: { open: boolean; onClose: () => v
       return
     }
     if (statusRef.current !== 'play') return
-    if (onGround.current) {
+    // hop if grounded, or within coyote time after running off an edge (falling,
+    // not rising) — so an edge-tap is a hop, never an accidental carpet
+    const canHop =
+      onGround.current || (sinceGround.current <= COYOTE && vy.current >= 0)
+    if (canHop) {
       vy.current = -JUMP
       onGround.current = false
+      sinceGround.current = 999 // consumed — a follow-up tap is a carpet, not a re-hop
     } else if (!carpetUsed.current && carpetsRef.current > 0) {
       // magic carpet: mid-air save / extend the hop
       vy.current = -JUMP * 0.92
