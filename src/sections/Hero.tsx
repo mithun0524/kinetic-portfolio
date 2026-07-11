@@ -42,10 +42,8 @@ export function Hero({ ready }: { ready: boolean }) {
       line('home?', false)
       line('whose home?', true)
       line("Herby's home.", false, () => m()?.peek())
-      line("who's Herby?", true)
-      tl.call(() => { clear(); m()?.duck() })
-        .to({}, { duration: 1.3 })
-        .call(() => m()?.arrive())
+      // as soon as "who's Herby?" lands, Herby ducks back and drops onto home
+      line("who's Herby?", true, () => { m()?.duck(); gsap.delayedCall(0.9, () => { clear(); m()?.arrive() }) })
     },
     { dependencies: [ready] }
   )
