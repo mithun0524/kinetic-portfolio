@@ -223,30 +223,85 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
     root.current?.releasePointerCapture?.(e.pointerId)
     if (!s.active) return
     s.active = false
-
     if (!s.moved) {
       hop()
       return
     }
+    dropAndFall()
+  }
 
-    // walk back home
-    const x = (gsap.getProperty(drag.current, 'x') as number) || 0
-    const y = (gsap.getProperty(drag.current, 'y') as number) || 0
-    face(x > 0 ? -1 : 1)
-    const dur = gsap.utils.clamp(0.5, 1.8, Math.hypot(x, y) / 180)
-    gsap.to(body.current, { scale: 1, duration: 0.25 })
-    // legs start stepping again for the trip home
-    legTweens.current.forEach((t) => t.resume())
-    gsap.to(drag.current, {
-      x: 0,
-      y: 0,
-      duration: dur,
-      ease: 'power1.inOut',
-      onComplete: () => {
-        if (hovering.current) stopWalking()
-        else startWalking()
-      },
+  // ---- gravity physics ----
+  const feetBottom = () => body.current?.getBoundingClientRect().bottom ?? 0
+  const feetCenterX = () => {
+    const r = body.current?.getBoundingClientRect()
+    return r ? r.left + r.width / 2 : 0
+  }
+
+  const dropAndFall = () => {
+    busy.current = true
+    walkTl.current?.pause()
+    legTweens.current.forEach((t) => t.pause())
+    gsap.to([legL.current, legR.current], { y: 0, duration: 0.15 })
+    gsap.to(body.current, { scale: 1, duration: 0.2 })
+    showHappy(false)
+
+    // find the highest solid surface directly below the feet
+    const startFeet = feetBottom()
+    const fx = feetCenterX()
+    let target = window.innerHeight - 6 // floor fallback
+    document.querySelectorAll<HTMLElement>('[data-solid]').forEach((el) => {
+      const r = el.getBoundingClientRect()
+      if (fx >= r.left && fx <= r.right && r.top >= startFeet - 2 && r.top < target) {
+        target = r.top
+      }
     })
+
+    let v = 0
+    const g = 1.5
+    const fall = () => {
+      v += g
+      const y = (gsap.getProperty(drag.current, 'y') as number) + v
+      gsap.set(drag.current, { y })
+      if (feetBottom() >= target) {
+        const over = feetBottom() - target
+        gsap.set(drag.current, { y: (gsap.getProperty(drag.current, 'y') as number) - over })
+        gsap.ticker.remove(fall)
+        land()
+      }
+    }
+    gsap.ticker.add(fall)
+  }
+
+  const land = () => {
+    gsap
+      .timeline()
+      .to(body.current, { scaleY: 0.7, scaleX: 1.25, transformOrigin: '50% 100%', duration: 0.08 })
+      .to(body.current, { scaleY: 1, scaleX: 1, duration: 0.35, ease: 'elastic.out(1, 0.4)' })
+    // dust sparkle
+    gsap.set(spark.current, { autoAlpha: 1, scale: 0.3, y: 20, transformOrigin: '50% 50%' })
+    gsap.timeline().to(spark.current, { scale: 0.9, y: -6, duration: 0.4, ease: 'power2.out' }).to(spark.current, { autoAlpha: 0, duration: 0.3 }, '-=0.1')
+    gsap.delayedCall(0.5, returnHome)
+  }
+
+  const returnHome = () => {
+    const x = (gsap.getProperty(drag.current, 'x') as number) || 0
+    face(x > 0 ? -1 : 1)
+    legTweens.current.forEach((t) => t.resume())
+    const dur = gsap.utils.clamp(0.4, 1.6, Math.abs(x) / 180)
+    gsap
+      .timeline({
+        onComplete: () => {
+          busy.current = false
+          if (hovering.current) stopWalking()
+          else startWalking()
+        },
+      })
+      // walk under home
+      .to(drag.current, { x: 0, duration: dur, ease: 'power1.inOut' })
+      // hop back up onto the home line
+      .to(body.current, { scaleY: 1.1, scaleX: 0.92, duration: 0.15 }, '<0.05')
+      .to(drag.current, { y: 0, duration: 0.5, ease: 'power2.out' }, '<')
+      .to(body.current, { scaleY: 1, scaleX: 1, duration: 0.3, ease: 'elastic.out(1, 0.4)' }, '-=0.2')
   }
 
   return (

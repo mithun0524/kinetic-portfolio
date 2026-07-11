@@ -76,7 +76,7 @@ export function Hero({ ready }: { ready: boolean }) {
         Full-Stack AI Engineer
       </span>
 
-      <h1 className={`display ${styles.title}`}>
+      <h1 className={`display ${styles.title}`} data-solid>
         <span className={styles.lineMask}>
           <span ref={line1} className={styles.line} style={{ opacity: 0 }}>
             Mithun

@@ -48,7 +48,8 @@ export function Contact() {
       <span className="eyebrow">( Let&apos;s build )</span>
 
       <div className={styles.row}>
-        <h2 className={`display ${styles.line}`}>
+        <h2 className={`display ${styles.line}`} data-solid>
+
           <span className={styles.lineMask}>
             <span ref={l1} className={styles.lineInner}>
               Have something that
@@ -63,7 +64,7 @@ export function Contact() {
 
         {/* ground line the mascot patrols on — beside the headline */}
         <div className={styles.groundWrap}>
-          <span ref={lineRef} className={styles.groundLine} />
+          <span ref={lineRef} className={styles.groundLine} data-solid />
           <Mascot ground range={110} />
         </div>
       </div>
@@ -74,6 +75,7 @@ export function Contact() {
         onClick={() => setFormOpen(true)}
         className={styles.cta}
         data-cursor="grow"
+        data-solid
       >
         <span>Get in touch</span>
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
