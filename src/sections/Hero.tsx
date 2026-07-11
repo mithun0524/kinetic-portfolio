@@ -18,34 +18,39 @@ export function Hero({ ready }: { ready: boolean }) {
   const heroLine = useRef<HTMLSpanElement>(null)
   const cue = useMagnetic<HTMLAnchorElement>(0.6)
   const herby = useRef<MascotHandle>(null)
-  const chatL = useRef<HTMLDivElement>(null)
-  const chatR = useRef<HTMLDivElement>(null)
+  const chat = useRef<HTMLDivElement>(null)
   const introRan = useRef(false)
 
-  // two mystery voices chat about the empty home; Herby peeks at his name
+  // a little chat at the home base — each line slides up; Herby peeks at his name
   useGSAP(
     () => {
       if (!ready || prefersReducedMotion() || introRan.current) return
       introRan.current = true
-      const bub = (el: HTMLDivElement | null, text: string, hold: number) => {
+      let first = true
+      const msg = (text: string) => {
+        const el = chat.current
         if (!el) return
         const s = el.querySelector('span')
-        if (s) s.textContent = text
-        gsap.fromTo(el, { autoAlpha: 0, y: 10, scale: 0.85 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.35, ease: 'back.out(2)' })
-        gsap.to(el, { autoAlpha: 0, duration: 0.3, delay: hold })
+        const enter = () => {
+          if (s) s.textContent = text
+          gsap.fromTo(el, { autoAlpha: 0, y: 18, scale: 0.9, xPercent: -50 }, { autoAlpha: 1, y: 0, scale: 1, xPercent: -50, duration: 0.35, ease: 'back.out(2)' })
+        }
+        if (first) { first = false; enter() }
+        else gsap.to(el, { autoAlpha: 0, y: -18, xPercent: -50, duration: 0.25, ease: 'power2.in', onComplete: enter })
       }
+      const hide = () => gsap.to(chat.current, { autoAlpha: 0, y: -18, xPercent: -50, duration: 0.3 })
       const m = () => herby.current
       gsap
         .timeline({ delay: 1.4 })
-        .call(() => bub(chatL.current, 'home?', 2.4))
-        .to({}, { duration: 3 })
-        .call(() => bub(chatR.current, 'whose home?', 2.4))
-        .to({}, { duration: 3 })
-        .call(() => { bub(chatL.current, "Herby's home.", 2.8); m()?.peek() })
-        .to({}, { duration: 3 })
-        .call(() => bub(chatR.current, "who's Herby?", 2.4))
+        .call(() => msg('home?'))
+        .to({}, { duration: 2.4 })
+        .call(() => msg('whose home?'))
         .to({}, { duration: 2.6 })
-        .call(() => m()?.duck())
+        .call(() => { msg("Herby's home."); m()?.peek() })
+        .to({}, { duration: 2.8 })
+        .call(() => msg("who's Herby?"))
+        .to({}, { duration: 2.6 })
+        .call(() => { hide(); m()?.duck() })
         .to({}, { duration: 1.2 })
         .call(() => m()?.arrive())
     },
@@ -106,12 +111,10 @@ export function Hero({ ready }: { ready: boolean }) {
       <div ref={blob} className={styles.blob} aria-hidden />
 
       <div className={styles.homeWrap}>
+        <div ref={chat} className={styles.homeChat} aria-hidden><span /></div>
         <span className={styles.homeLabel}>HOME</span>
         <span ref={heroLine} className={styles.homeLine} data-solid />
       </div>
-
-      <div ref={chatL} className={`${styles.chat} ${styles.chatL}`} aria-hidden><span /></div>
-      <div ref={chatR} className={`${styles.chat} ${styles.chatR}`} aria-hidden><span /></div>
 
       <Mascot ref={herby} homeRef={heroLine} intro />
 
