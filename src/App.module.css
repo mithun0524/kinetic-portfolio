@@ -1,0 +1,11 @@
+.curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  background: #d97757;
+  transform: scaleY(0);
+  transform-origin: 50% 100%;
+  visibility: hidden;
+  pointer-events: none;
+  will-change: transform;
+}

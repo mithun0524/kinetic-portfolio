@@ -55,11 +55,7 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
   const [ink, setInk] = useState(0)
   const [exitX, setExitX] = useState(200)
   const [ghostArrived, setGhostArrived] = useState(false)
-  const [closing, setClosing] = useState(false)
-  const handleClose = () => {
-    setClosing(true)
-    setTimeout(onClose, 560) // let the wipe play before unmounting
-  }
+  const handleClose = () => onClose() // App plays the shared curtain transition
 
   const linesRef = useRef<Seg[]>([])
   linesRef.current = lines
@@ -280,7 +276,7 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
   useEffect(() => {
     if (!open) return
     buildLevel()
-    setLines([]); setInk(0); setCarpets(CARPETS); setClosing(false)
+    setLines([]); setInk(0); setCarpets(CARPETS);
     resetHerby()
     raf.current = requestAnimationFrame(loop)
     const onResize = () => buildLevel()
@@ -405,7 +401,7 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
   const L = level.current
 
   return (
-    <div className={`${styles.overlay} ${closing ? styles.closing : ''}`}>
+    <div className={styles.overlay}>
       <div className={styles.head}>
         <div>
           <span className="eyebrow">( Play )</span>
