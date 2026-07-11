@@ -309,7 +309,7 @@ function MascotBase(
     // start fully above the top edge, then slide down so only the eyes peek in
     gsap.set(drag.current, { y: `+=${-30 - r.bottom}` })
     gsap.set(facer.current, { autoAlpha: 1 })
-    gsap.to(drag.current, { y: '+=150', duration: 1.1, ease: 'power2.out' })
+    gsap.to(drag.current, { y: '+=118', duration: 1.1, ease: 'power2.out' })
     gsap.killTweensOf([pupilL.current, pupilR.current])
     gsap.fromTo([pupilL.current, pupilR.current], { y: 0 }, { y: 3, duration: 0.9, yoyo: true, repeat: -1, ease: 'sine.inOut', delay: 1.0 })
   }
