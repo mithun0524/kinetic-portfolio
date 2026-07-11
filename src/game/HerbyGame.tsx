@@ -50,7 +50,7 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
 
   const [lines, setLines] = useState<Seg[]>([])
   const [status, setStatus] = useState<'play' | 'won'>('play')
-  const [face, setFace] = useState<'normal' | 'happy' | 'dizzy'>('normal')
+  const [face, setFace] = useState<'normal' | 'happy' | 'dizzy' | 'angry'>('normal')
   const [carpets, setCarpets] = useState(CARPETS)
   const [ink, setInk] = useState(0)
 
@@ -273,9 +273,28 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
 
   // Herby is pokeable but NOT draggable in the game
   const hi = useRef({ down: false, x: 0, y: 0, moved: false })
+  const pokeTimes = useRef<number[]>([])
   const flashFace = (f: 'happy' | 'dizzy') => {
     setFace(f)
-    setTimeout(() => { if (statusRef.current !== 'won') setFace('normal') }, 1000)
+    setTimeout(() => { if (statusRef.current !== 'won' && face !== 'angry') setFace('normal') }, 1000)
+  }
+  // count recent pesters; returns how many in the last 3s
+  const annoy = () => {
+    const t = typeof performance !== 'undefined' ? performance.now() : 0
+    pokeTimes.current.push(t)
+    pokeTimes.current = pokeTimes.current.filter((x) => t - x < 3000)
+    return pokeTimes.current.length
+  }
+  const goAngry = () => {
+    setFace('angry')
+    herbyEl.current?.classList.add(styles.angry)
+    say(pick(['grr! stop it!', '>:( leave me be', 'rude!!', 'hmph!', 'no!! 😠']), true)
+    setTimeout(() => {
+      if (statusRef.current !== 'won') {
+        setFace('normal')
+        herbyEl.current?.classList.remove(styles.angry)
+      }
+    }, 1800)
   }
   const onHerbyEnter = (e: React.PointerEvent) => {
     e.stopPropagation()
@@ -292,20 +311,26 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
     e.stopPropagation()
     if (!hi.current.moved && Math.hypot(e.clientX - hi.current.x, e.clientY - hi.current.y) > 6) {
       hi.current.moved = true
-      say(pick(['no cheating! 😤', 'nice try~', 'i walk myself!', 'no shortcuts!', 'hey!! >:(']), true)
-      flashFace('dizzy')
+      if (annoy() >= 4) goAngry()
+      else {
+        say(pick(['no cheating! 😤', 'nice try~', 'i walk myself!', 'no shortcuts!', 'hey!! >:(']), true)
+        flashFace('dizzy')
+      }
     }
   }
   const onHerbyUp = (e: React.PointerEvent) => {
     e.stopPropagation()
     herbyEl.current?.releasePointerCapture?.(e.pointerId)
     if (hi.current.down && !hi.current.moved) {
-      say(pick(['boop!', 'hehe', 'yay!', 'again!', 'teehee', 'wheee']), true)
-      flashFace('happy')
-      // little jump on poke
-      if (herb.current.mode === 'walk') {
-        herb.current.vy = -10
-        herb.current.mode = 'fall'
+      if (annoy() >= 4) {
+        goAngry()
+      } else {
+        say(pick(['boop!', 'hehe', 'yay!', 'again!', 'teehee', 'wheee']), true)
+        flashFace('happy')
+        if (herb.current.mode === 'walk') {
+          herb.current.vy = -10
+          herb.current.mode = 'fall'
+        }
       }
     }
     hi.current.down = false
@@ -421,6 +446,15 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
                 <g stroke="#20140f" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" fill="none">
                   <path d="M72 90 L92 100 L72 110" />
                   <path d="M128 90 L108 100 L128 110" />
+                </g>
+              ) : face === 'angry' ? (
+                <g>
+                  <g stroke="#20140f" strokeWidth="7" strokeLinecap="round">
+                    <path d="M70 86 L94 96" />
+                    <path d="M130 86 L106 96" />
+                  </g>
+                  <ellipse cx="84" cy="105" rx="7" ry="8" fill="#20140f" />
+                  <ellipse cx="116" cy="105" rx="7" ry="8" fill="#20140f" />
                 </g>
               ) : face === 'dizzy' ? (
                 <g stroke="#20140f" strokeWidth="6" strokeLinecap="round">

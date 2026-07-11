@@ -212,6 +212,17 @@
   opacity: 1;
   box-shadow: 0 4px 14px rgba(150, 190, 255, 0.6);
 }
+/* angry — turns red and shakes when pestered repeatedly */
+.angry .sprite {
+  filter: saturate(3.2) hue-rotate(-22deg) brightness(0.82) drop-shadow(0 0 12px rgba(255, 60, 40, 0.6));
+  animation: herbyAngry 0.22s linear 4;
+}
+@keyframes herbyAngry {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
 .charged .sprite {
   animation: herbyCharge 0.7s linear infinite;
 }
