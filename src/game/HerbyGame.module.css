@@ -177,6 +177,19 @@
   background: var(--chrome);
 }
 
+/* stack the control buttons as an even, aligned column on phones */
+@media (max-width: 640px) {
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+    flex-wrap: nowrap;
+  }
+  .controls button {
+    text-align: center;
+    padding-inline: 1.2rem;
+  }
+}
+
 /* shrink the legend on phones so it takes less of the playfield */
 @media (max-width: 640px) {
   .legend {
