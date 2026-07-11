@@ -361,7 +361,7 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
     return { x: e.clientX - r.left, y: e.clientY - r.top }
   }
   const onDown = (e: React.PointerEvent) => {
-    if (status === 'won' || ink >= INK_MAX) return
+    if (status !== 'play' || ink >= INK_MAX) return
     drawing.current = true
     dstart.current = rel(e)
     area.current?.setPointerCapture(e.pointerId)
