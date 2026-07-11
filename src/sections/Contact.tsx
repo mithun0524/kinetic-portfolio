@@ -13,11 +13,41 @@ export function Contact() {
   const l3 = useRef<HTMLSpanElement>(null)
   const btn = useMagnetic<HTMLButtonElement>(0.5)
   const lineRef = useRef<HTMLSpanElement>(null)
+  const labelRef = useRef<HTMLSpanElement>(null)
   const [formOpen, setFormOpen] = useState(false)
 
   useGSAP(
     () => {
       if (prefersReducedMotion()) return
+
+      // place the home ground-line + label just to the right of "should move?".
+      // measured on the mask (its box doesn't move during the reveal), so the
+      // line lands correctly even before the text has animated in.
+      const place = () => {
+        const line = lineRef.current
+        const label = labelRef.current
+        const el = l3.current
+        const mask = el?.parentElement // overflow mask — its bottom is the static baseline
+        const box = root.current
+        if (!line || !el || !mask || !box) return
+        const cr = box.getBoundingClientRect()
+        // text extent is horizontally correct even mid-reveal (reveal is vertical)
+        const range = document.createRange()
+        range.selectNodeContents(el)
+        const tr = range.getBoundingClientRect()
+        range.detach?.()
+        const mr = mask.getBoundingClientRect()
+        if (tr.width < 10) return
+        const x = tr.right - cr.left + 48
+        const y = mr.bottom - cr.top - 6
+        line.style.left = `${x}px`
+        line.style.top = `${y}px`
+        if (label) {
+          label.style.left = `${x + 95}px`
+          label.style.top = `${y - 26}px`
+        }
+      }
+
       gsap.from([l1.current, l2.current, l3.current], {
         yPercent: 115,
         duration: 1,
@@ -30,25 +60,14 @@ export function Contact() {
         },
       })
 
-      // place the home ground-line just to the right of "should move?"
-      const place = () => {
-        const line = lineRef.current
-        const el = l3.current
-        const box = root.current
-        if (!line || !el || !box) return
-        const cr = box.getBoundingClientRect()
-        const range = document.createRange()
-        range.selectNodeContents(el)
-        const r = range.getBoundingClientRect()
-        range.detach?.()
-        if (r.width < 10) return
-        line.style.left = `${r.right - cr.left + 48}px`
-        line.style.top = `${r.bottom - cr.top - 4}px`
-      }
-      gsap.delayedCall(0.7, place)
-      gsap.delayedCall(1.6, place)
+      gsap.delayedCall(0.5, place)
       window.addEventListener('resize', place)
-      return () => window.removeEventListener('resize', place)
+      const onScroll = () => place()
+      window.addEventListener('scroll', onScroll, { passive: true })
+      return () => {
+        window.removeEventListener('resize', place)
+        window.removeEventListener('scroll', onScroll)
+      }
     },
     { scope: root }
   )
@@ -75,7 +94,8 @@ export function Contact() {
         </span>
       </h2>
 
-      {/* home ground-line beside "should move?" + the buddy that lives on it */}
+      {/* home base beside "should move?" — label + ground line + the buddy */}
+      <span ref={labelRef} className={styles.homeLabel}>HOME</span>
       <span ref={lineRef} className={styles.homeLine} data-solid />
       <Mascot ground homeRef={lineRef} />
 
