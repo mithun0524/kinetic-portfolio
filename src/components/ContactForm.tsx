@@ -13,7 +13,7 @@ export function ContactForm({ open, onClose }: { open: boolean; onClose: () => v
   const root = useRef<HTMLDivElement>(null)
   const panel = useRef<HTMLDivElement>(null)
   const [status, setStatus] = useState<Status>('idle')
-  const [form, setForm] = useState({ name: '', email: '', message: '' })
+  const [form, setForm] = useState({ name: '', email: '', link: '', message: '' })
   const [emailErr, setEmailErr] = useState('')
 
   const validEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())
@@ -79,6 +79,7 @@ export function ContactForm({ open, onClose }: { open: boolean; onClose: () => v
             subject: `Portfolio message from ${form.name}`,
             from_name: form.name,
             email: form.email,
+            link: form.link || '—',
             message: form.message,
           }),
         })
@@ -88,7 +89,8 @@ export function ContactForm({ open, onClose }: { open: boolean; onClose: () => v
       }
     } else {
       // no key: open a prefilled email as a graceful fallback
-      const body = encodeURIComponent(`${form.message}\n\n— ${form.name} (${form.email})`)
+      const linkLine = form.link ? `\nLink: ${form.link}` : ''
+      const body = encodeURIComponent(`${form.message}${linkLine}\n\n— ${form.name} (${form.email})`)
       const subject = encodeURIComponent(`Portfolio message from ${form.name}`)
       window.location.href = `mailto:${EMAIL}?subject=${subject}&body=${body}`
       setStatus('sent')
@@ -96,9 +98,10 @@ export function ContactForm({ open, onClose }: { open: boolean; onClose: () => v
   }
 
   const field = (
-    key: 'name' | 'email' | 'message',
+    key: 'name' | 'email' | 'link' | 'message',
     label: string,
-    type = 'text'
+    type = 'text',
+    optional = false
   ) => (
     <label className={styles.field}>
       <span className={styles.label}>{label}</span>
@@ -120,7 +123,7 @@ export function ContactForm({ open, onClose }: { open: boolean; onClose: () => v
             if (key === 'email' && emailErr) setEmailErr('')
           }}
           aria-invalid={key === 'email' && !!emailErr}
-          required
+          required={!optional}
         />
       )}
       <span className={styles.underline} />
@@ -160,6 +163,7 @@ export function ContactForm({ open, onClose }: { open: boolean; onClose: () => v
 
             {field('name', 'Your name')}
             {field('email', 'Email', 'email')}
+            {field('link', 'Link (optional)', 'url', true)}
             {field('message', 'What should move?')}
 
             <button className={styles.submit} type="submit" data-cursor="grow" disabled={status === 'sending'}>
