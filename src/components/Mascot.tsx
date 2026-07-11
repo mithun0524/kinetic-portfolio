@@ -485,6 +485,10 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
 
     const tl = gsap.timeline({
       onComplete: () => {
+        // hard-reset every offset so it sits exactly on its home line (no drift)
+        gsap.set(drag.current, { x: 0, y: 0 })
+        gsap.set(jump.current, { y: 0 })
+        gsap.set(body.current, { x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0 })
         busy.current = false
         setEmotion('happy', 1.4)
         if (hovering.current) stopWalking()
