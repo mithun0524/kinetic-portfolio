@@ -47,23 +47,25 @@ export function Contact() {
     <footer ref={root} className={`section ${styles.contact}`} id="contact">
       <span className="eyebrow">( Let&apos;s build )</span>
 
-      <h2 className={`display ${styles.line}`}>
-        <span className={styles.lineMask}>
-          <span ref={l1} className={styles.lineInner}>
-            Have something that
+      <div className={styles.row}>
+        <h2 className={`display ${styles.line}`}>
+          <span className={styles.lineMask}>
+            <span ref={l1} className={styles.lineInner}>
+              Have something that
+            </span>
           </span>
-        </span>
-        <span className={styles.lineMask}>
-          <span ref={l2} className={styles.lineInner}>
-            should <span className="chrome-text">move?</span>
+          <span className={styles.lineMask}>
+            <span ref={l2} className={styles.lineInner}>
+              should <span className="chrome-text">move?</span>
+            </span>
           </span>
-        </span>
-      </h2>
+        </h2>
 
-      {/* ground line the mascot patrols on — right under the headline */}
-      <div className={styles.groundWrap}>
-        <span ref={lineRef} className={styles.groundLine} />
-        <Mascot ground range={160} />
+        {/* ground line the mascot patrols on — beside the headline */}
+        <div className={styles.groundWrap}>
+          <span ref={lineRef} className={styles.groundLine} />
+          <Mascot ground range={110} />
+        </div>
       </div>
 
       <button

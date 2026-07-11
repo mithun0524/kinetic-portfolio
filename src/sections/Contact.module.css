@@ -46,10 +46,17 @@
   color: var(--bg);
 }
 
+.row {
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(1.5rem, 5vw, 4rem);
+}
+
 .groundWrap {
   position: relative;
-  height: clamp(120px, 16vh, 180px);
-  margin-top: clamp(1rem, 3vh, 2rem);
+  flex: 1;
+  min-width: 220px;
+  height: clamp(130px, 18vh, 190px);
 }
 
 .groundLine {
