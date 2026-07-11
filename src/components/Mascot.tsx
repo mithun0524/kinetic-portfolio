@@ -284,24 +284,85 @@ export function Mascot({ ground = false, range = 80 }: { ground?: boolean; range
   }
 
   const returnHome = () => {
-    const x = (gsap.getProperty(drag.current, 'x') as number) || 0
-    face(x > 0 ? -1 : 1)
     legTweens.current.forEach((t) => t.resume())
-    const dur = gsap.utils.clamp(0.4, 1.6, Math.abs(x) / 180)
-    gsap
-      .timeline({
-        onComplete: () => {
-          busy.current = false
-          if (hovering.current) stopWalking()
-          else startWalking()
-        },
-      })
-      // walk under home
-      .to(drag.current, { x: 0, duration: dur, ease: 'power1.inOut' })
-      // hop back up onto the home line
-      .to(body.current, { scaleY: 1.1, scaleX: 0.92, duration: 0.15 }, '<0.05')
-      .to(drag.current, { y: 0, duration: 0.5, ease: 'power2.out' }, '<')
-      .to(body.current, { scaleY: 1, scaleX: 1, duration: 0.3, ease: 'elastic.out(1, 0.4)' }, '-=0.2')
+
+    // map between viewport pixels and the drag transform (home = drag 0,0)
+    const dragX0 = (gsap.getProperty(drag.current, 'x') as number) || 0
+    const dragY0 = (gsap.getProperty(drag.current, 'y') as number) || 0
+    const homeFeetX = feetCenterX() - dragX0
+    const homeFeetY = feetBottom() - dragY0
+    const toDragX = (px: number) => px - homeFeetX
+    const toDragY = (py: number) => py - homeFeetY
+
+    const surfaces = Array.from(document.querySelectorAll<HTMLElement>('[data-solid]')).map((el) => {
+      const r = el.getBoundingClientRect()
+      return { left: r.left, right: r.right, top: r.top }
+    })
+
+    let cx = feetCenterX()
+    let cy = feetBottom()
+    const REACH = 260 // how far horizontally it can reach a ledge to hop onto
+
+    const tl = gsap.timeline({
+      onComplete: () => {
+        busy.current = false
+        if (hovering.current) stopWalking()
+        else startWalking()
+      },
+    })
+
+    const walkTo = (px: number) => {
+      const d = Math.abs(px - cx)
+      if (d < 3) return
+      face(px < cx ? -1 : 1)
+      tl.to(drag.current, { x: toDragX(px), duration: gsap.utils.clamp(0.25, 1.2, d / 220), ease: 'power1.inOut' })
+      cx = px
+    }
+    const hopTo = (px: number, py: number) => {
+      face(px < cx ? -1 : 1)
+      const up = Math.max(70, cy - py + 40)
+      tl.to(body.current, { scaleY: 0.8, scaleX: 1.2, transformOrigin: '50% 100%', duration: 0.08 })
+        .to(drag.current, { x: toDragX(px), duration: 0.55, ease: 'power1.inOut' })
+        .to(
+          drag.current,
+          {
+            keyframes: [
+              { y: toDragY(py) - up, duration: 0.26, ease: 'power2.out' },
+              { y: toDragY(py), duration: 0.3, ease: 'power2.in' },
+            ],
+          },
+          '<'
+        )
+        .to(body.current, { scaleY: 1.12, scaleX: 0.9, duration: 0.2 }, '<')
+        .to(body.current, { scaleY: 1, scaleX: 1, duration: 0.3, ease: 'elastic.out(1, 0.4)' })
+      cx = px
+      cy = py
+    }
+
+    // greedy climb: hop ledge-by-ledge up toward home
+    let guard = 0
+    while (guard++ < 14) {
+      if (Math.abs(cy - homeFeetY) < 6) {
+        walkTo(homeFeetX)
+        break
+      }
+      const cands = surfaces.filter(
+        (s) => s.top < cy - 6 && s.top >= homeFeetY - 6 && s.right >= cx - REACH && s.left <= cx + REACH
+      )
+      if (cands.length) {
+        cands.sort((a, b) => b.top - a.top) // smallest climb first
+        const s = cands[0]
+        const targetX = gsap.utils.clamp(s.left + 18, s.right - 18, homeFeetX)
+        walkTo(targetX)
+        hopTo(targetX, s.top)
+      } else {
+        // nothing reachable — one big hop straight home
+        hopTo(homeFeetX, homeFeetY)
+        break
+      }
+    }
+    // guarantee an exact settle at home
+    tl.to(drag.current, { x: 0, y: 0, duration: 0.3, ease: 'power2.out' })
   }
 
   return (
