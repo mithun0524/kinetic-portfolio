@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, type RefObject } from 'react'
 import { gsap, useGSAP, prefersReducedMotion } from '../lib/gsap'
 import styles from './Mascot.module.css'
 
@@ -7,8 +7,9 @@ const SAY: Record<string, string[]> = {
   idle: ['beep!', 'boop~', 'la la la', 'hmm?', 'ooo', '*wiggle*', 'wheee', 'hi hi!', '^-^', 'nyoom', '*hums*'],
   hover: ['hi!', 'you again? ^-^', 'pat pat?', 'ooh a cursor!', 'sup!', '*blinks*', 'hehe~', 'hi friend!', 'boop me!'],
   click: ['boing!', 'wheee!', 'yay!', '*giggles*', 'hop hop!', 'again! again!', 'weee~', 'eee!'],
-  land: ['oof!', 'ta-da!', '*lands*', 'phew~', 'ow- jk!', 'wheee!'],
-  happy: ['yay!', '^-^', 'hehe~', 'wheee', 'so happy!'],
+  climb: ['up we go!', 'climbing!', 'almost home~', 'hup!', 'wooo', '*determined*', 'nearly there!', 'homeward!'],
+  land: ['oof!', 'ta-da!', '*lands*', 'phew~', 'ow- jk!'],
+  happy: ['yay!', '^-^', 'hehe~', 'wheee', 'home!'],
   blush: ['eee~', '>///<', 's-stop it~', '*blush*', 'hehe//', ';///;'],
   angry: ['grr!', 'hey!', 'put me down!', 'no throwing!', '>:(', 'rude!'],
   sad: ['aww…', 'why…', '*sniff*', ':(', 'so far…', 'oof…'],
@@ -18,13 +19,18 @@ const SAY: Record<string, string[]> = {
 const rand = (a: string[]) => a[Math.floor(Math.random() * a.length)]
 
 /**
- * A blocky little buddy (Claude-Code-ish) that ROAMS the page's visible text.
- * It walks along a line of text, hops to nearby text blocks, blinks, chatters,
- * and reacts with moods. Draggable with gravity — drop it onto a word and it
- * grabs it, drop it in space and it falls to the nearest text below, then keeps
- * wandering. Ground = the actual rendered glyphs (never invisible layout boxes).
+ * A blocky buddy that lives at HOME (a visible text line) and paces along it.
+ * Drag it anywhere and it finds its way back home, climbing ledge-by-ledge —
+ * only ever standing on visible text (never invisible layout boxes).
+ * Moods: happy/blush/angry/sad/bored/dizzy. Speech bubbles throughout.
  */
-export function Mascot({ ground = false }: { ground?: boolean } = {}) {
+export function Mascot({
+  ground = false,
+  homeRef,
+}: {
+  ground?: boolean
+  homeRef?: RefObject<HTMLElement | null>
+} = {}) {
   const root = useRef<HTMLDivElement>(null)
   const drag = useRef<HTMLDivElement>(null)
   const jump = useRef<HTMLDivElement>(null)
@@ -48,8 +54,8 @@ export function Mascot({ ground = false }: { ground?: boolean } = {}) {
   const cheeks = useRef<SVGGElement>(null)
 
   const legTweens = useRef<gsap.core.Tween[]>([])
-  const roamTl = useRef<gsap.core.Timeline | null>(null)
-  const roamOn = useRef(true)
+  const patrolTl = useRef<gsap.core.Timeline | null>(null)
+  const walkOn = useRef(true)
   const boredTween = useRef<gsap.core.Tween | null>(null)
   const emoTimer = useRef<gsap.core.Tween | null>(null)
 
@@ -66,6 +72,8 @@ export function Mascot({ ground = false }: { ground?: boolean } = {}) {
 
   const now = () => (typeof performance !== 'undefined' ? performance.now() : 0)
   const recent = (arr: number[], win: number) => arr.filter((t) => now() - t < win).length
+  const getX = () => (gsap.getProperty(drag.current, 'x') as number) || 0
+  const getY = () => (gsap.getProperty(drag.current, 'y') as number) || 0
 
   const face = (dir: number) => gsap.to(facer.current, { scaleX: dir, duration: 0.25, overwrite: 'auto' })
 
@@ -96,7 +104,6 @@ export function Mascot({ ground = false }: { ground?: boolean } = {}) {
     gsap.killTweensOf(cheeks.current)
     gsap.set(cheeks.current, { autoAlpha: name === 'blush' ? 1 : 0 })
   }
-
   const reaction = (name: string) => {
     if (name !== 'bored') {
       boredTween.current?.kill()
@@ -132,7 +139,6 @@ export function Mascot({ ground = false }: { ground?: boolean } = {}) {
         break
     }
   }
-
   const setEmotion = (name: string, hold = 2.2, persist = false) => {
     if (prefersReducedMotion()) return
     emotion.current = name
@@ -148,7 +154,6 @@ export function Mascot({ ground = false }: { ground?: boolean } = {}) {
       })
     }
   }
-
   const resetIdle = () => {
     lastInteract.current = now()
     if (emotion.current === 'bored') {
@@ -161,7 +166,7 @@ export function Mascot({ ground = false }: { ground?: boolean } = {}) {
     }
   }
 
-  // ---- geometry: ground = visible text rects ----
+  // ---- geometry: ground = visible text ----
   const feetBottom = () => body.current?.getBoundingClientRect().bottom ?? 0
   const feetCenterX = () => {
     const r = body.current?.getBoundingClientRect()
@@ -204,85 +209,59 @@ export function Mascot({ ground = false }: { ground?: boolean } = {}) {
     return merged
   }
 
-  // ---- roaming: wander across visible text ----
-  const roamStep = () => {
-    if (!roamOn.current || prefersReducedMotion()) return
+  // home = the visible text line it lives on (or a small ledge at its rest spot)
+  const homeRect = () => {
+    if (homeRef?.current) {
+      const range = document.createRange()
+      range.selectNodeContents(homeRef.current)
+      const r = range.getBoundingClientRect()
+      range.detach?.()
+      if (r.width > 20) return { left: r.left, right: r.right, top: r.top }
+    }
+    const ax = feetCenterX() - getX()
+    const ay = feetBottom() - getY()
+    return { left: ax - 70, right: ax + 70, top: ay }
+  }
+
+  // ---- pace back and forth along home ----
+  const patrol = () => {
+    if (!walkOn.current || prefersReducedMotion()) return
     if (busy.current || drag_.current.active || hovering.current || emotion.current !== 'normal') {
-      gsap.delayedCall(1, roamStep)
+      gsap.delayedCall(1, patrol)
       return
     }
-    const surfs = getSurfaces()
-    if (!surfs.length) {
-      gsap.delayedCall(1.5, roamStep)
-      return
-    }
+    const h = homeRect()
     const fx = feetCenterX()
     const fy = feetBottom()
-    const dx0 = (gsap.getProperty(drag.current, 'x') as number) || 0
-    const dy0 = (gsap.getProperty(drag.current, 'y') as number) || 0
-    const anchorX = fx - dx0
-    const anchorY = fy - dy0
-
-    const onLedge = surfs
-      .filter((s) => fx >= s.left - 30 && fx <= s.right + 30 && Math.abs(fy - s.top) < 34)
-      .sort((a, b) => Math.abs(fy - a.top) - Math.abs(fy - b.top))[0]
-    const nearby = surfs.filter(
-      (s) => s !== onLedge && s.right >= fx - 300 && s.left <= fx + 300 && Math.abs(s.top - fy) < 240 && Math.abs(s.top - fy) > 20
-    )
-
-    let tx: number
-    let ty: number
-    let hop = false
-    if (onLedge && (Math.random() < 0.6 || !nearby.length)) {
-      tx = gsap.utils.random(onLedge.left + 18, onLedge.right - 18)
-      ty = onLedge.top
-    } else if (nearby.length) {
-      const s = nearby[Math.floor(Math.random() * nearby.length)]
-      tx = gsap.utils.random(s.left + 18, s.right - 18)
-      ty = s.top
-      hop = true
-    } else {
-      // floating with no ledge under us — drop to the nearest text below
-      const below = surfs.filter((s) => s.top >= fy - 2 && fx >= s.left - 30 && fx <= s.right + 30).sort((a, b) => a.top - b.top)[0]
-      if (!below) {
-        gsap.delayedCall(1.2, roamStep)
-        return
-      }
-      tx = fx
-      ty = below.top
+    // drifted off home (e.g. layout shift) → walk/climb back
+    if (Math.abs(fy - h.top) > 26) {
+      returnHome()
+      return
     }
-
+    const anchorX = fx - getX()
+    const anchorY = fy - getY()
+    const mid = (h.left + h.right) / 2
+    const tx = fx < mid ? h.right - 18 : h.left + 18
     face(tx < fx ? -1 : 1)
-    const tdx = tx - anchorX
-    const tdy = ty - anchorY
     legTweens.current.forEach((t) => t.resume())
-    const tl = gsap.timeline({
+    patrolTl.current = gsap.timeline({
       onComplete: () => {
-        if (roamOn.current) gsap.delayedCall(0.4 + Math.random() * 1.8, roamStep)
+        if (walkOn.current) gsap.delayedCall(0.5 + Math.random() * 1.6, patrol)
       },
     })
-    roamTl.current = tl
-    if (!hop) {
-      tl.set(drag.current, { y: tdy }, 0)
-      tl.to(drag.current, { x: tdx, duration: gsap.utils.clamp(0.4, 1.8, Math.abs(tx - fx) / 140), ease: 'none' })
-    } else {
-      const up = gsap.utils.clamp(36, 72, fy - ty + 18)
-      tl.to(body.current, { scaleY: 0.82, scaleX: 1.18, transformOrigin: '50% 100%', duration: 0.1, ease: 'power2.in' })
-        .to(drag.current, { x: tdx, duration: 0.34, ease: 'power1.inOut' })
-        .to(drag.current, { keyframes: [{ y: tdy - up, duration: 0.16, ease: 'power2.out' }, { y: tdy, duration: 0.18, ease: 'power2.in' }] }, '<')
-        .to(body.current, { scaleY: 1, scaleX: 1, duration: 0.25, ease: 'elastic.out(1, 0.5)' })
-      if (Math.random() < 0.3) tl.call(() => say(rand(SAY.idle), 1.4))
-    }
+    patrolTl.current
+      .set(drag.current, { y: h.top - anchorY }, 0)
+      .to(drag.current, { x: tx - anchorX, duration: gsap.utils.clamp(0.6, 2.4, Math.abs(tx - fx) / 120), ease: 'none' })
   }
 
   const startWalking = () => {
-    roamOn.current = true
+    walkOn.current = true
     legTweens.current.forEach((t) => t.resume())
-    roamStep()
+    patrol()
   }
   const stopWalking = () => {
-    roamOn.current = false
-    roamTl.current?.kill()
+    walkOn.current = false
+    patrolTl.current?.kill()
     legTweens.current.forEach((t) => t.pause())
     gsap.to([legL.current, legR.current], { y: 0, duration: 0.2, ease: 'power2.out' })
     gsap.to(facer.current, { rotation: 0, duration: 0.2 })
@@ -292,6 +271,14 @@ export function Mascot({ ground = false }: { ground?: boolean } = {}) {
       scaleX: on ? 1.06 : 1, scaleY: on ? 0.94 : 1, rotation: on ? 3 : 0,
       transformOrigin: '50% 100%', duration: 0.5, ease: 'elastic.out(1, 0.4)',
     })
+
+  // place feet exactly on home instantly (no travel)
+  const snapHome = () => {
+    const h = homeRect()
+    const ax = feetCenterX() - getX()
+    const ay = feetBottom() - getY()
+    gsap.set(drag.current, { x: (h.left + h.right) / 2 - ax, y: h.top - ay })
+  }
 
   useGSAP(
     () => {
@@ -326,15 +313,13 @@ export function Mascot({ ground = false }: { ground?: boolean } = {}) {
         })
       }
       antics()
-
       const talk = () => {
-        gsap.delayedCall(6 + Math.random() * 9, () => {
+        gsap.delayedCall(7 + Math.random() * 9, () => {
           if (!drag_.current.active && emotion.current === 'normal') say(rand(SAY.idle))
           talk()
         })
       }
       talk()
-
       const boredCheck = () => {
         gsap.delayedCall(2, () => {
           if (!busy.current && !hovering.current && !drag_.current.active && emotion.current === 'normal' && now() - lastInteract.current > 16000) {
@@ -362,8 +347,11 @@ export function Mascot({ ground = false }: { ground?: boolean } = {}) {
       }
       window.addEventListener('pointermove', onMove)
 
-      // kick off roaming after layout/fonts settle
-      gsap.delayedCall(0.6, () => roamStep())
+      // settle onto home once fonts/layout are ready, then start pacing
+      gsap.delayedCall(0.6, () => {
+        snapHome()
+        patrol()
+      })
       return () => window.removeEventListener('pointermove', onMove)
     },
     { scope: root }
@@ -397,7 +385,6 @@ export function Mascot({ ground = false }: { ground?: boolean } = {}) {
     petTimes.current.push(now())
     if (recent(clickTimes.current, 2000) >= 5) return setEmotion('angry', 2)
     if (recent(petTimes.current, 4000) >= 3) return setEmotion('blush', 2.5)
-
     busy.current = true
     stopWalking()
     showFace('happy')
@@ -419,7 +406,6 @@ export function Mascot({ ground = false }: { ground?: boolean } = {}) {
       .to(body.current, { scaleY: 1.1, scaleX: 0.92, rotation: 6, duration: 0.2 }, '<')
       .to(jump.current, { y: 0, duration: 0.38, ease: 'bounce.out' })
       .to(body.current, { scaleY: 1, scaleX: 1, rotation: 0, duration: 0.3, ease: 'elastic.out(1, 0.4)' }, '-=0.12')
-
     gsap.set(spark.current, { autoAlpha: 1, scale: 0.3, y: 0, transformOrigin: '50% 50%' })
     gsap.timeline().to(spark.current, { scale: 1, y: -34, duration: 0.5, ease: 'power2.out' }).to(spark.current, { autoAlpha: 0, y: -50, duration: 0.3 }, '-=0.15')
   }
@@ -433,8 +419,8 @@ export function Mascot({ ground = false }: { ground?: boolean } = {}) {
     s.moved = false
     s.sx = e.clientX
     s.sy = e.clientY
-    s.ox = (gsap.getProperty(drag.current, 'x') as number) || 0
-    s.oy = (gsap.getProperty(drag.current, 'y') as number) || 0
+    s.ox = getX()
+    s.oy = getY()
     s.shake = 0
     s.lastDir = 0
     s.lastFlip = 0
@@ -444,7 +430,6 @@ export function Mascot({ ground = false }: { ground?: boolean } = {}) {
     stopWalking()
     root.current?.setPointerCapture(e.pointerId)
   }
-
   const onMoveDrag = (e: React.PointerEvent) => {
     const s = drag_.current
     if (!s.active) return
@@ -462,7 +447,6 @@ export function Mascot({ ground = false }: { ground?: boolean } = {}) {
     }
     s.lastX = e.clientX
     s.lastT = t
-
     const dx = e.clientX - s.sx
     const dy = e.clientY - s.sy
     if (!s.moved && Math.hypot(dx, dy) > 4) {
@@ -478,7 +462,6 @@ export function Mascot({ ground = false }: { ground?: boolean } = {}) {
       gsap.set(drag.current, { x: s.ox + dx, y: s.oy + dy })
     }
   }
-
   const onUp = (e: React.PointerEvent) => {
     const s = drag_.current
     root.current?.releasePointerCapture?.(e.pointerId)
@@ -490,14 +473,14 @@ export function Mascot({ ground = false }: { ground?: boolean } = {}) {
     }
     if (s.shake >= 4) setEmotion('dizzy', 2.4)
     else if (s.maxSpeed > 2.2) setEmotion('angry', 2)
-    else if (s.shake === 0 && s.maxSpeed < 0.6 && Math.hypot((gsap.getProperty(drag.current, 'x') as number) || 0, (gsap.getProperty(drag.current, 'y') as number) || 0) > 500) setEmotion('sad', 3)
+    else if (s.maxSpeed < 0.6 && Math.hypot(getX(), getY()) > 520) setEmotion('sad', 3)
     dropAndFall()
   }
 
   const dropAndFall = () => {
     busy.current = true
-    roamOn.current = false
-    roamTl.current?.kill()
+    walkOn.current = false
+    patrolTl.current?.kill()
     legTweens.current.forEach((t) => t.pause())
     gsap.to([legL.current, legR.current], { y: 0, duration: 0.15 })
     if (emotion.current === 'normal') gsap.to(body.current, { scale: 1, duration: 0.2 })
@@ -515,10 +498,7 @@ export function Mascot({ ground = false }: { ground?: boolean } = {}) {
     })
     if (grabTop !== null) {
       const over = feetBottom() - grabTop
-      gsap.to(drag.current, {
-        y: ((gsap.getProperty(drag.current, 'y') as number) || 0) - over,
-        duration: 0.18, ease: 'power2.out', onComplete: land,
-      })
+      gsap.to(drag.current, { y: getY() - over, duration: 0.18, ease: 'power2.out', onComplete: land })
       return
     }
 
@@ -530,11 +510,9 @@ export function Mascot({ ground = false }: { ground?: boolean } = {}) {
     const g = 1.6
     const fall = () => {
       v = Math.min(v + g, 28)
-      const y = (gsap.getProperty(drag.current, 'y') as number) + v
-      gsap.set(drag.current, { y })
+      gsap.set(drag.current, { y: getY() + v })
       if (feetBottom() >= target) {
-        const over = feetBottom() - target
-        gsap.set(drag.current, { y: (gsap.getProperty(drag.current, 'y') as number) - over })
+        gsap.set(drag.current, { y: getY() - (feetBottom() - target) })
         gsap.ticker.remove(fall)
         land()
       }
@@ -549,11 +527,92 @@ export function Mascot({ ground = false }: { ground?: boolean } = {}) {
     gsap.set(spark.current, { autoAlpha: 1, scale: 0.3, y: 20, transformOrigin: '50% 50%' })
     gsap.timeline().to(spark.current, { scale: 0.9, y: -6, duration: 0.4, ease: 'power2.out' }).to(spark.current, { autoAlpha: 0, duration: 0.3 }, '-=0.1')
     if (emotion.current === 'normal') say(rand(SAY.land))
-    gsap.delayedCall(0.5, () => {
-      busy.current = false
-      if (hovering.current) return
-      startWalking() // keep wandering from wherever it landed
+    gsap.delayedCall(0.6, returnHome)
+  }
+
+  // ---- find the way home over visible-text ledges ----
+  const returnHome = () => {
+    legTweens.current.forEach((t) => t.resume())
+    if (emotion.current === 'normal') say(rand(SAY.climb), 2.4)
+
+    gsap.set(jump.current, { y: 0 })
+    gsap.set(facer.current, { x: 0, rotation: 0 })
+    gsap.set(body.current, { x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0 })
+
+    const h = homeRect()
+    const homeFeetX = gsap.utils.clamp(h.left + 18, h.right - 18, (h.left + h.right) / 2)
+    const homeFeetY = h.top
+    const anchorX = feetCenterX() - getX()
+    const anchorY = feetBottom() - getY()
+    const toDX = (px: number) => px - anchorX
+    const toDY = (py: number) => py - anchorY
+
+    const surfaces = getSurfaces()
+    let cx = feetCenterX()
+    let cy = feetBottom()
+    const REACH = 190
+
+    const tl = gsap.timeline({
+      onComplete: () => {
+        gsap.set(drag.current, { x: toDX(homeFeetX), y: toDY(homeFeetY) })
+        gsap.set(jump.current, { y: 0 })
+        gsap.set(body.current, { x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0 })
+        busy.current = false
+        setEmotion('happy', 1.2)
+        if (hovering.current) stopWalking()
+        else startWalking()
+      },
     })
+    const clampX = (s: { left: number; right: number }) => gsap.utils.clamp(s.left + 18, s.right - 18, homeFeetX)
+    const walkTo = (px: number) => {
+      const d = Math.abs(px - cx)
+      if (d < 3) return
+      face(px < cx ? -1 : 1)
+      tl.to(drag.current, { x: toDX(px), duration: gsap.utils.clamp(0.45, 1.6, d / 140), ease: 'none' })
+      cx = px
+    }
+    const hopTo = (px: number, py: number) => {
+      face(px < cx ? -1 : 1)
+      tl.call(() => {
+        if (emotion.current === 'normal' && Math.random() < 0.35) say(rand(SAY.climb), 1.4)
+      })
+      const up = gsap.utils.clamp(36, 72, cy - py + 18)
+      tl.to(body.current, { scaleY: 0.82, scaleX: 1.18, transformOrigin: '50% 100%', duration: 0.1, ease: 'power2.in' })
+        .to(drag.current, { x: toDX(px), duration: 0.34, ease: 'power1.inOut' })
+        .to(drag.current, { keyframes: [{ y: toDY(py) - up, duration: 0.16, ease: 'power2.out' }, { y: toDY(py), duration: 0.18, ease: 'power2.in' }] }, '<')
+        .to(body.current, { scaleY: 1, scaleX: 1, duration: 0.28, ease: 'elastic.out(1, 0.5)' })
+      cx = px
+      cy = py
+    }
+
+    let guard = 0
+    while (guard++ < 26) {
+      if (Math.abs(cy - homeFeetY) < 8) {
+        walkTo(homeFeetX)
+        break
+      }
+      if (homeFeetY > cy + 8) {
+        // home is below — walk over and drop onto it
+        walkTo(homeFeetX)
+        tl.to(drag.current, { y: toDY(homeFeetY), duration: 0.45, ease: 'power2.in' })
+        break
+      }
+      const cands = surfaces.filter((s) => s.top <= cy - 24 && s.top >= homeFeetY - 8 && s.right >= cx - REACH && s.left <= cx + REACH)
+      if (cands.length) {
+        const maxTop = Math.max(...cands.map((c) => c.top))
+        const band = cands.filter((c) => c.top >= maxTop - 70)
+        band.sort((a, b) => Math.abs(clampX(a) - homeFeetX) - Math.abs(clampX(b) - homeFeetX))
+        const s = band[0]
+        const targetX = clampX(s)
+        walkTo(targetX)
+        hopTo(targetX, s.top)
+      } else if (Math.abs(cx - homeFeetX) > 6) {
+        walkTo(homeFeetX)
+      } else {
+        hopTo(homeFeetX, homeFeetY)
+        break
+      }
+    }
   }
 
   return (
@@ -578,19 +637,16 @@ export function Mascot({ ground = false }: { ground?: boolean } = {}) {
               <g ref={spark} fill="var(--m)">
                 <path d="M100 12 L104 26 L118 30 L104 34 L100 48 L96 34 L82 30 L96 26 Z" />
               </g>
-
               <g ref={body}>
                 <rect x="8" y="82" width="22" height="34" rx="2" fill="var(--m)" />
                 <rect x="170" y="82" width="22" height="34" rx="2" fill="var(--m)" />
                 <rect ref={legL} x="62" y="138" width="22" height="30" rx="2" fill="var(--m)" />
                 <rect ref={legR} x="116" y="138" width="22" height="30" rx="2" fill="var(--m)" />
                 <rect x="28" y="52" width="144" height="90" rx="5" fill="var(--m)" />
-
                 <g ref={cheeks}>
                   <ellipse cx="64" cy="114" rx="11" ry="6" fill="#ff8f8f" opacity="0.75" />
                   <ellipse cx="136" cy="114" rx="11" ry="6" fill="#ff8f8f" opacity="0.75" />
                 </g>
-
                 <g ref={eyesOpen}>
                   <ellipse cx="82" cy="97" rx="11" ry="13" fill="#20140f" />
                   <ellipse cx="118" cy="97" rx="11" ry="13" fill="#20140f" />
@@ -601,17 +657,14 @@ export function Mascot({ ground = false }: { ground?: boolean } = {}) {
                     <circle cx="121" cy="94" r="3.2" fill="#fff" />
                   </g>
                 </g>
-
                 <g ref={eyesHappy} stroke="#20140f" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" fill="none">
                   <path d="M72 86 L92 99 L72 112" />
                   <path d="M128 86 L108 99 L128 112" />
                 </g>
-
                 <g ref={faceBlush} stroke="#20140f" strokeWidth="7" strokeLinecap="round" fill="none">
                   <path d="M72 100 Q82 90 92 100" />
                   <path d="M108 100 Q118 90 128 100" />
                 </g>
-
                 <g ref={faceAngry}>
                   <g stroke="#20140f" strokeWidth="7" strokeLinecap="round">
                     <path d="M70 86 L94 96" />
@@ -620,7 +673,6 @@ export function Mascot({ ground = false }: { ground?: boolean } = {}) {
                   <ellipse cx="84" cy="105" rx="7" ry="8" fill="#20140f" />
                   <ellipse cx="116" cy="105" rx="7" ry="8" fill="#20140f" />
                 </g>
-
                 <g ref={faceSad}>
                   <g stroke="#20140f" strokeWidth="7" strokeLinecap="round" fill="none">
                     <path d="M72 96 Q82 108 92 100" />
@@ -628,12 +680,10 @@ export function Mascot({ ground = false }: { ground?: boolean } = {}) {
                   </g>
                   <ellipse cx="86" cy="116" rx="3.5" ry="6" fill="#bfe3ff" />
                 </g>
-
                 <g ref={faceBored} stroke="#20140f" strokeWidth="7" strokeLinecap="round">
                   <path d="M70 100 L94 100" />
                   <path d="M106 100 L130 100" />
                 </g>
-
                 <g ref={faceDizzy} stroke="#20140f" strokeWidth="6" strokeLinecap="round">
                   <path d="M76 92 L92 108" />
                   <path d="M92 92 L76 108" />

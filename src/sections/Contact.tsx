@@ -54,8 +54,8 @@ export function Contact() {
         </span>
       </h2>
 
-      {/* free-roaming buddy — wanders across the visible text of this section */}
-      <Mascot ground />
+      {/* buddy lives on the "should move?" line and finds its way back when dragged */}
+      <Mascot ground homeRef={l3} />
 
       <button
         ref={btn}
