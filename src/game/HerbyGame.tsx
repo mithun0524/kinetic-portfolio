@@ -67,6 +67,14 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
   const raf = useRef(0)
   const statusRef = useRef<'play' | 'won'>('play')
   statusRef.current = status
+  const faceRef = useRef(face)
+  faceRef.current = face
+
+  // aliveness
+  const eyesG = useRef<SVGGElement>(null)
+  const pupilLeft = useRef<SVGCircleElement>(null)
+  const pupilRight = useRef<SVGCircleElement>(null)
+  const cursor = useRef({ x: -9999, y: -9999 })
 
   const say = (text: string) => {
     if (bubbleTxt.current) bubbleTxt.current.textContent = text
@@ -202,8 +210,28 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
       }
     }
 
+    const perf = typeof performance !== 'undefined' ? performance.now() : 0
     if (herbyEl.current) {
-      herbyEl.current.style.transform = `translate(${h.x - 26}px, ${h.y - 46}px) scaleX(${h.face})`
+      const bob = h.mode === 'walk' ? Math.sin(perf * 0.007) * 2 : 0
+      herbyEl.current.style.transform = `translate(${h.x - 26}px, ${h.y - 46 + bob}px) scaleX(${h.face})`
+    }
+    // blink
+    if (eyesG.current) {
+      const tb = perf % 3000
+      const sy = tb < 90 ? 0.12 : 1
+      eyesG.current.setAttribute('transform', `translate(100 97) scale(1 ${sy}) translate(-100 -97)`)
+    }
+    // pupils track the cursor
+    if (faceRef.current === 'normal' && pupilLeft.current && pupilRight.current && herbyEl.current) {
+      const r = herbyEl.current.getBoundingClientRect()
+      const cx = r.left + r.width / 2
+      const cy = r.top + r.height * 0.45
+      const ang = Math.atan2(cursor.current.y - cy, cursor.current.x - cx)
+      const dd = Math.min(Math.hypot(cursor.current.x - cx, cursor.current.y - cy) / 50, 1) * 2.6
+      const ox = Math.cos(ang) * dd * h.face
+      const oy = Math.sin(ang) * dd
+      pupilLeft.current.setAttribute('transform', `translate(${ox} ${oy})`)
+      pupilRight.current.setAttribute('transform', `translate(${ox} ${oy})`)
     }
     raf.current = requestAnimationFrame(loop)
   }
@@ -215,11 +243,14 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
     resetHerby()
     raf.current = requestAnimationFrame(loop)
     const onResize = () => buildLevel()
+    const onCursor = (e: PointerEvent) => { cursor.current = { x: e.clientX, y: e.clientY } }
     window.addEventListener('resize', onResize)
+    window.addEventListener('pointermove', onCursor)
     document.body.style.overflow = 'hidden'
     return () => {
       cancelAnimationFrame(raf.current)
       window.removeEventListener('resize', onResize)
+      window.removeEventListener('pointermove', onCursor)
       document.body.style.overflow = ''
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -333,12 +364,12 @@ export function HerbyGame({ open, onClose }: { open: boolean; onClose: () => voi
                   <path d="M108 92 L124 108" /><path d="M124 92 L108 108" />
                 </g>
               ) : (
-                <>
+                <g ref={eyesG}>
                   <ellipse cx="82" cy="97" rx="11" ry="13" fill="#20140f" />
                   <ellipse cx="118" cy="97" rx="11" ry="13" fill="#20140f" />
-                  <circle cx="85" cy="94" r="3.2" fill="#fff" />
-                  <circle cx="121" cy="94" r="3.2" fill="#fff" />
-                </>
+                  <circle ref={pupilLeft} cx="85" cy="94" r="3.2" fill="#fff" />
+                  <circle ref={pupilRight} cx="121" cy="94" r="3.2" fill="#fff" />
+                </g>
               )}
             </g>
           </svg>
