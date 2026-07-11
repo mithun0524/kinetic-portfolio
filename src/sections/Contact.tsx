@@ -45,7 +45,7 @@ export function Contact({ onPlay }: { onPlay: () => void }) {
         line.style.top = `${y}px`
         if (label) {
           label.style.left = `${x + 95}px`
-          label.style.top = `${y - 26}px`
+          label.style.top = `${y - 40}px`
         }
         if (playRef.current) {
           // just below the home line, aligned with its left edge
