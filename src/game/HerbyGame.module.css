@@ -187,6 +187,11 @@
   .controls button {
     text-align: center;
     padding-inline: 1.2rem;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
   }
 }
 
