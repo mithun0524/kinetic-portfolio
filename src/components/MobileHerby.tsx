@@ -83,9 +83,9 @@ export function MobileHerby() {
     setMood('angry')
     revert.current?.kill()
     const off = (typeof window !== 'undefined' ? window.innerWidth : 800) * 0.85
-    // he loses it — rants, then storms off
+    // he loses it — stomps, shakes, rants, then storms off
     showBubble('okay, that’s IT. 😤')
-    gsap.fromTo(jump.current, { x: -5 }, { x: 5, duration: 0.05, yoyo: true, repeat: 13, onComplete: () => gsap.set(jump.current, { x: 0 }) })
+    furious(true)
     gsap.delayedCall(1.2, () => showBubble('i’m done — stop poking me!'))
     gsap.delayedCall(2.4, () => showBubble('bye. 🙄'))
     gsap.killTweensOf(wrap.current)
@@ -104,6 +104,26 @@ export function MobileHerby() {
       showBubble('…okay, i’m back')
       leaving.current = false
     })
+  }
+
+  // stomping, jittering, puffing-up fury. `hard` = the rage-quit meltdown.
+  const furious = (hard: boolean) => {
+    gsap.killTweensOf([jump.current, body.current])
+    gsap.set(jump.current, { x: 0, y: 0 })
+    const reps = hard ? 46 : 8
+    // fast side-to-side jitter (shaking with rage)
+    gsap.fromTo(
+      jump.current,
+      { x: -6 },
+      { x: 6, duration: 0.05, yoyo: true, repeat: reps, ease: 'none', onComplete: () => gsap.set(jump.current, { x: 0 }) }
+    )
+    // angry stomps + chest-puff, repeated
+    const tl = gsap.timeline({ repeat: hard ? 5 : 1 })
+    tl.to(jump.current, { y: -14, duration: 0.12, ease: 'power2.out' })
+      .to(body.current, { scaleX: 1.16, scaleY: 0.86, transformOrigin: '50% 100%', duration: 0.12 }, '<')
+      .to(jump.current, { y: 0, duration: 0.13, ease: 'power2.in' }) // stomp down
+      .to(body.current, { scaleX: 1, scaleY: 1, duration: 0.16, ease: 'back.out(2)' }, '<')
+      .to({}, { duration: hard ? 0.1 : 0.2 })
   }
 
   const poke = () => {
@@ -126,7 +146,7 @@ export function MobileHerby() {
 
     // motion per mood
     if (m === 'angry') {
-      gsap.fromTo(jump.current, { x: -4 }, { x: 4, duration: 0.05, yoyo: true, repeat: 9, onComplete: () => gsap.set(jump.current, { x: 0 }) })
+      furious(false)
     } else if (m === 'sad') {
       gsap.to(jump.current, { y: 5, duration: 0.4, yoyo: true, repeat: 1, ease: 'power2.out' })
     } else {
@@ -153,6 +173,11 @@ export function MobileHerby() {
         {mood === 'sad' && (
           <div className={`${styles.hearts} ${styles.heartsSad}`} aria-hidden>
             <span>💔</span><span>💧</span><span>💔</span>
+          </div>
+        )}
+        {mood === 'angry' && (
+          <div className={`${styles.hearts} ${styles.heartsAngry}`} aria-hidden>
+            <span>💢</span><span>💢</span>
           </div>
         )}
         <div className={styles.line} />

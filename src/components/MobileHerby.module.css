@@ -65,6 +65,20 @@
   100% { opacity: 0; transform: translateY(-64px) scale(1.05) rotate(8deg); }
 }
 
+/* angry: 💢 marks pop at the top corners, pulsing */
+.heartsAngry span {
+  bottom: auto;
+  top: 8%;
+  animation: angryPop 0.5s ease-out infinite;
+}
+.heartsAngry span:nth-child(1) { left: 12%; font-size: 1.1rem; animation-delay: 0s; }
+.heartsAngry span:nth-child(2) { left: 74%; font-size: 1rem; animation-delay: 0.18s; }
+@keyframes angryPop {
+  0% { opacity: 0; transform: scale(0.4) rotate(-10deg); }
+  40% { opacity: 1; transform: scale(1.1) rotate(6deg); }
+  100% { opacity: 0; transform: scale(0.8) rotate(-4deg); }
+}
+
 /* sad: broken hearts sink and droop instead of rising */
 .heartsSad span {
   bottom: 60%;
