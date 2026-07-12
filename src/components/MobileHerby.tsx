@@ -193,7 +193,8 @@ export function MobileHerby() {
         {showHint && (
           <div className={styles.tapHint} aria-hidden>
             <span className={styles.ripple} />
-            <span className={styles.hand}>👆</span>
+            <span className={`${styles.ripple} ${styles.ripple2}`} />
+            <span className={styles.dot} />
           </div>
         )}
         <div ref={jump} className={styles.jump}>
