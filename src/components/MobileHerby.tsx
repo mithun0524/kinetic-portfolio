@@ -85,7 +85,7 @@ export function MobileHerby() {
     const off = (typeof window !== 'undefined' ? window.innerWidth : 800) * 0.85
     // he loses it — stomps, shakes, rants, then storms off
     showBubble('okay, that’s IT. 😤')
-    furious(true)
+    rage()
     gsap.delayedCall(1.2, () => showBubble('i’m done — stop poking me!'))
     gsap.delayedCall(2.4, () => showBubble('bye. 🙄'))
     gsap.killTweensOf(wrap.current)
@@ -106,24 +106,37 @@ export function MobileHerby() {
     })
   }
 
-  // stomping, jittering, puffing-up fury. `hard` = the rage-quit meltdown.
-  const furious = (hard: boolean) => {
+  // light angry tremble — mostly idle, the 💢 marks carry it
+  const angryTremble = () => {
+    gsap.killTweensOf(jump.current)
+    gsap.fromTo(jump.current, { x: -2.5 }, { x: 2.5, duration: 0.06, yoyo: true, repeat: 5, onComplete: () => gsap.set(jump.current, { x: 0 }) })
+  }
+
+  // rage-quit meltdown: hard stomps + shake the WHOLE screen
+  const rage = () => {
     gsap.killTweensOf([jump.current, body.current])
     gsap.set(jump.current, { x: 0, y: 0 })
-    const reps = hard ? 46 : 8
-    // fast side-to-side jitter (shaking with rage)
-    gsap.fromTo(
-      jump.current,
-      { x: -6 },
-      { x: 6, duration: 0.05, yoyo: true, repeat: reps, ease: 'none', onComplete: () => gsap.set(jump.current, { x: 0 }) }
-    )
-    // angry stomps + chest-puff, repeated
-    const tl = gsap.timeline({ repeat: hard ? 5 : 1 })
-    tl.to(jump.current, { y: -14, duration: 0.12, ease: 'power2.out' })
-      .to(body.current, { scaleX: 1.16, scaleY: 0.86, transformOrigin: '50% 100%', duration: 0.12 }, '<')
-      .to(jump.current, { y: 0, duration: 0.13, ease: 'power2.in' }) // stomp down
+    gsap.fromTo(jump.current, { x: -6 }, { x: 6, duration: 0.05, yoyo: true, repeat: 46, ease: 'none', onComplete: () => gsap.set(jump.current, { x: 0 }) })
+    const tl = gsap.timeline({ repeat: 5 })
+    tl.to(jump.current, { y: -16, duration: 0.12, ease: 'power2.out' })
+      .to(body.current, { scaleX: 1.18, scaleY: 0.84, transformOrigin: '50% 100%', duration: 0.12 }, '<')
+      .to(jump.current, { y: 0, duration: 0.13, ease: 'power2.in' })
       .to(body.current, { scaleX: 1, scaleY: 1, duration: 0.16, ease: 'back.out(2)' }, '<')
-      .to({}, { duration: hard ? 0.1 : 0.2 })
+      .to({}, { duration: 0.1 })
+    screenShake(3)
+  }
+
+  // jolt the whole page, decaying over `dur` seconds
+  const screenShake = (dur: number) => {
+    const el = document.body
+    const steps = Math.floor(dur / 0.05)
+    const tl = gsap.timeline({ onComplete: () => gsap.set(el, { x: 0, y: 0 }) })
+    for (let i = 0; i < steps; i++) {
+      const decay = 1 - i / steps
+      const amp = 9 * decay + 1
+      tl.to(el, { x: (i % 2 ? 1 : -1) * amp, y: (i % 3 ? -1 : 1) * amp * 0.6, duration: 0.05, ease: 'none' })
+    }
+    tl.to(el, { x: 0, y: 0, duration: 0.12 })
   }
 
   const poke = () => {
@@ -146,7 +159,7 @@ export function MobileHerby() {
 
     // motion per mood
     if (m === 'angry') {
-      furious(false)
+      angryTremble()
     } else if (m === 'sad') {
       gsap.to(jump.current, { y: 5, duration: 0.4, yoyo: true, repeat: 1, ease: 'power2.out' })
     } else {
