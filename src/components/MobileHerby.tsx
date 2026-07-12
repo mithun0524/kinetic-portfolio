@@ -26,6 +26,7 @@ export function MobileHerby() {
   const bubble = useRef<HTMLDivElement>(null)
   const taps = useRef<number[]>([])
   const leaving = useRef(false)
+  const tapped = useRef(false)
   const lastMood = useRef<Mood>('normal')
   const revert = useRef<ReturnType<typeof gsap.delayedCall>>()
   const [mood, setMood] = useState<Mood>('normal')
@@ -41,8 +42,13 @@ export function MobileHerby() {
         gsap.delayedCall(2.2 + Math.random() * 1.5, blink)
       }
       gsap.delayedCall(2, blink)
-      // one-time invite
-      gsap.delayedCall(1.6, () => showBubble('tap me!'))
+      // keep nudging "tap me!" until they actually tap him
+      const invite = () => {
+        if (tapped.current) return
+        showBubble('tap me!')
+        gsap.delayedCall(3.4, invite)
+      }
+      gsap.delayedCall(1.6, invite)
     },
     { scope: wrap }
   )
@@ -76,23 +82,22 @@ export function MobileHerby() {
     lastMood.current = 'angry'
     setMood('angry')
     revert.current?.kill()
-    showBubble('that’s it — i’m out! 😤')
+    const off = (typeof window !== 'undefined' ? window.innerWidth : 800) * 0.85
+    // he loses it — rants, then storms off
+    showBubble('okay, that’s IT. 😤')
+    gsap.fromTo(jump.current, { x: -5 }, { x: 5, duration: 0.05, yoyo: true, repeat: 13, onComplete: () => gsap.set(jump.current, { x: 0 }) })
+    gsap.delayedCall(1.2, () => showBubble('i’m done — stop poking me!'))
+    gsap.delayedCall(2.4, () => showBubble('bye. 🙄'))
     gsap.killTweensOf(wrap.current)
-    // storm off to the right
-    gsap.to(wrap.current, {
-      x: (typeof window !== 'undefined' ? window.innerWidth : 800) * 0.8,
-      rotation: 14,
-      duration: 0.9,
-      ease: 'power2.in',
-    })
-    // ...then sheepishly return
-    gsap.delayedCall(6, () => {
+    gsap.to(wrap.current, { x: off, rotation: 14, duration: 0.9, ease: 'power2.in', delay: 3.1 })
+    // ...then sheepishly return later
+    gsap.delayedCall(9, () => {
       taps.current = []
       lastMood.current = 'normal'
       setMood('normal')
       gsap.fromTo(
         wrap.current,
-        { x: (typeof window !== 'undefined' ? window.innerWidth : 800) * 0.8, rotation: 14 },
+        { x: off, rotation: 14 },
         { x: 0, rotation: 0, duration: 0.9, ease: 'power3.out' }
       )
       gsap.to(wrap.current, { y: -6, duration: 1.4, yoyo: true, repeat: -1, ease: 'sine.inOut' })
@@ -103,17 +108,18 @@ export function MobileHerby() {
 
   const poke = () => {
     if (prefersReducedMotion() || leaving.current) return
+    tapped.current = true // stop the "tap me!" nudges
     const now = Date.now()
     taps.current.push(now)
-    taps.current = taps.current.filter((t) => now - t < 2200)
+    taps.current = taps.current.filter((t) => now - t < 2600)
     const rapid = taps.current.length
 
-    if (rapid >= 10) return leave() // last straw — he walks off
+    if (rapid >= 8) return leave() // 8th poke — he loses it and leaves
 
     let m: Mood = 'happy'
-    if (rapid >= 7) m = 'sad' // kept poking after getting mad → he's hurt
-    else if (rapid >= 5) m = 'angry'
-    else if (rapid === 3) m = 'blush'
+    if (rapid >= 7) m = 'sad' // 7 → hurt
+    else if (rapid >= 5) m = 'angry' // 5–6 → angry
+    else if (rapid === 3) m = 'blush' // 3 → blush
 
     setMoodFor(m, m === 'sad' ? 2.6 : m === 'angry' ? 2 : 2.2)
     showBubble(rand(LINES[m]))
