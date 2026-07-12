@@ -31,6 +31,7 @@ export function MobileHerby() {
   const revert = useRef<ReturnType<typeof gsap.delayedCall>>()
   const [mood, setMood] = useState<Mood>('normal')
   const [line, setLine] = useState('')
+  const [showHint, setShowHint] = useState(true)
 
   useGSAP(
     () => {
@@ -42,13 +43,8 @@ export function MobileHerby() {
         gsap.delayedCall(2.2 + Math.random() * 1.5, blink)
       }
       gsap.delayedCall(2, blink)
-      // keep nudging "tap me!" until they actually tap him
-      const invite = () => {
-        if (tapped.current) return
-        showBubble('tap me!')
-        gsap.delayedCall(3.4, invite)
-      }
-      gsap.delayedCall(1.6, invite)
+      // one gentle "tap me!" once; the hand hint carries the rest
+      gsap.delayedCall(1.6, () => { if (!tapped.current) showBubble('tap me!') })
     },
     { scope: wrap }
   )
@@ -141,7 +137,7 @@ export function MobileHerby() {
 
   const poke = () => {
     if (prefersReducedMotion() || leaving.current) return
-    tapped.current = true // stop the "tap me!" nudges
+    if (!tapped.current) { tapped.current = true; setShowHint(false) } // hide the hint on first tap
     const now = Date.now()
     taps.current.push(now)
     taps.current = taps.current.filter((t) => now - t < 2600)
@@ -194,6 +190,19 @@ export function MobileHerby() {
           </div>
         )}
         <div className={styles.line} />
+        {showHint && (
+          <div className={styles.tapHint} aria-hidden>
+            <span className={styles.ripple} />
+            <svg viewBox="0 0 44 52" className={styles.hand}>
+              <g fill="#f3f0ea" stroke="#20140f" strokeWidth="1.5" strokeLinejoin="round">
+                {/* index finger */}
+                <rect x="17" y="4" width="9" height="26" rx="4.5" />
+                {/* palm / folded fingers */}
+                <path d="M17 20c-3 0-5 2-5 5v9c0 7 5 12 12 12h2c7 0 12-5 12-12v-8c0-3-2-4-4-4s-4 1-4 4v-2c0-3-2-4-4-4s-4 1-4 4v-1c0-3-2-4-4-4z" />
+              </g>
+            </svg>
+          </div>
+        )}
         <div ref={jump} className={styles.jump}>
           <svg viewBox="0 0 200 174" className={styles.svg}>
             <g ref={body} fill="#d97757">
