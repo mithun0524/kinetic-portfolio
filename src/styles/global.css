@@ -12,7 +12,10 @@ html {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   background: var(--bg); /* keeps edges dark during the rage screen-shake */
-  overflow-x: hidden; /* screen-shake translates body a few px — no horizontal scrollbar */
+}
+
+body {
+  overflow-x: hidden; /* screen-shake nudges #root a few px — no horizontal scrollbar */
 }
 
 body {

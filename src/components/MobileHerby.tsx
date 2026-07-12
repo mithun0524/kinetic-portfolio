@@ -126,14 +126,18 @@ export function MobileHerby() {
     screenShake(3)
   }
 
-  // jolt the whole page, decaying over `dur` seconds
+  // jolt the whole page, decaying over `dur` seconds.
+  // Shake <main> (the content) — NOT body/html (Lenis controls those) and NOT
+  // #root (would re-anchor the fixed grain/scroll-bar to the document). <main>
+  // moves the content + Herby while leaving the scroll mechanism untouched.
   const screenShake = (dur: number) => {
-    const el = document.body
+    const el = document.querySelector('main')
+    if (!el) return
     const steps = Math.floor(dur / 0.05)
-    const tl = gsap.timeline({ onComplete: () => gsap.set(el, { x: 0, y: 0 }) })
+    const tl = gsap.timeline({ onComplete: () => gsap.set(el, { x: 0, y: 0, clearProps: 'transform' }) })
     for (let i = 0; i < steps; i++) {
       const decay = 1 - i / steps
-      const amp = 9 * decay + 1
+      const amp = 8 * decay + 1
       tl.to(el, { x: (i % 2 ? 1 : -1) * amp, y: (i % 3 ? -1 : 1) * amp * 0.6, duration: 0.05, ease: 'none' })
     }
     tl.to(el, { x: 0, y: 0, duration: 0.12 })
