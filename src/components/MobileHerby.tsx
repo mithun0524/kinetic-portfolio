@@ -193,14 +193,7 @@ export function MobileHerby() {
         {showHint && (
           <div className={styles.tapHint} aria-hidden>
             <span className={styles.ripple} />
-            <svg viewBox="0 0 44 52" className={styles.hand}>
-              <g fill="#f3f0ea" stroke="#20140f" strokeWidth="1.5" strokeLinejoin="round">
-                {/* index finger */}
-                <rect x="17" y="4" width="9" height="26" rx="4.5" />
-                {/* palm / folded fingers */}
-                <path d="M17 20c-3 0-5 2-5 5v9c0 7 5 12 12 12h2c7 0 12-5 12-12v-8c0-3-2-4-4-4s-4 1-4 4v-2c0-3-2-4-4-4s-4 1-4 4v-1c0-3-2-4-4-4z" />
-              </g>
-            </svg>
+            <span className={styles.hand}>👆</span>
           </div>
         )}
         <div ref={jump} className={styles.jump}>
