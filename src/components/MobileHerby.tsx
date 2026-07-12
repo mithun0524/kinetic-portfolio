@@ -31,7 +31,6 @@ export function MobileHerby() {
   const revert = useRef<ReturnType<typeof gsap.delayedCall>>()
   const [mood, setMood] = useState<Mood>('normal')
   const [line, setLine] = useState('')
-  const [showHint, setShowHint] = useState(true)
 
   useGSAP(
     () => {
@@ -43,8 +42,13 @@ export function MobileHerby() {
         gsap.delayedCall(2.2 + Math.random() * 1.5, blink)
       }
       gsap.delayedCall(2, blink)
-      // one gentle "tap me!" once; the hand hint carries the rest
-      gsap.delayedCall(1.6, () => { if (!tapped.current) showBubble('tap me!') })
+      // keep nudging "tap me!" until they actually tap him
+      const invite = () => {
+        if (tapped.current) return
+        showBubble('tap me!')
+        gsap.delayedCall(3.4, invite)
+      }
+      gsap.delayedCall(1.6, invite)
     },
     { scope: wrap }
   )
@@ -137,7 +141,7 @@ export function MobileHerby() {
 
   const poke = () => {
     if (prefersReducedMotion() || leaving.current) return
-    if (!tapped.current) { tapped.current = true; setShowHint(false) } // hide the hint on first tap
+    tapped.current = true // stop the "tap me!" nudges
     const now = Date.now()
     taps.current.push(now)
     taps.current = taps.current.filter((t) => now - t < 2600)
@@ -190,13 +194,6 @@ export function MobileHerby() {
           </div>
         )}
         <div className={styles.line} />
-        {showHint && (
-          <div className={styles.tapHint} aria-hidden>
-            <span className={styles.ripple} />
-            <span className={`${styles.ripple} ${styles.ripple2}`} />
-            <span className={styles.dot} />
-          </div>
-        )}
         <div ref={jump} className={styles.jump}>
           <svg viewBox="0 0 200 174" className={styles.svg}>
             <g ref={body} fill="#d97757">

@@ -108,52 +108,6 @@
   opacity: 0.8;
 }
 
-/* tap hint: a soft touch-pulse over Herby (until first tap) */
-.tapHint {
-  position: absolute;
-  left: 50%;
-  top: 46%;
-  transform: translate(-50%, -50%);
-  z-index: 4;
-  width: 46px;
-  height: 46px;
-  pointer-events: none;
-}
-.dot {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 12px;
-  height: 12px;
-  margin: -6px 0 0 -6px;
-  border-radius: 50%;
-  background: var(--chrome);
-  box-shadow: 0 0 10px rgba(210, 216, 228, 0.6);
-  animation: tapDot 1.3s ease-in-out infinite;
-}
-@keyframes tapDot {
-  0%, 100% { transform: scale(0.85); opacity: 0.85; }
-  50% { transform: scale(1.15); opacity: 1; }
-}
-.ripple {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 46px;
-  height: 46px;
-  margin: -23px 0 0 -23px;
-  border: 2px solid var(--chrome);
-  border-radius: 50%;
-  opacity: 0;
-  animation: tapRipple 1.3s ease-out infinite;
-}
-.ripple2 { animation-delay: 0.5s; }
-@keyframes tapRipple {
-  0% { opacity: 0; transform: scale(0.25); }
-  40% { opacity: 0.65; }
-  100% { opacity: 0; transform: scale(1); }
-}
-
 .bubble {
   position: absolute;
   bottom: 100%;
