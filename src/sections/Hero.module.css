@@ -42,8 +42,9 @@
   margin-bottom: 1.5rem;
   display: flex;
   align-items: center;
-  gap: clamp(1.5rem, 3vw, 3rem);
-  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 100%;
+  gap: 1rem;
 }
 
 .tagInline {
