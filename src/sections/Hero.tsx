@@ -17,7 +17,7 @@ export function Hero({ ready }: { ready: boolean }) {
   const intro = useRef<HTMLParagraphElement>(null)
   const blob = useRef<HTMLDivElement>(null)
   const heroLine = useRef<HTMLSpanElement>(null)
-  const statusPill = useMagnetic<HTMLDivElement>(0.4)
+  const statusPill = useRef<HTMLDivElement>(null)
   const cue = useMagnetic<HTMLAnchorElement>(0.6)
   const herby = useRef<MascotHandle>(null)
   const chat = useRef<HTMLDivElement>(null)
@@ -152,8 +152,8 @@ export function Hero({ ready }: { ready: boolean }) {
             been deep in a terminal coding agent and an AI code editor that runs
             right in the browser.
           </p>
-          <div ref={statusPill} className={styles.styleA} data-cursor="grow" style={{ opacity: 0 }}>
-            [ BLR / 12.97°N · USUALLY ONLINE ]
+          <div ref={statusPill} className={styles.styleA} style={{ opacity: 0 }}>
+            [ BLR · USUALLY ONLINE ]
           </div>
         </div>
         <a ref={cue} href="#work" className={styles.cue} data-cursor="grow" style={{ opacity: 0 }}>
