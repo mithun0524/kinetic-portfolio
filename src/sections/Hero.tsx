@@ -17,6 +17,7 @@ export function Hero({ ready }: { ready: boolean }) {
   const intro = useRef<HTMLParagraphElement>(null)
   const blob = useRef<HTMLDivElement>(null)
   const heroLine = useRef<HTMLSpanElement>(null)
+  const statusPill = useRef<HTMLDivElement>(null)
   const cue = useMagnetic<HTMLAnchorElement>(0.6)
   const herby = useRef<MascotHandle>(null)
   const chat = useRef<HTMLDivElement>(null)
@@ -68,7 +69,7 @@ export function Hero({ ready }: { ready: boolean }) {
         removeMove = () => window.removeEventListener('pointermove', move)
       }
 
-      const targets = [eyebrow.current, line1.current, line2.current, intro.current, cue.current]
+      const targets = [statusPill.current, eyebrow.current, line1.current, line2.current, intro.current, cue.current]
 
       if (prefersReducedMotion()) {
         gsap.set(targets, { opacity: 1 })
@@ -85,7 +86,8 @@ export function Hero({ ready }: { ready: boolean }) {
         gsap.set(targets, { opacity: 1 })
 
         const tl = gsap.timeline({ defaults: { ease: 'power4.out' } })
-        tl.from(eyebrow.current, { y: 20, opacity: 0, duration: 0.6 })
+        tl.from(statusPill.current, { y: -15, opacity: 0, duration: 0.6 })
+          .from(eyebrow.current, { y: 20, opacity: 0, duration: 0.6 }, '-=0.4')
           // each name line slides up from behind its mask
           .from(
             [line1.current, line2.current],
@@ -104,6 +106,11 @@ export function Hero({ ready }: { ready: boolean }) {
   return (
     <header className={styles.hero}>
       <div ref={blob} className={styles.blob} aria-hidden />
+
+      <div ref={statusPill} className={styles.statusPill} style={{ opacity: 0 }}>
+        <span className={styles.pulseDot} aria-hidden />
+        <span>Usually online · BLR</span>
+      </div>
 
       <div className={styles.homeWrap}>
         <div ref={chat} className={styles.homeChat} aria-hidden>
