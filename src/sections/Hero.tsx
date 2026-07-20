@@ -17,7 +17,7 @@ export function Hero({ ready }: { ready: boolean }) {
   const intro = useRef<HTMLParagraphElement>(null)
   const blob = useRef<HTMLDivElement>(null)
   const heroLine = useRef<HTMLSpanElement>(null)
-  const statusPill = useRef<HTMLDivElement>(null)
+  const statusPill = useMagnetic<HTMLDivElement>(0.4)
   const cue = useMagnetic<HTMLAnchorElement>(0.6)
   const herby = useRef<MascotHandle>(null)
   const chat = useRef<HTMLDivElement>(null)
@@ -86,15 +86,19 @@ export function Hero({ ready }: { ready: boolean }) {
         gsap.set(targets, { opacity: 1 })
 
         const tl = gsap.timeline({ defaults: { ease: 'power4.out' } })
-        tl.from(statusPill.current, { y: -15, opacity: 0, duration: 0.6 })
-          .from(eyebrow.current, { y: 20, opacity: 0, duration: 0.6 }, '-=0.4')
+        tl.from(eyebrow.current, { y: 20, opacity: 0, duration: 0.6 })
           // each name line slides up from behind its mask
           .from(
             [line1.current, line2.current],
             { yPercent: 115, duration: 1, stagger: 0.12 },
             '-=0.2'
           )
-          .from(intro.current, { y: 40, opacity: 0, duration: 0.8 }, '-=0.55')
+          .from(intro.current, { y: 35, opacity: 0, duration: 0.8 }, '-=0.55')
+          .from(
+            statusPill.current,
+            { y: 20, opacity: 0, scale: 0.94, duration: 0.7, ease: 'back.out(1.5)' },
+            '-=0.4'
+          )
           .from(cue.current, { opacity: 0, duration: 0.6 }, '-=0.3')
       })
 
@@ -148,7 +152,7 @@ export function Hero({ ready }: { ready: boolean }) {
             been deep in a terminal coding agent and an AI code editor that runs
             right in the browser.
           </p>
-          <div ref={statusPill} className={styles.statusPill} style={{ opacity: 0 }}>
+          <div ref={statusPill} className={styles.statusPill} data-cursor="grow" style={{ opacity: 0 }}>
             <span className={styles.pulseDot} aria-hidden />
             <span>Usually online · BLR</span>
           </div>
