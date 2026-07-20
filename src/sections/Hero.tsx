@@ -152,9 +152,8 @@ export function Hero({ ready }: { ready: boolean }) {
             been deep in a terminal coding agent and an AI code editor that runs
             right in the browser.
           </p>
-          <div ref={statusPill} className={styles.statusPill} data-cursor="grow" style={{ opacity: 0 }}>
-            <span className={styles.pulseDot} aria-hidden />
-            <span>Usually online · BLR</span>
+          <div ref={statusPill} className={styles.styleA} data-cursor="grow" style={{ opacity: 0 }}>
+            [ BLR / 12.97°N · USUALLY ONLINE ]
           </div>
         </div>
         <a ref={cue} href="#work" className={styles.cue} data-cursor="grow" style={{ opacity: 0 }}>
