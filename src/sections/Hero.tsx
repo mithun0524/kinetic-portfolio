@@ -123,7 +123,7 @@ export function Hero({ ready }: { ready: boolean }) {
       <Mascot ref={herby} homeRef={heroLine} intro />
 
       <span ref={eyebrow} className={`eyebrow ${styles.eyebrow}`} style={{ opacity: 0 }}>
-        Full-Stack AI Engineer
+        Full-Stack AI Engineer · Bangalore, India
       </span>
 
       <h1 className={`display ${styles.title}`} data-solid>
@@ -141,9 +141,9 @@ export function Hero({ ready }: { ready: boolean }) {
 
       <div className={styles.meta}>
         <p ref={intro} style={{ opacity: 0 }}>
-          I build AI agents, dev tools and full-stack apps. Lately I&apos;ve
-          been deep in a terminal coding agent and an AI code editor that runs
-          right in the browser.
+          Based in Bangalore, India. I build AI agents, dev tools and full-stack
+          apps. Lately I&apos;ve been deep in a terminal coding agent and an AI
+          code editor that runs right in the browser.
         </p>
         <a ref={cue} href="#work" className={styles.cue} data-cursor="grow" style={{ opacity: 0 }}>
           <span>Scroll</span>
