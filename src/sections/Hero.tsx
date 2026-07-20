@@ -11,13 +11,12 @@ import styles from './Hero.module.css'
  * reveal) -> scroll cue, so it flows straight out of the loader wipe.
  */
 export function Hero({ ready }: { ready: boolean }) {
-  const eyebrow = useRef<HTMLSpanElement>(null)
+  const eyebrow = useRef<HTMLDivElement>(null)
   const line1 = useRef<HTMLSpanElement>(null)
   const line2 = useRef<HTMLSpanElement>(null)
   const intro = useRef<HTMLParagraphElement>(null)
   const blob = useRef<HTMLDivElement>(null)
   const heroLine = useRef<HTMLSpanElement>(null)
-  const statusPill = useRef<HTMLDivElement>(null)
   const cue = useMagnetic<HTMLAnchorElement>(0.6)
   const herby = useRef<MascotHandle>(null)
   const chat = useRef<HTMLDivElement>(null)
@@ -69,7 +68,7 @@ export function Hero({ ready }: { ready: boolean }) {
         removeMove = () => window.removeEventListener('pointermove', move)
       }
 
-      const targets = [statusPill.current, eyebrow.current, line1.current, line2.current, intro.current, cue.current]
+      const targets = [eyebrow.current, line1.current, line2.current, intro.current, cue.current]
 
       if (prefersReducedMotion()) {
         gsap.set(targets, { opacity: 1 })
@@ -94,11 +93,6 @@ export function Hero({ ready }: { ready: boolean }) {
             '-=0.2'
           )
           .from(intro.current, { y: 35, opacity: 0, duration: 0.8 }, '-=0.55')
-          .from(
-            statusPill.current,
-            { y: 20, opacity: 0, scale: 0.94, duration: 0.7, ease: 'back.out(1.5)' },
-            '-=0.4'
-          )
           .from(cue.current, { opacity: 0, duration: 0.6 }, '-=0.3')
       })
 
@@ -128,9 +122,10 @@ export function Hero({ ready }: { ready: boolean }) {
 
       <Mascot ref={herby} homeRef={heroLine} intro />
 
-      <span ref={eyebrow} className={`eyebrow ${styles.eyebrow}`} style={{ opacity: 0 }}>
-        Full-Stack AI Engineer
-      </span>
+      <div ref={eyebrow} className={`eyebrow ${styles.eyebrowRow}`} style={{ opacity: 0 }}>
+        <span>Full-Stack AI Engineer</span>
+        <span className={styles.tagInline}>[ BLR · USUALLY ONLINE ]</span>
+      </div>
 
       <h1 className={`display ${styles.title}`} data-solid>
         <span className={styles.lineMask}>
@@ -146,16 +141,11 @@ export function Hero({ ready }: { ready: boolean }) {
       </h1>
 
       <div className={styles.meta}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', maxWidth: '42ch' }}>
-          <p ref={intro} style={{ opacity: 0 }}>
-            I build AI agents, dev tools and full-stack apps. Lately I&apos;ve
-            been deep in a terminal coding agent and an AI code editor that runs
-            right in the browser.
-          </p>
-          <div ref={statusPill} className={styles.styleA} style={{ opacity: 0 }}>
-            [ BLR · USUALLY ONLINE ]
-          </div>
-        </div>
+        <p ref={intro} style={{ opacity: 0 }}>
+          I build AI agents, dev tools and full-stack apps. Lately I&apos;ve
+          been deep in a terminal coding agent and an AI code editor that runs
+          right in the browser.
+        </p>
         <a ref={cue} href="#work" className={styles.cue} data-cursor="grow" style={{ opacity: 0 }}>
           <span>Scroll</span>
           <svg width="14" height="30" viewBox="0 0 14 30" fill="none">
