@@ -107,11 +107,6 @@ export function Hero({ ready }: { ready: boolean }) {
     <header className={styles.hero}>
       <div ref={blob} className={styles.blob} aria-hidden />
 
-      <div ref={statusPill} className={styles.statusPill} style={{ opacity: 0 }}>
-        <span className={styles.pulseDot} aria-hidden />
-        <span>Usually online · BLR</span>
-      </div>
-
       <div className={styles.homeWrap}>
         <div ref={chat} className={styles.homeChat} aria-hidden>
           {msgs.map((mm, i) => (
@@ -147,11 +142,17 @@ export function Hero({ ready }: { ready: boolean }) {
       </h1>
 
       <div className={styles.meta}>
-        <p ref={intro} style={{ opacity: 0 }}>
-          I build AI agents, dev tools and full-stack apps. Lately I&apos;ve
-          been deep in a terminal coding agent and an AI code editor that runs
-          right in the browser.
-        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', maxWidth: '42ch' }}>
+          <p ref={intro} style={{ opacity: 0 }}>
+            I build AI agents, dev tools and full-stack apps. Lately I&apos;ve
+            been deep in a terminal coding agent and an AI code editor that runs
+            right in the browser.
+          </p>
+          <div ref={statusPill} className={styles.statusPill} style={{ opacity: 0 }}>
+            <span className={styles.pulseDot} aria-hidden />
+            <span>Usually online · BLR</span>
+          </div>
+        </div>
         <a ref={cue} href="#work" className={styles.cue} data-cursor="grow" style={{ opacity: 0 }}>
           <span>Scroll</span>
           <svg width="14" height="30" viewBox="0 0 14 30" fill="none">
