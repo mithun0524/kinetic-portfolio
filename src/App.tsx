@@ -68,6 +68,7 @@ export default function App() {
       <Grain />
       <ScrollProgress />
 
+      <a href="#work" className="sr-only">Skip to main content</a>
       <main>
         <Hero ready={ready} />
         <Marquee />

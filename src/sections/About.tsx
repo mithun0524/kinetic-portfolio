@@ -16,6 +16,7 @@ export function About() {
 
   return (
     <section className={`section ${styles.about}`} id="about">
+      <h2 className="sr-only">About</h2>
       <span className="eyebrow">( About )</span>
       <p ref={statement} className={`display ${styles.statement}`} style={{ opacity: 0 }}>
         I like building things that actually ship. Mostly AI agents, developer

@@ -149,27 +149,27 @@ export function Contact({ onPlay }: { onPlay: () => void }) {
       <div className={styles.meta}>
         <span>© 2026 Mithun Chavan A — Bangalore, India</span>
         <div className={styles.socials}>
-          <a href="https://github.com/mithun0524" target="_blank" rel="noreferrer" data-cursor="grow">
+          <a href="https://github.com/mithun0524" target="_blank" rel="noopener noreferrer" data-cursor="grow">
             GitHub
           </a>
           <a
             href="https://www.linkedin.com/in/mithun-chavan-8b9198254"
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             data-cursor="grow"
           >
             LinkedIn
           </a>
-          <a href="https://x.com/Mithun_Chavan_" target="_blank" rel="noreferrer" data-cursor="grow">
+          <a href="https://x.com/Mithun_Chavan_" target="_blank" rel="noopener noreferrer" data-cursor="grow">
             X
           </a>
-          <a href="https://leetcode.com/mithun0524/" target="_blank" rel="noreferrer" data-cursor="grow">
+          <a href="https://leetcode.com/mithun0524/" target="_blank" rel="noopener noreferrer" data-cursor="grow">
             LeetCode
           </a>
           <a
             href="https://www.codewars.com/users/mithun0524"
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             data-cursor="grow"
           >
             Codewars

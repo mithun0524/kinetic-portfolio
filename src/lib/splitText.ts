@@ -24,7 +24,6 @@ export function splitText(
   const chars: HTMLElement[] = []
 
   el.innerHTML = ''
-  el.setAttribute('aria-label', source)
 
   const rawWords = source.split(/(\s+)/) // keep whitespace tokens
 
@@ -37,7 +36,6 @@ export function splitText(
     const wordEl = document.createElement('span')
     wordEl.className = 'split-word'
     wordEl.style.display = 'inline-block'
-    wordEl.setAttribute('aria-hidden', 'true')
 
     if (type === 'chars') {
       for (const ch of Array.from(token)) {
@@ -61,7 +59,6 @@ export function splitText(
     words,
     revert: () => {
       el.innerHTML = original
-      el.removeAttribute('aria-label')
     },
   }
 }
